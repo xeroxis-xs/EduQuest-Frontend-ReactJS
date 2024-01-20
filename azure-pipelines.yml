@@ -27,8 +27,6 @@ stages:
         displayName: Build
         pool:
           vmImage: $(vmImageName)
-        strategy:
-          maxParallel: 1
         steps:
           - task: ArchiveFiles@2
             displayName: "Archive files"
@@ -53,7 +51,6 @@ stages:
         pool:
           vmImage: $(vmImageName)
         strategy:
-          maxParallel: 1
           runOnce:
             deploy:
               steps:
