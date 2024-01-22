@@ -10,10 +10,10 @@ resources:
 
 variables:
   # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: '13729650-44b5-457d-8095-c83f47b1c6fb'
-  imageRepository: 'image-$(BuildRepositoryName):$(BuildBuildId)'
+  dockerRegistryServiceConnection: '6081e543-f395-476b-b21e-5402b7ec2792'
+  imageRepository: 'image-$(Build.RepositoryName):$(Build.BuildId)'
   containerRegistry: 'ntuleaderboard.azurecr.io'
-  dockerfilePath: 'Dockerfile'
+  dockerfilePath: '$(Build.SourcesDirectory)/Dockerfile'
   tag: '$(Build.BuildId)'
 
   # Agent VM image name
