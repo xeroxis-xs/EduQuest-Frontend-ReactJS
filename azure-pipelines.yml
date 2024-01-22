@@ -11,7 +11,7 @@ resources:
 variables:
   # Container registry service connection established during pipeline creation
   dockerRegistryServiceConnection: '13729650-44b5-457d-8095-c83f47b1c6fb'
-  imageRepository: 'imagebuildrepositorynamebuildbuildid'
+  imageRepository: 'image-$(BuildRepositoryName):$(BuildBuildId)'
   containerRegistry: 'ntuleaderboard.azurecr.io'
   dockerfilePath: 'Dockerfile'
   tag: '$(Build.BuildId)'
