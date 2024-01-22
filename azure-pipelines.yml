@@ -1,69 +1,39 @@
-# Node.js React Web App to Linux on Azure
-# Build a Node.js React app and deploy it to Azure as a Linux web app.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
+# Docker
+# Build and push an image to Azure Container Registry
+# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
 
 trigger:
-  - main
+- main
+
+resources:
+- repo: self
 
 variables:
-  # Azure Resource Manager connection created during pipeline creation
-  azureSubscription: "b36e89f3-9857-4e61-bf27-8c54ab6a6e06"
-
-  # Web app name
-  webAppName: "ntuleaderboard"
-
-  # Environment name
-  environmentName: "ntuleaderboard"
+  # Container registry service connection established during pipeline creation
+  dockerRegistryServiceConnection: '13729650-44b5-457d-8095-c83f47b1c6fb'
+  imageRepository: 'imagebuildrepositorynamebuildbuildid'
+  containerRegistry: 'ntuleaderboard.azurecr.io'
+  dockerfilePath: 'Dockerfile'
+  tag: '$(Build.BuildId)'
 
   # Agent VM image name
-  vmImageName: "ubuntu-latest"
+  vmImageName: 'ubuntu-latest'
 
 stages:
-  - stage: Build
-    displayName: Build stage
-    jobs:
-      - job: Build
-        displayName: Build
-        pool:
-          vmImage: $(vmImageName)
-        steps:
-          - task: ArchiveFiles@2
-            displayName: "Archive files"
-            inputs:
-              rootFolderOrFile: "$(System.DefaultWorkingDirectory)"
-              includeRootFolder: false
-              archiveType: zip
-              archiveFile: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
-              replaceExistingArchive: true
-
-          - upload: $(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip
-            artifact: drop
-
-  - stage: Deploy
-    displayName: Deploy stage
-    dependsOn: Build
-    condition: succeeded()
-    jobs:
-      - deployment: Deploy
-        displayName: Deploy
-        environment: $(environmentName)
-        pool:
-          vmImage: $(vmImageName)
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - task: AzureRmWebAppDeployment@4
-                  displayName: "Azure App Service Deploy: ntuleaderboard"
-                  inputs:
-                    azureSubscription: $(azureSubscription)
-                    appType: webAppLinux
-                    WebAppName: $(webAppName)
-                    packageForLinux: "$(Pipeline.Workspace)/drop/$(Build.BuildId).zip"
-                    RuntimeStack: "NODE|18.17"
-                    StartupCommand: "npm run start"
-                    ScriptType: "Inline Script"
-                    InlineScript: |
-                      npm install
-                      npm run build --if-present
+- stage: Build
+  displayName: Build and push stage
+  jobs:
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - task: Docker@2
+      displayName: Build and push an image to container registry
+      inputs:
+        command: buildAndPush
+        repository: $(imageRepository)
+        dockerfile: $(dockerfilePath)
+        containerRegistry: $(dockerRegistryServiceConnection)
+        tags: |
+          $(tag)
