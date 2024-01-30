@@ -39,3 +39,9 @@ stages:
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(tags)
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: 'Dockerfile'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
