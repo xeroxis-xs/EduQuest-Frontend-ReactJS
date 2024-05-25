@@ -23,14 +23,14 @@ jobs:
       uses: docker/login-action@v2
       with:
         registry: https://eduquestfrontend.azurecr.io/
-        username: ${{ secrets.AzureAppService_ContainerUsername_55b1635e909a4571a51e04174da7bca7 }}
-        password: ${{ secrets.AzureAppService_ContainerPassword_c57fa8dc42454e4bb0e09f237771a89a }}
+        username: ${{ secrets.AzureAppService_ContainerUsername_822ffc751887496590e16db8ee107df5 }}
+        password: ${{ secrets.AzureAppService_ContainerPassword_d51fd7a0a8774dcba2b01a710ea3c530 }}
 
     - name: Build and push container image to registry
       uses: docker/build-push-action@v3
       with:
         push: true
-        tags: eduquestfrontend.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_55b1635e909a4571a51e04174da7bca7 }}/xeroxis-xs/eduquest-frontend-reactjs/main:${{ github.sha }}
+        tags: eduquestfrontend.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_822ffc751887496590e16db8ee107df5 }}/EduQuestFrontend/main:${{ github.sha }}
         file: ./Dockerfile
 
   deploy:
@@ -47,5 +47,5 @@ jobs:
       with:
         app-name: 'EduQuest-Frontend'
         slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_e5416deaa85a477cb30cd42efc5d597f }}
-        images: 'eduquestfrontend.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_55b1635e909a4571a51e04174da7bca7 }}/xeroxis-xs/eduquest-frontend-reactjs/main:${{ github.sha }}'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_91a579367d944e7a93eeb59f69ff22f1 }}
+        images: 'eduquestfrontend.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_822ffc751887496590e16db8ee107df5 }}/EduQuestFrontend/main:${{ github.sha }}'
