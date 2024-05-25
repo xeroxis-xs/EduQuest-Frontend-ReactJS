@@ -1,5 +1,8 @@
 import { createContext, useContext, useEffect, useReducer, useRef } from 'react';
+import { MsalProvider } from "@azure/msal-react";
+import { msalInstance } from "src/msalConfig";
 import PropTypes from 'prop-types';
+
 
 const HANDLERS = {
   INITIALIZE: 'INITIALIZE',
@@ -69,38 +72,24 @@ export const AuthProvider = (props) => {
     if (initialized.current) {
       return;
     }
-
     initialized.current = true;
 
-    let isAuthenticated = false;
+
+    dispatch({
+      type: HANDLERS.INITIALIZE
+    });
 
     try {
-      isAuthenticated = window.sessionStorage.getItem('authenticated') === 'true';
-    } catch (err) {
-      console.error(err);
+      console.log('Initializing MSAL')
+      await msalInstance.initialize();
+    } catch (error) {
+      console.error('MSAL initialization error:', error);
     }
 
-    if (isAuthenticated) {
-      const user = {
-        id: '5e86809283e28b96d2d38537',
-        avatar: '/assets/avatars/avatar-anika-visser.png',
-        name: 'Anika Visser',
-        email: 'anika.visser@devias.io'
-      };
-
-      dispatch({
-        type: HANDLERS.INITIALIZE,
-        payload: user
-      });
-    } else {
-      dispatch({
-        type: HANDLERS.INITIALIZE
-      });
-    }
   };
 
-  useEffect(
-    () => {
+  useEffect(() => {
+      console.log('useEffect')
       initialize();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -127,31 +116,34 @@ export const AuthProvider = (props) => {
     });
   };
 
-  const signIn = async (email, password) => {
-    if (email !== 'demo@devias.io' || password !== 'Password123!') {
-      throw new Error('Please check your email and password');
-    }
 
+  const signIn = async () => {
     try {
-      window.sessionStorage.setItem('authenticated', 'true');
-    } catch (err) {
-      console.error(err);
+      // Use MSAL to sign in
+      const response = await msalInstance.loginPopup();
+      console.log('Sign in response:', response);
+      if (response) {
+        const account = response.account;
+        const user = {
+          id: account.homeAccountId,
+          avatar: '/assets/avatars/avatar-anika-visser.png',
+          name: account.name,
+          email: account.username,
+        };
+        window.sessionStorage.setItem('authenticated', 'true');
+        dispatch({
+          type: HANDLERS.SIGN_IN,
+          payload: user,
+        });
+      }
+
+    } catch (error) {
+      console.error(error);
+      throw new Error('Failed to sign in');
     }
-
-    const user = {
-      id: '5e86809283e28b96d2d38537',
-      avatar: '/assets/avatars/avatar-anika-visser.png',
-      name: 'Anika Visser',
-      email: 'anika.visser@devias.io'
-    };
-
-    dispatch({
-      type: HANDLERS.SIGN_IN,
-      payload: user
-    });
   };
 
-  const signUp = async (email, name, password) => {
+  const signUp = async () => {
     throw new Error('Sign up is not implemented');
   };
 
@@ -162,17 +154,19 @@ export const AuthProvider = (props) => {
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        ...state,
-        skip,
-        signIn,
-        signUp,
-        signOut
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+    <MsalProvider instance={msalInstance}>
+      <AuthContext.Provider
+        value={{
+          ...state,
+          skip,
+          signIn,
+          signUp,
+          signOut
+        }}
+      >
+        {children}
+      </AuthContext.Provider>
+    </MsalProvider>
   );
 };
 

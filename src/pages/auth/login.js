@@ -42,7 +42,7 @@ const Page = () => {
     }),
     onSubmit: async (values, helpers) => {
       try {
-        await auth.signIn(values.email, values.password);
+        await auth.signIn();
         router.push('/');
       } catch (err) {
         helpers.setStatus({ success: false });
@@ -66,6 +66,32 @@ const Page = () => {
     },
     [auth, router]
   );
+
+  const handleLogin = useCallback(
+    async () => {
+      await auth.signIn();
+      router.push('/');
+    },
+    [auth, router]
+  );
+
+  // const handleLogin = async () => {
+  //   try {
+  //     await auth.signIn();
+  //     router.push('/');
+  //   } catch (err) {
+  //     console.log('Error handling login')
+  //     console.error(err);
+  //   }
+  // };
+
+  // const handleLogin = useCallback(
+  //   () => {
+  //     auth.signIn();
+  //     router.push('/');
+  //   },
+  //   [auth, router]
+  // );
 
   return (
     <>
@@ -186,6 +212,14 @@ const Page = () => {
                   onClick={handleSkip}
                 >
                   Skip authentication
+                </Button>
+                <Button
+                  fullWidth
+                  size="large"
+                  sx={{ mt: 3 }}
+                  onClick={handleLogin}
+                >
+                  Login with NTU Account
                 </Button>
                 <Alert
                   color="primary"

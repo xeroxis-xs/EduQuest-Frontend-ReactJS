@@ -36,18 +36,19 @@ export const AuthGuard = (props) => {
           })
           .catch(console.error);
       } else {
+        console.log('Authenticated in auth-guard.js, setting checked to true');
         setChecked(true);
       }
     },
-    [router.isReady]
+    [isAuthenticated, router, router.isReady]
   );
 
   if (!checked) {
     return null;
   }
-
   // If got here, it means that the redirect did not occur, and that tells us that the user is
   // authenticated / authorized.
+  console.log('Authenticated in auth-guard.js, returning children')
 
   return children;
 };
