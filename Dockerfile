@@ -1,23 +1,29 @@
-# Use an official Node.js runtime as a parent image
-FROM node:20-alpine
+# Stage 1: Build the Next.js app
+FROM node:20-alpine AS build
 
-# Set the working directory in the container
-WORKDIR /usr/src/app
+WORKDIR /app
 
-# Copy package.json and package-lock.json to the container
-COPY package*.json ./
-
-# Install app dependencies
+# Install dependencies
+COPY package.json package-lock.json ./
 RUN npm install
 
-# Bundle app source
+# Copy all files and build the project
 COPY . .
-
-# Build the app
 RUN npm run build
 
-# Expose the port your app will run on
-EXPOSE 80
+# Stage 2: Run the Next.js app
+FROM node:20-alpine
 
-# Define the command to run your app
+WORKDIR /app
+
+# Install necessary dependencies
+RUN apk add --no-cache libc6-compat
+
+# Copy the built files from the previous stage
+COPY --from=build /app ./
+
+# Expose the port the app runs on
+EXPOSE 3000
+
+# Start the Next.js app
 CMD ["npm", "start"]
