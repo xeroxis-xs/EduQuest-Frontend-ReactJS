@@ -20,6 +20,7 @@ import { useAuth } from 'src/hooks/use-auth';
 import { Layout as AuthLayout } from 'src/layouts/auth/layout';
 
 const Page = () => {
+  const test = process.env.NEXT_PUBLIC_AZURE_CLIENT_ID;
   const router = useRouter();
   const auth = useAuth();
   const [method, setMethod] = useState('email');
@@ -123,7 +124,7 @@ const Page = () => {
               sx={{ mb: 3 }}
             >
               <Typography variant="h4">
-                Login 1
+                Login 1 {test}
               </Typography>
               <Typography
                 color="text.secondary"

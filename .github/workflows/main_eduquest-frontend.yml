@@ -59,9 +59,9 @@ jobs:
 
       - name: Set environment variables
         run: |
-          echo "NEXT_PUBLIC_AZURE_CLIENT_ID=${{ secrets.NEXT_PUBLIC_AZURE_CLIENT_ID }}" >> .env.production
-          echo "NEXT_PUBLIC_AZURE_TENANT_ID=${{ secrets.NEXT_PUBLIC_AZURE_TENANT_ID }}" >> .env.production
-          echo "NEXT_PUBLIC_AZURE_CLIENT_SECRET=${{ secrets.NEXT_PUBLIC_AZURE_CLIENT_SECRET }}" >> .env.production
+          echo "NEXT_PUBLIC_AZURE_CLIENT_ID=${{ secrets.NEXT_PUBLIC_AZURE_CLIENT_ID }}" >> .env.local
+          echo "NEXT_PUBLIC_AZURE_TENANT_ID=${{ secrets.NEXT_PUBLIC_AZURE_TENANT_ID }}" >> .env.local
+          echo "NEXT_PUBLIC_AZURE_CLIENT_SECRET=${{ secrets.NEXT_PUBLIC_AZURE_CLIENT_SECRET }}" >> .env.local
 
 
       - name: Build and push container image to registry
