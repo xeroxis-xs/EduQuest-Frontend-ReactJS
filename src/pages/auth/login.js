@@ -124,7 +124,7 @@ const Page = () => {
               sx={{ mb: 3 }}
             >
               <Typography variant="h4">
-                Login 1 {test}
+                Login 2 {test}
               </Typography>
               <Typography
                 color="text.secondary"
