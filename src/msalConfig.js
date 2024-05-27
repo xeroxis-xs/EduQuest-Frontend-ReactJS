@@ -4,7 +4,7 @@ export const msalConfig = {
   auth: {
     clientId: process.env.NEXT_PUBLIC_AZURE_CLIENT_ID,
     authority: `https://login.microsoftonline.com/common`,
-    redirectUri: "http://localhost:3000/"
+    redirectUri: process.env.NEXT_PUBLIC_AZURE_REDIRECT_URI
   },
   cache: {
     cacheLocation: "sessionStorage", // This configures where your cache will be stored
