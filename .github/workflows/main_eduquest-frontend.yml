@@ -57,17 +57,17 @@ jobs:
       - name: Lowercase the repo name and username
         run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
 
-#      - name: Set environment variables
-#        run: |
-#          echo "NEXT_PUBLIC_AZURE_CLIENT_ID=${{ secrets.NEXT_PUBLIC_AZURE_CLIENT_ID }}" >> .env.prodcution
+      - name: Set environment variables
+        run: |
+          echo "NEXT_PUBLIC_AZURE_CLIENT_ID=${{ secrets.NEXT_PUBLIC_AZURE_CLIENT_ID }}" > .env.local
 #          echo "NEXT_PUBLIC_AZURE_TENANT_ID=${{ secrets.NEXT_PUBLIC_AZURE_TENANT_ID }}" >> .env.prodcution
 #          echo "NEXT_PUBLIC_AZURE_CLIENT_SECRET=${{ secrets.NEXT_PUBLIC_AZURE_CLIENT_SECRET }}" >> .env.prodcution
 
-      - name: Create .env file
-        uses: SpicyPizza/create-envfile@v2.0.3
-        with:
-          envkey_NEXT_PUBLIC_AZURE_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_AZURE_CLIENT_ID }}
-          file_name: .env
+#      - name: Create .env file
+#        uses: SpicyPizza/create-envfile@v2.0.3
+#        with:
+#          envkey_NEXT_PUBLIC_AZURE_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_AZURE_CLIENT_ID }}
+#          file_name: .env
 
 
       - name: Build and push container image to registry
