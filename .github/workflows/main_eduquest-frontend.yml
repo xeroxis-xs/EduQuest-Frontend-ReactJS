@@ -64,7 +64,7 @@ jobs:
 #          echo "NEXT_PUBLIC_AZURE_CLIENT_SECRET=${{ secrets.NEXT_PUBLIC_AZURE_CLIENT_SECRET }}" >> .env.prodcution
 
       - name: Create .env file
-        uses: SpicyPizza/create-env-file@v2.0.3
+        uses: SpicyPizza/create-envfile@v2.0.3
         with:
           envkey_NEXT_PUBLIC_AZURE_CLIENT_ID: ${{ secrets.NEXT_PUBLIC_AZURE_CLIENT_ID }}
           file_name: .env
