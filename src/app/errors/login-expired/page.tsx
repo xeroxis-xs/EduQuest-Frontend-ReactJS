@@ -6,7 +6,7 @@ import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { ArrowLeft as ArrowLeftIcon } from '@phosphor-icons/react/dist/ssr/ArrowLeft';
-import { SignInButton } from '@/components/auth/sign-in-button';
+// import { SignInButton } from '@/components/auth/sign-in-button';
 
 
 import { config } from '@/config';
