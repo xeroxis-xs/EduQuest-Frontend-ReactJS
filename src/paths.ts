@@ -5,8 +5,12 @@ export const paths = {
     overview: '/dashboard',
     account: '/dashboard/account',
     customers: '/dashboard/customers',
+    wooclap: '/dashboard/wooclap',
     integrations: '/dashboard/integrations',
     settings: '/dashboard/settings',
   },
-  errors: { notFound: '/errors/not-found' },
+  errors: {
+    notFound: '/errors/not-found',
+    loginExpired: '/errors/login-expired',
+  },
 } as const;

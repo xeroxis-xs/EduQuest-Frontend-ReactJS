@@ -17,7 +17,7 @@ export const msalConfig = {
   },
 };
 
-export const API_SCOPE = "User.ReadBasic.All";
+// export const API_SCOPE = "User.ReadBasic.All";
 
 /**
  * Scopes you add here will be prompted for user consent during sign-in.
@@ -26,11 +26,11 @@ export const API_SCOPE = "User.ReadBasic.All";
  * https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-permissions-and-consent#openid-connect-scopes
  */
 export const loginRequest = {
-  scopes: [API_SCOPE]
+  scopes: ["api://778ca789-6293-4ad6-8bae-04fb1a9d9943/.default"]
 };
 
 export const userDataLoginRequest = {
-  scopes: [API_SCOPE]
+  scopes: ["User.Read"]
 };
 /**
  * Add here the scopes to request when obtaining an access token for MS Graph API. For more information, see:

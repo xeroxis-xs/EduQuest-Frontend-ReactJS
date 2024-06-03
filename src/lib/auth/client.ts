@@ -127,7 +127,7 @@ class AuthClient {
     }
 
     const token = generateToken();
-    localStorage.setItem('custom-auth-token', token);
+    localStorage.setItem('access-token', token);
 
     return {};
   }
@@ -151,13 +151,13 @@ class AuthClient {
     // }
     // Make API request
     // logger.debug('getUser() CALLED!')
-    const token = localStorage.getItem('custom-auth-token');
-    logger.debug('custom-auth-token', token)
+    const token = localStorage.getItem('access-token');
+    logger.debug('access-token', token)
 
     if (token !== null) {
 
       const msalUser = msalInstance.getActiveAccount();
-      logger.debug('AccountInfo', msalUser);
+      // logger.debug('AccountInfo', msalUser);
       return { data: msalUser };
       // localStorage.setItem('custom-auth-token', token);
     }
@@ -179,7 +179,7 @@ class AuthClient {
   }
 
   async signOut(): Promise<{ error?: string }> {
-    localStorage.removeItem('custom-auth-token');
+    localStorage.removeItem('access-token');
 
     return {};
   }
@@ -187,7 +187,7 @@ class AuthClient {
   async signOutMsal(): Promise<{ error?: string }> {
     try {
       handleLogout("redirect");
-      localStorage.removeItem('custom-auth-token');
+      localStorage.removeItem('access-token');
       return {};
     } catch (error) {
       const err = error as Error;
