@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import Button from '@mui/material/Button';
 import { MicrosoftOutlookLogo } from '@phosphor-icons/react/dist/ssr/MicrosoftOutlookLogo';
-
+import { paths } from '@/paths';
 import { authClient } from '@/lib/auth/client';
 import { useUser } from '@/hooks/use-user';
 
@@ -21,7 +21,8 @@ export function SignInButton(): React.JSX.Element {
 
       // Refresh the auth state
       await checkSession?.();
-      router.push("/dashboard");
+      // router.replace(paths.dashboard.overview);
+      router.refresh();
     },
       [checkSession, router]
   );

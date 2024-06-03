@@ -11,6 +11,5 @@ export const paths = {
   },
   errors: {
     notFound: '/errors/not-found',
-    loginExpired: '/errors/login-expired',
   },
 } as const;

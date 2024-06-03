@@ -13,6 +13,7 @@ export async function initializeMsal() : Promise<void>{
   const accounts = msalInstance.getAllAccounts();
   if (accounts.length > 0) {
     msalInstance.setActiveAccount(accounts[0]);
+
   }
 
   const loginResponse = await msalInstance.handleRedirectPromise();
@@ -69,7 +70,7 @@ export async function getToken(): Promise<string | null> {
       });
       return response.accessToken;
     }
-    logger.error('No accounts found.');
+    logger.debug('No accounts found.');
     return null;
   } catch (error) {
     logger.error('Token acquisition failed.', error);

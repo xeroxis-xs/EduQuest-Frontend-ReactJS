@@ -14,13 +14,14 @@ import type { WooclapUser } from '@/types/wooclap-user';
 import apiService from "@/api/api-service";
 import { type AxiosResponse } from "axios";
 import { logger } from '@/lib/default-logger'
+import {authClient} from "@/lib/auth/client";
 
 function applyPagination(rows: WooclapUser[], page: number, rowsPerPage: number): WooclapUser[] {
   return rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 }
 
 export default function Page(): React.JSX.Element {
-  const router = useRouter();
+  // const router = useRouter();
   const page = 0;
   const rowsPerPage = 5;
   const [wooclapUsers, setWooclapUsers] = React.useState<WooclapUser[]>([]);
@@ -38,8 +39,9 @@ export default function Page(): React.JSX.Element {
       // } else {
       //   logger.error(error);
       // }
+      await authClient.signInWithMsal();
       logger.error(error);
-      router.push('/errors/login-expired');
+      // router.replace('/errors/login-expired');
     }
   };
 

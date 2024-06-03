@@ -7,16 +7,16 @@ import {
   // getToken,
   msalInstance,
   // handleLoginPopupNew,
-  handleLoginRedirectNew
+  handleLoginRedirectNew, getToken
 } from "@/app/msal/msal";
 import { logger } from '@/lib/default-logger';
 import { type AccountInfo } from "@azure/msal-browser";
 
-function generateToken(): string {
-  const arr = new Uint8Array(12);
-  window.crypto.getRandomValues(arr);
-  return Array.from(arr, (v) => v.toString(16).padStart(2, '0')).join('');
-}
+// function generateToken(): string {
+//   const arr = new Uint8Array(12);
+//   window.crypto.getRandomValues(arr);
+//   return Array.from(arr, (v) => v.toString(16).padStart(2, '0')).join('');
+// }
 
 // const user = {
 //   id: 'USR-000',
@@ -26,43 +26,43 @@ function generateToken(): string {
 //   email: 'sofia@devias.io',
 // } satisfies User;
 
-export interface SignUpParams {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-}
-
-export interface SignInWithOAuthParams {
-  provider: 'google' | 'discord';
-}
-
-export interface SignInWithPasswordParams {
-  email: string;
-  password: string;
-}
-
-export interface ResetPasswordParams {
-  email: string;
-}
+// export interface SignUpParams {
+//   firstName: string;
+//   lastName: string;
+//   email: string;
+//   password: string;
+// }
+//
+// export interface SignInWithOAuthParams {
+//   provider: 'google' | 'discord';
+// }
+//
+// export interface SignInWithPasswordParams {
+//   email: string;
+//   password: string;
+// }
+//
+// export interface ResetPasswordParams {
+//   email: string;
+// }
 
 
 
 class AuthClient {
 
-  async signUp(_: SignUpParams): Promise<{ error?: string }> {
-    // Make API request
+  // async signUp(_: SignUpParams): Promise<{ error?: string }> {
+  //   // Make API request
+  //
+  //   // We do not handle the API, so we'll just generate a token and store it in localStorage.
+  //   const token = generateToken();
+  //   localStorage.setItem('custom-auth-token', token);
+  //
+  //   return {};
+  // }
 
-    // We do not handle the API, so we'll just generate a token and store it in localStorage.
-    const token = generateToken();
-    localStorage.setItem('custom-auth-token', token);
-
-    return {};
-  }
-
-  async signInWithOAuth(_: SignInWithOAuthParams): Promise<{ error?: string }> {
-    return { error: 'Social authentication not implemented' };
-  }
+  // async signInWithOAuth(_: SignInWithOAuthParams): Promise<{ error?: string }> {
+  //   return { error: 'Social authentication not implemented' };
+  // }
 
   async signInWithMsal(): Promise<{ error?: string }> {
     // try {
@@ -83,6 +83,12 @@ class AuthClient {
     // }
     try {
       // logger.debug('signInWithMsal');
+      localStorage.removeItem('access-token');
+      msalInstance.setActiveAccount(null);
+      // const token = await getToken();
+      // if (token !== null) {
+      //   localStorage.setItem('access-token', token);
+      // }
       await handleLoginRedirectNew();
       return {};
     } catch (error) {
@@ -116,29 +122,29 @@ class AuthClient {
     // }
   }
 
-  async signInWithPassword(params: SignInWithPasswordParams): Promise<{ error?: string }> {
-    const { email, password } = params;
+  // async signInWithPassword(params: SignInWithPasswordParams): Promise<{ error?: string }> {
+  //   const { email, password } = params;
+  //
+  //   // Make API request
+  //
+  //   // We do not handle the API, so we'll check if the credentials match with the hardcoded ones.
+  //   if (email !== 'sofia@devias.io' || password !== 'Secret1') {
+  //     return { error: 'Invalid credentials' };
+  //   }
+  //
+  //   const token = generateToken();
+  //   localStorage.setItem('access-token', token);
+  //
+  //   return {};
+  // }
 
-    // Make API request
-
-    // We do not handle the API, so we'll check if the credentials match with the hardcoded ones.
-    if (email !== 'sofia@devias.io' || password !== 'Secret1') {
-      return { error: 'Invalid credentials' };
-    }
-
-    const token = generateToken();
-    localStorage.setItem('access-token', token);
-
-    return {};
-  }
-
-  async resetPassword(_: ResetPasswordParams): Promise<{ error?: string }> {
-    return { error: 'Password reset not implemented' };
-  }
-
-  async updatePassword(_: ResetPasswordParams): Promise<{ error?: string }> {
-    return { error: 'Update reset not implemented' };
-  }
+  // async resetPassword(_: ResetPasswordParams): Promise<{ error?: string }> {
+  //   return { error: 'Password reset not implemented' };
+  // }
+  //
+  // async updatePassword(_: ResetPasswordParams): Promise<{ error?: string }> {
+  //   return { error: 'Update reset not implemented' };
+  // }
 
   async getUser(): Promise<{ data: AccountInfo | null; error?: string }> {
     // const response = await msalInstance.handleRedirectPromise();
@@ -178,11 +184,11 @@ class AuthClient {
 
   }
 
-  async signOut(): Promise<{ error?: string }> {
-    localStorage.removeItem('access-token');
-
-    return {};
-  }
+  // async signOut(): Promise<{ error?: string }> {
+  //   localStorage.removeItem('access-token');
+  //
+  //   return {};
+  // }
 
   async signOutMsal(): Promise<{ error?: string }> {
     try {
