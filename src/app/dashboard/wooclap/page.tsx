@@ -1,6 +1,5 @@
 "use client"
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
@@ -21,7 +20,6 @@ function applyPagination(rows: WooclapUser[], page: number, rowsPerPage: number)
 }
 
 export default function Page(): React.JSX.Element {
-  // const router = useRouter();
   const page = 0;
   const rowsPerPage = 5;
   const [wooclapUsers, setWooclapUsers] = React.useState<WooclapUser[]>([]);

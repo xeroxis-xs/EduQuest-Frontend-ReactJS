@@ -7,7 +7,7 @@ import {
   // getToken,
   msalInstance,
   // handleLoginPopupNew,
-  handleLoginRedirectNew, getToken
+  handleLoginRedirectNew
 } from "@/app/msal/msal";
 import { logger } from '@/lib/default-logger';
 import { type AccountInfo } from "@azure/msal-browser";
