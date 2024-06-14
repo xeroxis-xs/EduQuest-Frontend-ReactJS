@@ -27,19 +27,12 @@ export default function Page(): React.JSX.Element {
 
   const getWooclapUser = async (): Promise<void> => {
     try {
-      const response: AxiosResponse<WooclapUser[]> = await apiService.get<WooclapUser[]>('/api/WooclapUsers/');
+      const response: AxiosResponse<WooclapUser[]> = await apiService.get<WooclapUser[]>('/api/WooclapUser/');
       const data: WooclapUser[] = response.data;
       setWooclapUsers(data);
     } catch (error: unknown) {
-      // if (axios.isAxiosError(error)) {
-      //   logger.error(error.response?.data);
-      //   // Handle specific axios errors here if necessary
-      // } else {
-      //   logger.error(error);
-      // }
       await authClient.signInWithMsal();
       logger.error(error);
-      // router.replace('/errors/login-expired');
     }
   };
 
