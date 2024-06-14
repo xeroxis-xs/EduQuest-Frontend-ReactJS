@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography';
 import { Download as DownloadIcon } from '@phosphor-icons/react/dist/ssr/Download';
 import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
 import { Upload as UploadIcon } from '@phosphor-icons/react/dist/ssr/Upload';
+import { XCircle as XCircleIcon } from '@phosphor-icons/react/dist/ssr/XCircle';
 
 import { WooclapUserFilters } from '@/components/dashboard/wooclap/wooclap-user-filters';
 import { WooclapUserTable } from '@/components/dashboard/wooclap/wooclap-user-table';
@@ -14,6 +15,7 @@ import apiService from "@/api/api-service";
 import { type AxiosResponse } from "axios";
 import { logger } from '@/lib/default-logger'
 import {authClient} from "@/lib/auth/client";
+import { WooclapUserForm } from "@/components/dashboard/wooclap/wooclap-user-form";
 
 function applyPagination(rows: WooclapUser[], page: number, rowsPerPage: number): WooclapUser[] {
   return rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
@@ -24,6 +26,11 @@ export default function Page(): React.JSX.Element {
   const rowsPerPage = 5;
   const [wooclapUsers, setWooclapUsers] = React.useState<WooclapUser[]>([]);
   const [paginatedWooclapUsers, setPaginatedWooclapUsers] = React.useState<WooclapUser[]>([]);
+  const [showForm, setShowForm] = React.useState(false);
+
+  const toggleForm = (): void => {
+    setShowForm(!showForm);
+  };
 
   const getWooclapUser = async (): Promise<void> => {
     try {
@@ -65,11 +72,12 @@ export default function Page(): React.JSX.Element {
           </Stack>
         </Stack>
         <div>
-          <Button startIcon={<PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained">
-            Add
+          <Button startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
+            {showForm ? 'Close' : 'Add'}
           </Button>
         </div>
       </Stack>
+      {showForm && <WooclapUserForm />} {/* Conditional rendering */}
       <WooclapUserFilters />
       <WooclapUserTable
         count={paginatedWooclapUsers.length}
