@@ -17,15 +17,8 @@ import { logger } from '@/lib/default-logger'
 import {authClient} from "@/lib/auth/client";
 import { EduquestUserForm } from "@/components/dashboard/eduquest-user/eduquest-user-form";
 
-function applyPagination(rows: EduquestUser[], page: number, rowsPerPage: number): EduquestUser[] {
-  return rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-}
-
 export default function Page(): React.JSX.Element {
-  const page = 0;
-  const rowsPerPage = 5;
   const [eduquestUsers, setEduquestUsers] = React.useState<EduquestUser[]>([]);
-  const [paginatedEduquestUsers, setPaginatedEduquestUsers] = React.useState<EduquestUser[]>([]);
   const [showForm, setShowForm] = React.useState(false);
 
   const toggleForm = (): void => {
@@ -44,7 +37,7 @@ export default function Page(): React.JSX.Element {
   };
 
   React.useEffect(() => {
-    const fetchData = async () => {
+    const fetchData = async (): Promise<void> => {
       await getEduquestUser();
     };
 
@@ -52,10 +45,6 @@ export default function Page(): React.JSX.Element {
       logger.error('Failed to fetch data', error);
     });
   }, []);
-
-  React.useEffect(() => {
-    setPaginatedEduquestUsers(applyPagination(eduquestUsers, page, rowsPerPage));
-  }, [eduquestUsers]);
 
   return (
     <Stack spacing={3}>
@@ -79,12 +68,7 @@ export default function Page(): React.JSX.Element {
       </Stack>
       {showForm && <EduquestUserForm />} {/* Conditional rendering */}
       <EduquestUserFilters />
-      <EduquestUserTable
-        count={paginatedEduquestUsers.length}
-        page={page}
-        rows={paginatedEduquestUsers}
-        rowsPerPage={rowsPerPage}
-      />
+      <EduquestUserTable rows={eduquestUsers} />
     </Stack>
   );
 }

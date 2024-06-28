@@ -16,23 +16,12 @@ import { useSelection } from '@/hooks/use-selection';
 
 import type { Course } from '@/types/course';
 
-function noop(): void {
-  // do nothing
-}
-
-
 interface CourseTableProps {
-  count?: number;
-  page?: number;
   rows?: Course[];
-  rowsPerPage?: number;
 }
 
 export function CourseTable({
-  count = 0,
   rows = [],
-  page = 0,
-  rowsPerPage = 0,
 }: CourseTableProps): React.JSX.Element {
   const rowIds = React.useMemo(() => {
     return rows.map((course) => course.id);
@@ -42,7 +31,22 @@ export function CourseTable({
 
   const selectedSome = (selected?.size ?? 0) > 0 && (selected?.size ?? 0) < rows.length;
   const selectedAll = rows.length > 0 && selected?.size === rows.length;
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
+  const handleChangePage = (
+    event: React.MouseEvent<HTMLButtonElement> | null,
+    newPage: number,
+  ): void => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ): void => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
   return (
     <Card>
       <Box sx={{ overflowX: 'auto' }}>
@@ -70,7 +74,7 @@ export function CourseTable({
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((row) => {
+            {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
               const isSelected = selected?.has(row.id);
 
               return (
@@ -101,9 +105,9 @@ export function CourseTable({
       <Divider />
       <TablePagination
         component="div"
-        count={count}
-        onPageChange={noop}
-        onRowsPerPageChange={noop}
+        count={rows.length}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
         page={page}
         rowsPerPage={rowsPerPage}
         rowsPerPageOptions={[5, 10, 25]}

@@ -17,15 +17,8 @@ import { logger } from '@/lib/default-logger'
 import { authClient } from "@/lib/auth/client";
 import { CourseForm } from "@/components/dashboard/course/course-form";
 
-function applyPagination(rows: Course[], page: number, rowsPerPage: number): Course[] {
-  return rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-}
-
 export default function Page(): React.JSX.Element {
-  const page = 0;
-  const rowsPerPage = 5;
   const [courses, setCourses] = React.useState<Course[]>([]);
-  const [paginatedCourses, setPaginatedCourses] = React.useState<Course[]>([]);
   const [showForm, setShowForm] = React.useState(false);
 
   const toggleForm = (): void => {
@@ -45,7 +38,7 @@ export default function Page(): React.JSX.Element {
   };
 
   React.useEffect(() => {
-    const fetchData = async () => {
+    const fetchData = async (): Promise<void> => {
       await getCourse();
     };
 
@@ -54,9 +47,9 @@ export default function Page(): React.JSX.Element {
     });
   }, []);
 
-  React.useEffect(() => {
-    setPaginatedCourses(applyPagination(courses, page, rowsPerPage));
-  }, [courses]);
+  // React.useEffect(() => {
+  //   setPaginatedCourses(applyPagination(courses, page, rowsPerPage));
+  // }, [courses]);
 
   return (
     <Stack spacing={3}>
@@ -80,11 +73,11 @@ export default function Page(): React.JSX.Element {
       </Stack>
       {showForm && <CourseForm />} {/* Conditional rendering */}
       <CourseFilters />
-      <CourseTable
-        count={paginatedCourses.length}
-        page={page}
-        rows={paginatedCourses}
-        rowsPerPage={rowsPerPage}
+      <CourseTable rows={courses}
+        // count={paginatedCourses.length}
+        // page={page}
+        // rows={paginatedCourses}
+        // rowsPerPage={rowsPerPage}
       />
     </Stack>
   );
