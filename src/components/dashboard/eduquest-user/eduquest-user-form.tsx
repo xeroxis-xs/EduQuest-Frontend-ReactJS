@@ -14,7 +14,7 @@ import OutlinedInput from '@mui/material/OutlinedInput';
 // import Select from '@mui/material/Select';
 import Grid from '@mui/material/Unstable_Grid2';
 // import type {AxiosResponse} from "axios";
-import type {WooclapUser} from "@/types/wooclap-user";
+import type {EduquestUser} from "@/types/eduquest-user";
 import apiService from "@/api/api-service";
 import {authClient} from "@/lib/auth/client";
 import {logger} from "@/lib/default-logger";
@@ -25,7 +25,7 @@ import {logger} from "@/lib/default-logger";
 //   { value: 'admin', label: 'Admin' },
 // ] as const;
 
-export function WooclapUserForm(): React.JSX.Element {
+export function EduquestUserForm(): React.JSX.Element {
   const [email, setEmail] = React.useState('');
   const [username, setUsername] = React.useState('');
   const [firstName, setFirstName] = React.useState('');
@@ -34,7 +34,7 @@ export function WooclapUserForm(): React.JSX.Element {
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
 
-    const newUser: Partial<WooclapUser> = {
+    const newUser: Partial<EduquestUser> = {
       email,
       username,
       first_name: firstName,
@@ -42,7 +42,7 @@ export function WooclapUserForm(): React.JSX.Element {
     };
 
     try {
-      await apiService.post('/api/WooclapUser/', newUser);
+      await apiService.post('/api/EduquestUser/', newUser);
       logger.debug('User added successfully');
     } catch (error: unknown) {
       await authClient.signInWithMsal();

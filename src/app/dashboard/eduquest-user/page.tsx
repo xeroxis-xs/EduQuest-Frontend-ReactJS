@@ -8,35 +8,35 @@ import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
 import { Upload as UploadIcon } from '@phosphor-icons/react/dist/ssr/Upload';
 import { XCircle as XCircleIcon } from '@phosphor-icons/react/dist/ssr/XCircle';
 
-import { WooclapUserFilters } from '@/components/dashboard/wooclap/wooclap-user-filters';
-import { WooclapUserTable } from '@/components/dashboard/wooclap/wooclap-user-table';
-import type { WooclapUser } from '@/types/wooclap-user';
+import { EduquestUserFilters } from '@/components/dashboard/eduquest-user/eduquest-user-filters';
+import { EduquestUserTable } from '@/components/dashboard/eduquest-user/eduquest-user-table';
+import type { EduquestUser } from '@/types/eduquest-user';
 import apiService from "@/api/api-service";
 import { type AxiosResponse } from "axios";
 import { logger } from '@/lib/default-logger'
 import {authClient} from "@/lib/auth/client";
-import { WooclapUserForm } from "@/components/dashboard/wooclap/wooclap-user-form";
+import { EduquestUserForm } from "@/components/dashboard/eduquest-user/eduquest-user-form";
 
-function applyPagination(rows: WooclapUser[], page: number, rowsPerPage: number): WooclapUser[] {
+function applyPagination(rows: EduquestUser[], page: number, rowsPerPage: number): EduquestUser[] {
   return rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 }
 
 export default function Page(): React.JSX.Element {
   const page = 0;
   const rowsPerPage = 5;
-  const [wooclapUsers, setWooclapUsers] = React.useState<WooclapUser[]>([]);
-  const [paginatedWooclapUsers, setPaginatedWooclapUsers] = React.useState<WooclapUser[]>([]);
+  const [eduquestUsers, setEduquestUsers] = React.useState<EduquestUser[]>([]);
+  const [paginatedEduquestUsers, setPaginatedEduquestUsers] = React.useState<EduquestUser[]>([]);
   const [showForm, setShowForm] = React.useState(false);
 
   const toggleForm = (): void => {
     setShowForm(!showForm);
   };
 
-  const getWooclapUser = async (): Promise<void> => {
+  const getEduquestUser = async (): Promise<void> => {
     try {
-      const response: AxiosResponse<WooclapUser[]> = await apiService.get<WooclapUser[]>('/api/WooclapUser/');
-      const data: WooclapUser[] = response.data;
-      setWooclapUsers(data);
+      const response: AxiosResponse<EduquestUser[]> = await apiService.get<EduquestUser[]>('/api/EduquestUser/');
+      const data: EduquestUser[] = response.data;
+      setEduquestUsers(data);
     } catch (error: unknown) {
       await authClient.signInWithMsal();
       logger.error(error);
@@ -45,7 +45,7 @@ export default function Page(): React.JSX.Element {
 
   React.useEffect(() => {
     const fetchData = async () => {
-      await getWooclapUser();
+      await getEduquestUser();
     };
 
     fetchData().catch((error: unknown) => {
@@ -54,14 +54,14 @@ export default function Page(): React.JSX.Element {
   }, []);
 
   React.useEffect(() => {
-    setPaginatedWooclapUsers(applyPagination(wooclapUsers, page, rowsPerPage));
-  }, [wooclapUsers]);
+    setPaginatedEduquestUsers(applyPagination(eduquestUsers, page, rowsPerPage));
+  }, [eduquestUsers]);
 
   return (
     <Stack spacing={3}>
       <Stack direction="row" spacing={3}>
         <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
-          <Typography variant="h4">Wooclap Users</Typography>
+          <Typography variant="h4">Eduquest Users</Typography>
           <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
             <Button color="inherit" startIcon={<UploadIcon fontSize="var(--icon-fontSize-md)" />}>
               Import
@@ -77,12 +77,12 @@ export default function Page(): React.JSX.Element {
           </Button>
         </div>
       </Stack>
-      {showForm && <WooclapUserForm />} {/* Conditional rendering */}
-      <WooclapUserFilters />
-      <WooclapUserTable
-        count={paginatedWooclapUsers.length}
+      {showForm && <EduquestUserForm />} {/* Conditional rendering */}
+      <EduquestUserFilters />
+      <EduquestUserTable
+        count={paginatedEduquestUsers.length}
         page={page}
-        rows={paginatedWooclapUsers}
+        rows={paginatedEduquestUsers}
         rowsPerPage={rowsPerPage}
       />
     </Stack>

@@ -18,13 +18,13 @@ import TableRow from '@mui/material/TableRow';
 
 import { useSelection } from '@/hooks/use-selection';
 
-import { type WooclapUser } from '@/types/wooclap-user';
+import { type EduquestUser } from '@/types/eduquest-user';
 
 function noop(): void {
   // do nothing
 }
 
-// export interface WooclapUser {
+// export interface EduquestUser {
 //   id: string;
 //   avatar: string;
 //   name: string;
@@ -34,21 +34,21 @@ function noop(): void {
 //   createdAt: Date;
 // }
 
-interface WooclapUserTableProps {
+interface EduquestUserTableProps {
   count?: number;
   page?: number;
-  rows?: WooclapUser[];
+  rows?: EduquestUser[];
   rowsPerPage?: number;
 }
 
-export function WooclapUserTable({
+export function EduquestUserTable({
   count = 0,
   rows = [],
   page = 0,
   rowsPerPage = 0,
-}: WooclapUserTableProps): React.JSX.Element {
+}: EduquestUserTableProps): React.JSX.Element {
   const rowIds = React.useMemo(() => {
-    return rows.map((wooclapUser) => wooclapUser.id);
+    return rows.map((eduquestUser) => eduquestUser.id);
   }, [rows]);
 
   const { selectAll, deselectAll, selectOne, deselectOne, selected } = useSelection(rowIds);

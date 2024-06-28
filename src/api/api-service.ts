@@ -1,7 +1,7 @@
 import axios from 'axios';
 // import { getToken } from '@/app/msal/msal';
 // import { logger } from '@/lib/default-logger';
-// import { type WooclapUser } from '@/types/wooclap-user';
+// import { type WooclapUser } from '@/types/eduquest-user-user';
 
 
 const api = axios.create({

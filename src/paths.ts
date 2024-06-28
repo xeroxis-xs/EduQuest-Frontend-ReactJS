@@ -1,7 +1,7 @@
 export const paths = {
   home: '/',
   auth: {
-    signIn: '/auth/sign-in', 
+    signIn: '/auth/sign-in',
     // signUp: '/auth/sign-up',
     // resetPassword: '/auth/reset-password'
   },
@@ -9,9 +9,10 @@ export const paths = {
     overview: '/dashboard',
     account: '/dashboard/account',
     customers: '/dashboard/customers',
-    wooclap: '/dashboard/wooclap',
+    user: '/dashboard/eduquest-user',
     integrations: '/dashboard/integrations',
     settings: '/dashboard/settings',
+    course: '/dashboard/course',
   },
   errors: {
     notFound: '/errors/not-found',

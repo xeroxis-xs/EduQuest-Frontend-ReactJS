@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { logger } from '@/lib/default-logger';
 
 export interface Selection<T = string> {
   deselectAll: () => void;
@@ -20,11 +21,13 @@ export function useSelection<T = string>(keys: T[] = []): Selection<T> {
 
   const handleDeselectAll = React.useCallback(() => {
     setSelected(new Set());
+    logger.debug('de-selected all');
   }, []);
 
   const handleDeselectOne = React.useCallback((key: T) => {
     setSelected((prev) => {
       const copy = new Set(prev);
+      logger.debug('de-selected', copy);
       copy.delete(key);
       return copy;
     });
@@ -32,12 +35,14 @@ export function useSelection<T = string>(keys: T[] = []): Selection<T> {
 
   const handleSelectAll = React.useCallback(() => {
     setSelected(new Set(keys));
+    logger.debug('selected', keys);
   }, [keys]);
 
   const handleSelectOne = React.useCallback((key: T) => {
     setSelected((prev) => {
       const copy = new Set(prev);
       copy.add(key);
+      logger.debug('selected', copy);
       return copy;
     });
   }, []);
