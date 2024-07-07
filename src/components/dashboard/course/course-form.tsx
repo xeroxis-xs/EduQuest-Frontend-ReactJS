@@ -54,7 +54,7 @@ export function CourseForm(): React.JSX.Element {
   return (
     <form onSubmit={handleSubmit}>
       <Card>
-        <CardHeader subheader="Add new user to the database" title="New User" />
+        <CardHeader subheader="Add new course to the database" title="New Course" />
         <Divider />
         <CardContent>
           <Grid container spacing={3}>

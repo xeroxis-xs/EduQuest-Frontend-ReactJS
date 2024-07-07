@@ -10,7 +10,7 @@ export function EduquestUserFilters(): React.JSX.Element {
       <OutlinedInput
         defaultValue=""
         fullWidth
-        placeholder="Search customer"
+        placeholder="Search User"
         startAdornment={
           <InputAdornment position="start">
             <MagnifyingGlassIcon fontSize="var(--icon-fontSize-md)" />

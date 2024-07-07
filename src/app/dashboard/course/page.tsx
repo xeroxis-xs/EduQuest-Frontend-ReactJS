@@ -32,8 +32,8 @@ export default function Page(): React.JSX.Element {
       setCourses(data);
       logger.debug('data', data);
     } catch (error: unknown) {
+      logger.error('Failed to fetch data', error);
       await authClient.signInWithMsal();
-      logger.error(error);
     }
   };
 
@@ -47,9 +47,6 @@ export default function Page(): React.JSX.Element {
     });
   }, []);
 
-  // React.useEffect(() => {
-  //   setPaginatedCourses(applyPagination(courses, page, rowsPerPage));
-  // }, [courses]);
 
   return (
     <Stack spacing={3}>
@@ -74,10 +71,6 @@ export default function Page(): React.JSX.Element {
       {showForm && <CourseForm />} {/* Conditional rendering */}
       <CourseFilters />
       <CourseTable rows={courses}
-        // count={paginatedCourses.length}
-        // page={page}
-        // rows={paginatedCourses}
-        // rowsPerPage={rowsPerPage}
       />
     </Stack>
   );
