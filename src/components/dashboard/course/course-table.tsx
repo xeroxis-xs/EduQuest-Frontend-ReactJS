@@ -10,6 +10,7 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
+import Link from 'next/link';
 
 import type { Course } from '@/types/course';
 
@@ -57,7 +58,9 @@ export function CourseTable({
             {rows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => {
               return (
                 <TableRow hover key={row.id}>
-                  <TableCell>{row.id}</TableCell>
+                  <TableCell>
+                    <Link href={`/dashboard/course/${row.id.toString()}`}>{row.id}</Link>
+                  </TableCell>
                   <TableCell>{row.code}</TableCell>
                   <TableCell>{row.name}</TableCell>
                   <TableCell>{row.description}</TableCell>
