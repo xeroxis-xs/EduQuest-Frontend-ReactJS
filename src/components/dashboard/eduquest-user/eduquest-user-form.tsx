@@ -18,6 +18,7 @@ import type {EduquestUser} from "@/types/eduquest-user";
 import apiService from "@/api/api-service";
 import {authClient} from "@/lib/auth/client";
 import {logger} from "@/lib/default-logger";
+import {AxiosError} from "axios";
 
 // const roles = [
 //   { value: 'student', label: 'Student' },
@@ -45,8 +46,12 @@ export function EduquestUserForm(): React.JSX.Element {
       await apiService.post('/api/EduquestUser/', newUser);
       logger.debug('User added successfully');
     } catch (error: unknown) {
-      await authClient.signInWithMsal();
-      logger.error(error);
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 401) {
+          await authClient.signInWithMsal();
+        }
+      }
+      logger.error('Error: ', error);
     }
   };
   return (

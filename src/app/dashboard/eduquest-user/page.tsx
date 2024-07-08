@@ -12,7 +12,7 @@ import { EduquestUserFilters } from '@/components/dashboard/eduquest-user/eduque
 import { EduquestUserTable } from '@/components/dashboard/eduquest-user/eduquest-user-table';
 import type { EduquestUser } from '@/types/eduquest-user';
 import apiService from "@/api/api-service";
-import { type AxiosResponse } from "axios";
+import {AxiosError, type AxiosResponse} from "axios";
 import { logger } from '@/lib/default-logger'
 import {authClient} from "@/lib/auth/client";
 import { EduquestUserForm } from "@/components/dashboard/eduquest-user/eduquest-user-form";
@@ -31,8 +31,12 @@ export default function Page(): React.JSX.Element {
       const data: EduquestUser[] = response.data;
       setEduquestUsers(data);
     } catch (error: unknown) {
-      await authClient.signInWithMsal();
-      logger.error(error);
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 401) {
+          await authClient.signInWithMsal();
+        }
+      }
+      logger.error('Error: ', error);
     }
   };
 
