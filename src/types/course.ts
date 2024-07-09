@@ -2,10 +2,9 @@ import type {Term} from "@/types/term";
 
 export interface Course {
   id: number;
-  term: Term
+  term: Term;
   name: string;
   code: string;
   description: string;
   status: string;
-  total_quests: number;
 }

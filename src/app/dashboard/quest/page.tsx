@@ -3,34 +3,30 @@ import * as React from 'react';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-// import { Download as DownloadIcon } from '@phosphor-icons/react/dist/ssr/Download';
 import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
 import { Upload as UploadIcon } from '@phosphor-icons/react/dist/ssr/Upload';
 import { XCircle as XCircleIcon } from '@phosphor-icons/react/dist/ssr/XCircle';
-
-// import { CourseFilters } from '@/components/dashboard/course/course-filters';
-// import { CourseTable } from '@/components/dashboard/course/course-table';
-import type { Course } from '@/types/course';
 import apiService from "@/api/api-service";
 import {AxiosError, type AxiosResponse} from "axios";
 import { logger } from '@/lib/default-logger'
 import { authClient } from "@/lib/auth/client";
-import { CourseForm } from "@/components/dashboard/course/course-form";
-import {CourseCard} from "@/components/dashboard/course/course-card";
+import { QuestForm } from "@/components/dashboard/quest/quest-form";
+import { QuestCard } from "@/components/dashboard/quest/quest-card";
+import type { Quest } from '@/types/quest';
 
 export default function Page(): React.JSX.Element {
-  const [courses, setCourses] = React.useState<Course[]>([]);
+  const [quests, setQuests] = React.useState<Quest[]>([]);
   const [showForm, setShowForm] = React.useState(false);
 
   const toggleForm = (): void => {
     setShowForm(!showForm);
   };
 
-  const getCourse = async (): Promise<void> => {
+  const getQuests = async (): Promise<void> => {
     try {
-      const response: AxiosResponse<Course[]> = await apiService.get<Course[]>('/api/Course/');
-      const data: Course[] = response.data;
-      setCourses(data);
+      const response: AxiosResponse<Quest[]> = await apiService.get<Quest[]>('/api/Quest/');
+      const data: Quest[] = response.data;
+      setQuests(data);
       logger.debug('data', data);
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
@@ -44,7 +40,7 @@ export default function Page(): React.JSX.Element {
 
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
-      await getCourse();
+      await getQuests();
     };
 
     fetchData().catch((error: unknown) => {
@@ -57,7 +53,7 @@ export default function Page(): React.JSX.Element {
     <Stack spacing={3}>
       <Stack direction="row" spacing={3}>
         <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
-          <Typography variant="h4">Courses</Typography>
+          <Typography variant="h4">Quests</Typography>
 
         </Stack>
         <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
@@ -69,8 +65,8 @@ export default function Page(): React.JSX.Element {
           </Button>
         </Stack>
       </Stack>
-      {showForm && <CourseForm onFormSubmitSuccess={getCourse}/>} {/* Conditional rendering */}
-      <CourseCard rows={courses}/>
+      {showForm && <QuestForm onFormSubmitSuccess={getQuests}/>} {/* Conditional rendering */}
+      {quests &&<QuestCard rows={quests}/>}
     </Stack>
   );
 }

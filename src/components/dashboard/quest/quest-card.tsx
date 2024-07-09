@@ -5,27 +5,24 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Pagination from '@mui/material/Pagination';
-import type { Course } from '@/types/course';
+import type { Quest } from '@/types/quest';
 import CardActionArea from "@mui/material/CardActionArea";
 import CardHeader from "@mui/material/CardHeader";
 import Chip from "@mui/material/Chip";
 
-interface CourseCardProps {
-  rows?: Course[];
+interface QuestCardProps {
+  rows?: Quest[];
 }
 
-export function CourseCard({
+export function QuestCard({
                              rows = [],
-                           }: CourseCardProps): React.JSX.Element {
+                           }: QuestCardProps): React.JSX.Element {
   const [page, setPage] = React.useState(1);
   const rowsPerPage = 6;
-
   // Calculate the number of pages
   const pageCount = Math.ceil(rows.length / rowsPerPage);
-
   // Calculate the items to be displayed on the current page
-  const currentCourses = rows.slice((page - 1) * rowsPerPage, page * rowsPerPage);
-
+  const currentQuests = rows.slice((page - 1) * rowsPerPage, page * rowsPerPage);
   // Handle page change
   const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number) => {
     setPage(newPage);
@@ -37,24 +34,24 @@ export function CourseCard({
       </Box>
       <Grid container spacing={4}>
 
-      {currentCourses.map((course) => (
-        <Grid item key={course.id} lg={4} md={6} xs={12} >
+      {currentQuests.map((quest) => (
+        <Grid item key={quest.id} lg={4} md={6} xs={12} >
           <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-            <CardActionArea sx={{ height: '100%'}} href={`/dashboard/course/${course.id.toString()}`}>
-            <CardHeader title={course.name}/>
+            <CardActionArea sx={{ height: '100%'}} href={`/dashboard/quest/${quest.id.toString()}`}>
+            <CardHeader title={quest.name}/>
               <CardContent>
-                <Typography sx={{ mb: 1.5 }} color="text.secondary">
-                  {course.code}
-                </Typography>
-                <Chip label={course.status} sx={{ mb: 1.5 }} color="success"/>
+                <Chip label={quest.status} sx={{ mb: 1.5 }} color="success"/>
                 <Typography variant="subtitle1">
-                  AY {course.term.academic_year.start_year}-{course.term.academic_year.end_year}
+                  {quest.from_course.code}
                 </Typography>
                 <Typography variant="subtitle1" sx={{ mb: 1.5 }}>
-                  {course.term.name}
+                  {quest.from_course.name}
+                </Typography>
+                <Typography variant="body2" sx={{ mb: 1.5 }}>
+                  AY{quest.from_course.term.academic_year.start_year}-{quest.from_course.term.academic_year.end_year} {quest.from_course.term.name}
                 </Typography>
                 <Typography variant="body2">
-                  {course.description}
+                  {quest.description}
                 </Typography>
               </CardContent>
             </CardActionArea>

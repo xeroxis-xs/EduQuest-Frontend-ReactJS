@@ -9,5 +9,6 @@ export const navItems = [
   { key: 'account', title: 'Account', href: paths.dashboard.account, icon: 'user' },
   { key: 'eduquest-user', title: 'Eduquest Users', href: paths.dashboard.user, icon: 'users' },
   { key: 'course', title: 'Courses', href: paths.dashboard.course, icon: 'book' },
+  { key: 'quest', title: 'Quests', href: paths.dashboard.quest, icon: 'sword' },
   { key: 'error', title: 'Error', href: paths.errors.notFound, icon: 'x-square' },
 ] satisfies NavItemConfig[];

@@ -13,6 +13,7 @@ export const paths = {
     integrations: '/dashboard/integrations',
     settings: '/dashboard/settings',
     course: '/dashboard/course',
+    quest: '/dashboard/quest',
   },
   errors: {
     notFound: '/errors/not-found',
