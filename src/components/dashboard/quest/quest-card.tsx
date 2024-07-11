@@ -1,6 +1,6 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
+import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
@@ -35,7 +35,7 @@ export function QuestCard({
       <Grid container spacing={4}>
 
       {currentQuests.map((quest) => (
-        <Grid item key={quest.id} lg={4} md={6} xs={12} >
+        <Grid key={quest.id} lg={4} md={6} xs={12} >
           <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <CardActionArea sx={{ height: '100%'}} href={`/dashboard/quest/${quest.id.toString()}`}>
             <CardHeader title={quest.name}/>

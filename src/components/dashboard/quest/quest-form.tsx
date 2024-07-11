@@ -24,6 +24,7 @@ import type { Course } from "@/types/course";
 import type { Quest } from "@/types/quest";
 import {useUser} from "@/hooks/use-user";
 import {EduquestUser} from "@/types/eduquest-user";
+import { FilePlus as FilePlusIcon } from '@phosphor-icons/react/dist/ssr/FilePlus';
 
 interface CourseFormProps {
   onFormSubmitSuccess: () => void;
@@ -232,7 +233,7 @@ export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Ele
         </CardContent>
 
         <CardActions sx={{ justifyContent: 'flex-end' }}>
-          <Button type="submit" variant="contained">Add</Button>
+          <Button endIcon={<FilePlusIcon fontSize="var(--icon-fontSize-md)"/>} type="submit" variant="contained">Add</Button>
         </CardActions>
 
       </Card>

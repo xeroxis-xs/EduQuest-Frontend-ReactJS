@@ -24,8 +24,7 @@ import Grid from "@mui/material/Unstable_Grid2";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import OutlinedInput from "@mui/material/OutlinedInput";
-import Select from "@mui/material/Select";
-import { SelectChangeEvent } from '@mui/material/Select';
+import Select, { SelectChangeEvent } from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import CardActions from "@mui/material/CardActions";
 import RouterLink from "next/link";
@@ -37,7 +36,7 @@ import {XCircle as XCircleIcon} from "@phosphor-icons/react/dist/ssr/XCircle";
 import Chip from "@mui/material/Chip";
 import {QuestCard} from "@/components/dashboard/quest/quest-card";
 
-export default function Page({ params }: { params: { id: string } }) : React.JSX.Element {
+export default function Page({ params }: { params: { courseId: string } }) : React.JSX.Element {
   const router = useRouter();
   const courseCodeRef = React.useRef<HTMLInputElement>(null);
   const courseNameRef = React.useRef<HTMLInputElement>(null);
@@ -57,7 +56,7 @@ export default function Page({ params }: { params: { id: string } }) : React.JSX
 
   const getCourse = async (): Promise<void> => {
     try {
-      const response: AxiosResponse<Course> = await apiService.get<Course>(`/api/Course/${params.id}`);
+      const response: AxiosResponse<Course> = await apiService.get<Course>(`/api/Course/${params.courseId}`);
       const data: Course = response.data;
       setCourse(data);
       logger.debug('course', data);
@@ -89,7 +88,7 @@ export default function Page({ params }: { params: { id: string } }) : React.JSX
 
   const getQuests = async (): Promise<void> => {
     try {
-      const response: AxiosResponse<Quest[]> = await apiService.get<Quest[]>(`/api/Quest/by-course/${params.id}`);
+      const response: AxiosResponse<Quest[]> = await apiService.get<Quest[]>(`/api/Quest/by-course/${params.courseId}`);
       const data: Quest[] = response.data;
       setQuests(data);
       logger.debug('quests', data);
@@ -129,16 +128,11 @@ export default function Page({ params }: { params: { id: string } }) : React.JSX
       name: courseNameRef.current?.value,
       description: courseDescriptionRef.current?.value,
       status: courseStatusRef.current?.value,
-      term: {
-        id: selectedTerm?.id || terms?.[0].id,
-        name: selectedTerm?.name || terms?.[0].name,
-        start_date: selectedTerm?.start_date || terms?.[0].start_date,
-        end_date: selectedTerm?.end_date || terms?.[0].end_date,
-      }
+      term: selectedTerm || terms?.[0],
     };
 
     try {
-      const response: AxiosResponse<Course> = await apiService.patch(`/api/Course/${params.id}/`, updatedCourse);
+      const response: AxiosResponse<Course> = await apiService.patch(`/api/Course/${params.courseId}/`, updatedCourse);
       logger.debug('Update Success:', response.data);
       setSubmitStatus({ type: 'success', message: 'Update Successful' });
       await getCourse();
@@ -153,7 +147,7 @@ export default function Page({ params }: { params: { id: string } }) : React.JSX
 
   const handleDeleteCourse = async () => {
     try {
-      await apiService.delete(`/api/Course/${params.id}`);
+      await apiService.delete(`/api/Course/${params.courseId}`);
 
       router.push(paths.dashboard.course);
     } catch (error) {
@@ -210,6 +204,9 @@ export default function Page({ params }: { params: { id: string } }) : React.JSX
                 <Typography variant="subtitle2">Course Description</Typography>
                 <Typography variant="body2">{course.description}</Typography>
               </Grid>
+            </Grid>
+              <Divider sx={{my: 3}}/>
+            <Grid container spacing={3}>
               <Grid md={6} xs={12}>
                 <Typography variant="subtitle2">Term ID</Typography>
                 <Typography variant="body2">{course.term.id}</Typography>
@@ -289,7 +286,7 @@ export default function Page({ params }: { params: { id: string } }) : React.JSX
 
                 <Grid container spacing={3}>
 
-                  <Grid md={3} xs={6}>
+                  <Grid md={3} xs={12}>
                     <FormControl fullWidth required>
                       <InputLabel>Term ID</InputLabel>
                       <Select defaultValue={course.term.id} onChange={handleTermChange} inputRef={courseTermIdRef}
@@ -302,41 +299,28 @@ export default function Page({ params }: { params: { id: string } }) : React.JSX
                       </Select>
                     </FormControl>
                   </Grid>
+                  <Grid md={9} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
                   <Grid md={3} xs={6}>
-                    <FormControl fullWidth required>
-                      <InputLabel>Term Name</InputLabel>
-                      <OutlinedInput value={selectedTerm?.name || terms[0].name} label="Term Name" disabled/>
-                    </FormControl>
-                  </Grid>
-                  <Grid md={3} xs={6}>
-                    <FormControl fullWidth required>
-                      <InputLabel>Term Start Date</InputLabel>
-                      <OutlinedInput value={selectedTerm?.start_date || terms[0].start_date}  label="Term Start Date" type="date" disabled/>
-                    </FormControl>
+                      <Typography variant="subtitle2">Term Name</Typography>
+                      <Typography variant="body2">{selectedTerm?.name || terms[0].name}</Typography>
                   </Grid>
                   <Grid md={3} xs={6}>
-                    <FormControl fullWidth required>
-                      <InputLabel>Term End Date</InputLabel>
-                      <OutlinedInput value={selectedTerm?.end_date || terms[0].end_date}  label="Term End Date" type="date" disabled/>
-                    </FormControl>
+                    <Typography variant="subtitle2">Term Start Date</Typography>
+                    <Typography variant="body2">{selectedTerm?.start_date || terms[0].start_date}</Typography>
+
                   </Grid>
-                  <Grid xs={4}>
-                    <FormControl fullWidth required>
-                      <InputLabel>Academic Year ID</InputLabel>
-                      <OutlinedInput value={selectedTerm?.academic_year.id || terms[0].academic_year.id}  label="Term End Date" type="number" disabled/>
-                    </FormControl>
+                  <Grid md={3} xs={6}>
+                    <Typography variant="subtitle2">Term End Date</Typography>
+                    <Typography variant="body2">{selectedTerm?.end_date || terms[0].end_date}</Typography>
+
                   </Grid>
-                  <Grid xs={4}>
-                    <FormControl fullWidth required>
-                      <InputLabel>Start Year</InputLabel>
-                      <OutlinedInput value={selectedTerm?.academic_year.start_year || terms[0].academic_year.start_year} label="Term End Date" type="number" disabled/>
-                    </FormControl>
+                  <Grid md={3} xs={6}>
+                    <Typography variant="subtitle2">Academic Year ID</Typography>
+                    <Typography variant="body2">{selectedTerm?.academic_year.id || terms[0].academic_year.id}</Typography>
                   </Grid>
-                  <Grid xs={4}>
-                    <FormControl fullWidth required>
-                      <InputLabel>End Year</InputLabel>
-                      <OutlinedInput value={selectedTerm?.academic_year.end_year || terms[0].academic_year.end_year}  label="Term End Date" type="number" disabled/>
-                    </FormControl>
+                  <Grid md={3} xs={6}>
+                    <Typography variant="subtitle2">Academic Year</Typography>
+                    <Typography variant="body2">AY {selectedTerm?.academic_year.start_year || terms[0].academic_year.start_year}-{selectedTerm?.academic_year.end_year || terms[0].academic_year.end_year}</Typography>
                   </Grid>
                 </Grid>
               )}

@@ -22,6 +22,7 @@ import type {Term} from "@/types/term";
 import Select, { type SelectChangeEvent} from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import Alert from "@mui/material/Alert";
+import { FilePlus as FilePlusIcon } from '@phosphor-icons/react/dist/ssr/FilePlus';
 
 interface CourseFormProps {
   onFormSubmitSuccess: () => void;
@@ -207,7 +208,7 @@ export function CourseForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.
         </CardContent>
 
         <CardActions sx={{ justifyContent: 'flex-end' }}>
-          <Button type="submit" variant="contained">Add</Button>
+          <Button endIcon={<FilePlusIcon fontSize="var(--icon-fontSize-md)"/>} type="submit" variant="contained">Add</Button>
         </CardActions>
 
       </Card>

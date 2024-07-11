@@ -1,8 +1,9 @@
-import * as React from 'react';
 import type { Metadata } from "next";
 import { config } from "@/config";
+import * as React from "react";
 
-export const metadata = { title: `Courses | ${config.site.name}` } satisfies Metadata;
+// Ensure metadata conforms to Metadata type through regular type checking
+export const metadata: Metadata = { title: `Quest Details | ${config.site.name}` };
 
 export default function Layout({ children }: { children: React.ReactNode }): React.JSX.Element {
   return (
