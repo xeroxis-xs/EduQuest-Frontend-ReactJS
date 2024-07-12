@@ -10,6 +10,7 @@ import { GameController as GameControllerIcon } from "@phosphor-icons/react/dist
 import type { Course } from '@/types/course';
 import type { Question } from '@/types/question';
 import type { Quest } from '@/types/quest';
+import type { UserQuestAttempt } from '@/types/user-quest-attempt';
 import apiService from "@/api/api-service";
 import type { AxiosResponse } from "axios";
 import { AxiosError } from "axios";
@@ -33,9 +34,14 @@ import Stack from "@mui/material/Stack";
 import {useRouter} from "next/navigation";
 import {XCircle as XCircleIcon} from "@phosphor-icons/react/dist/ssr/XCircle";
 import Chip from "@mui/material/Chip";
+import {useUser} from "@/hooks/use-user";
+import {EduquestUser} from "@/types/eduquest-user";
+import {QuestCard} from "@/components/dashboard/quest/quest-card";
+import {UserQuestAttemptTable} from "@/components/dashboard/quest/attempt/quest-attempt-table";
 
 export default function Page({ params }: { params: { questId: string } }) : React.JSX.Element {
   const router = useRouter();
+  const { eduquestUser } = useUser();
   const questTypeRef = React.useRef<HTMLInputElement>(null);
   const questNameRef = React.useRef<HTMLInputElement>(null);
   const questDescriptionRef = React.useRef<HTMLInputElement>(null);
@@ -44,6 +50,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
   const [quest, setQuest] = React.useState<Quest>();
   const [courses, setCourses] = React.useState<Course[]>();
   const [questions, setQuestions] = React.useState<Question[]>();
+  const [userQuestAttempts, setUserQuestAttempts] = React.useState<UserQuestAttempt[]>();
   const [selectedCourse, setSelectedCourse] = React.useState<Course | null>(null);
   const [submitStatus, setSubmitStatus] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [showForm, setShowForm] = React.useState(false);
@@ -100,6 +107,24 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
     }
   };
 
+  const getUserQuestAttempts = async (): Promise<void> => {
+    if (eduquestUser) {
+      try {
+        const response: AxiosResponse<UserQuestAttempt[]> = await apiService.get<UserQuestAttempt[]>(`/api/UserQuestAttempt/by-user/${eduquestUser.id.toString()}/by-quest/${params.questId}`);
+        const data: UserQuestAttempt[] = response.data;
+        setUserQuestAttempts(data);
+        logger.debug('user quest attempts', data);
+      } catch (error: unknown) {
+        if (error instanceof AxiosError) {
+          if (error.response?.status === 401) {
+            await authClient.signInWithMsal();
+          }
+        }
+        logger.error('Failed to fetch data', error);
+      }
+    }
+  }
+
   const handleCourseChange = (event: SelectChangeEvent<number>) => {
     // Since the value is now explicitly a number, ensure that the state and logic that depend on this value are correctly typed and implemented.
     const courseId = Number(event.target.value); // Convert the value to a number
@@ -155,6 +180,8 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
       await getQuest();
       await getCourses();
       await getQuestions();
+      await getUserQuestAttempts();
+
     };
 
     fetchData().catch((error: unknown) => {
@@ -167,7 +194,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
     <Stack spacing={3}>
       {quest &&
       <Stack direction="row" spacing={3} sx={{justifyContent: 'space-between'}}>
-          <Button startIcon={<CaretLeftIcon fontSize="var(--icon-fontSize-md)"/>} component={RouterLink} href={`/dashboard/course/${quest?.from_course.id.toString()}`}>Back to Quests for {quest.from_course.code} {quest.from_course.name}</Button>
+          <Button startIcon={<CaretLeftIcon fontSize="var(--icon-fontSize-md)"/>} component={RouterLink} href={`/dashboard/course/${quest?.from_course.id.toString()}`}>View Quests for {quest.from_course.code} {quest.from_course.name}</Button>
         <Button startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PenIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
           {showForm ? 'Close' : 'Edit Quest'}
         </Button>
@@ -207,7 +234,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
               </Grid>
               <Grid md={6} xs={12}>
                 <Typography variant="subtitle2">Quest Status</Typography>
-                <Chip label={quest.status} sx={{ mt: 1 }} color="success"/>
+                <Chip label={quest.status} sx={{ mt: 1 }} color="success" size="small"/>
               </Grid>
 
             </Grid>
@@ -346,6 +373,14 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
           </Alert> : null}
 
       </form>
+
+      <Typography variant="h5">My Attempts</Typography>
+
+        {userQuestAttempts && userQuestAttempts.length > 0 ? (
+          <UserQuestAttemptTable rows={userQuestAttempts} questId={params.questId}/>
+        ) : (
+          <Typography variant="body1">You have not attempted this quest yet.</Typography>
+        )}
 
 
     </Stack>

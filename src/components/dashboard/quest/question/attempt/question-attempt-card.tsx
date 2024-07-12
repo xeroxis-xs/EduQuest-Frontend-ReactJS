@@ -22,20 +22,21 @@ import apiService from "@/api/api-service";
 import {logger} from "@/lib/default-logger";
 import {authClient} from "@/lib/auth/client";
 import {Trash as TrashIcon} from "@phosphor-icons/react/dist/ssr/Trash";
+import {UserQuestQuestionAttempt} from "@/types/user-quest-question-attempt";
 
 
-interface QuestionCardProps {
-  questionsAndAnswers?: Question[];
+interface QuestionAttemptCardProps {
+  data?: UserQuestQuestionAttempt[];
 }
 
-export function QuestionCard({ questionsAndAnswers = []
-                           }: QuestionCardProps): React.JSX.Element {
+export function QuestionAttemptCard({ data = []
+                           }: QuestionAttemptCardProps): React.JSX.Element {
   const [page, setPage] = React.useState(1);
   const rowsPerPage = 1;
   // Calculate the number of pages
-  const pageCount = Math.ceil(questionsAndAnswers.length / rowsPerPage);
+  const pageCount = Math.ceil(data.length / rowsPerPage);
   // Calculate the items to be displayed on the current page
-  const currentQuestionsAndAnswers = questionsAndAnswers.slice((page - 1) * rowsPerPage, page * rowsPerPage);
+  const currentAttemptedQuestionsAndAnswers = data.slice((page - 1) * rowsPerPage, page * rowsPerPage);
   // Handle page change
   const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number) => {
     setPage(newPage);
@@ -80,23 +81,30 @@ export function QuestionCard({ questionsAndAnswers = []
       </Box>
       <Grid container spacing={4}>
 
-      {currentQuestionsAndAnswers.map((questionAndAnswer) => (
-        <Grid key={questionAndAnswer.id} xs={12} >
+      {currentAttemptedQuestionsAndAnswers.map((attemptedQuestionsAndAnswers) => (
+        <Grid key={attemptedQuestionsAndAnswers.id} xs={12} >
           <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-            <CardHeader title={`Question ${questionAndAnswer?.number.toString()}`}/>
+            <CardHeader title={`Question ${attemptedQuestionsAndAnswers?.question.number.toString()}`}/>
             <Divider/>
               <CardContent>
                 <Grid container spacing={3}>
                   <Grid xs={12}>
                     <Typography variant="subtitle1">
-                      {questionAndAnswer.text}
+                      {attemptedQuestionsAndAnswers.question.text}
                     </Typography>
                   </Grid>
-                {questionAndAnswer.answers.map((answer) => (
+                  {attemptedQuestionsAndAnswers.question.answers.map((answer) => (
                     <Grid key={answer.id} md={6} xs={12}>
-                      <FormControlLabel control={<Checkbox />} label={answer.text} />
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            checked={attemptedQuestionsAndAnswers.selected_answers.some(selectedAnswer => selectedAnswer.answer.id === answer.id)}
+                          />
+                        }
+                        label={answer.text}
+                      />
                     </Grid>
-                ))}
+                  ))}
                 </Grid>
 
               </CardContent>

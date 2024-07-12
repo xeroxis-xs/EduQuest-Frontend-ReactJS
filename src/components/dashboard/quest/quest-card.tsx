@@ -40,7 +40,7 @@ export function QuestCard({
             <CardActionArea sx={{ height: '100%'}} href={`/dashboard/quest/${quest.id.toString()}`}>
             <CardHeader title={quest.name}/>
               <CardContent>
-                <Chip label={quest.status} sx={{ mb: 1.5 }} color="success"/>
+                <Chip label={quest.status} sx={{ mb: 1.5 }} color="success" size="small"/>
                 <Typography variant="subtitle1">
                   {quest.from_course.code}
                 </Typography>

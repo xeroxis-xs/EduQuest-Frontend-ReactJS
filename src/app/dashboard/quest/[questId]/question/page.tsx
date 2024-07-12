@@ -45,8 +45,8 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
   // const questStatusRef = React.useRef<HTMLInputElement>(null);
   // const questCourseIdRef = React.useRef<HTMLInputElement>(null);
   const [quest, setQuest] = React.useState<Quest>();
-  const [answers, setAnswers] = React.useState<Answer[]>();
-  const [questions, setQuestions] = React.useState<Question[]>();
+  // const [answers, setAnswers] = React.useState<Answer[]>();
+  const [questionsAndAnswers, setQuestionsAndAnswers] = React.useState<Question[]>();
   const [selectedCourse, setSelectedCourse] = React.useState<Course | null>(null);
   const [submitStatus, setSubmitStatus] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [showForm, setShowForm] = React.useState(false);
@@ -87,11 +87,11 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
   //   }
   // };
 
-  const getQuestions = async (): Promise<void> => {
+  const getQuestionsAndAnswers = async (): Promise<void> => {
     try {
       const response: AxiosResponse<Question[]> = await apiService.get<Question[]>(`/api/Question/by-quest/${params.questId}`);
       const data: Question[] = response.data;
-      setQuestions(data);
+      setQuestionsAndAnswers(data);
       logger.debug('question', data);
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
@@ -103,21 +103,21 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
     }
   };
 
-  const getAnswers = async (): Promise<void> => {
-    try {
-      const response: AxiosResponse<Answer[]> = await apiService.get<Answer[]>(`/api/Answer/by-quest/${params.questId}`);
-      const data: Answer[] = response.data;
-      setAnswers(data);
-      logger.debug('answer', data);
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-      }
-      logger.error('Failed to fetch data', error);
-    }
-  };
+  // const getAnswers = async (): Promise<void> => {
+  //   try {
+  //     const response: AxiosResponse<Answer[]> = await apiService.get<Answer[]>(`/api/Answer/by-quest/${params.questId}`);
+  //     const data: Answer[] = response.data;
+  //     setAnswers(data);
+  //     logger.debug('answer', data);
+  //   } catch (error: unknown) {
+  //     if (error instanceof AxiosError) {
+  //       if (error.response?.status === 401) {
+  //         await authClient.signInWithMsal();
+  //       }
+  //     }
+  //     logger.error('Failed to fetch data', error);
+  //   }
+  // };
 
   // const handleCourseChange = (event: SelectChangeEvent<number>) => {
   //   // Since the value is now explicitly a number, ensure that the state and logic that depend on this value are correctly typed and implemented.
@@ -173,8 +173,8 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
     logger.debug(params.questId)
     const fetchData = async (): Promise<void> => {
       await getQuest();
-      await getAnswers();
-      await getQuestions();
+      // await getAnswers();
+      await getQuestionsAndAnswers();
     };
 
     fetchData().catch((error: unknown) => {
@@ -187,14 +187,14 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
     <Stack spacing={3}>
       {quest &&
         <Stack direction="row" spacing={3} sx={{justifyContent: 'space-between'}}>
-          <Button startIcon={<CaretLeftIcon fontSize="var(--icon-fontSize-md)"/>} href={`/dashboard/course/${quest?.id.toString()}`}>Back to Quest {quest?.name} </Button>
+          <Button startIcon={<CaretLeftIcon fontSize="var(--icon-fontSize-md)"/>} href={`/dashboard/quest/${quest?.id.toString()}`}>Back to Quest {quest?.name} </Button>
         <Button startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PenIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
           {showForm ? 'Close' : 'Edit Question'}
         </Button>
       </Stack>
       }
 
-      <QuestionCard questions={questions} answers={answers}/>
+      <QuestionCard questionsAndAnswers={questionsAndAnswers}/>
 
       {/*{!showForm && quest ?*/}
       {/*  <Card>*/}

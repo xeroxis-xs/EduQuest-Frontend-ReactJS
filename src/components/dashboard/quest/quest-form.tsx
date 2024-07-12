@@ -22,8 +22,8 @@ import MenuItem from "@mui/material/MenuItem";
 import Alert from "@mui/material/Alert";
 import type { Course } from "@/types/course";
 import type { Quest } from "@/types/quest";
-import {useUser} from "@/hooks/use-user";
-import {EduquestUser} from "@/types/eduquest-user";
+import { useUser } from "@/hooks/use-user";
+import { type EduquestUser } from "@/types/eduquest-user";
 import { FilePlus as FilePlusIcon } from '@phosphor-icons/react/dist/ssr/FilePlus';
 
 interface CourseFormProps {
@@ -31,6 +31,7 @@ interface CourseFormProps {
 }
 
 export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Element {
+  const { eduquestUser} = useUser();
   const questTypeRef = React.useRef<HTMLInputElement>(null);
   const questNameRef = React.useRef<HTMLInputElement>(null);
   const questDescriptionRef = React.useRef<HTMLInputElement>(null);
@@ -39,28 +40,27 @@ export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Ele
   const [courses, setCourses] = React.useState<Course[]>();
   const [selectedCourse, setSelectedCourse] = React.useState<Course | null>(null);
   const [submitStatus, setSubmitStatus] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
-  const {user} = useUser();
-  const [eduquestUser, setEduquestUser] = React.useState<EduquestUser>();
+  // const [eduquestUser, setEduquestUser] = React.useState<EduquestUser>();
 
-  const getUser = async ({username}: { username: string }): Promise<void> => {
-    try {
-      const response: AxiosResponse<EduquestUser> = await apiService.get<EduquestUser>(`/api/EduquestUser/${username}`);
-      const data: EduquestUser = response.data;
-      setEduquestUser(data);
-      logger.debug('eduquest user', data);
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-        else {
-          logger.error('Code: ', error.response?.status);
-          logger.error('Message: ', error.response?.data);
-        }
-      }
-      logger.error('Failed to fetch data', error);
-    }
-  };
+  // const getUser = async ({username}: { username: string }): Promise<void> => {
+  //   try {
+  //     const response: AxiosResponse<EduquestUser> = await apiService.get<EduquestUser>(`/api/EduquestUser/${username}`);
+  //     const data: EduquestUser = response.data;
+  //     setEduquestUser(data);
+  //     logger.debug('eduquest user', data);
+  //   } catch (error: unknown) {
+  //     if (error instanceof AxiosError) {
+  //       if (error.response?.status === 401) {
+  //         await authClient.signInWithMsal();
+  //       }
+  //       else {
+  //         logger.error('Code: ', error.response?.status);
+  //         logger.error('Message: ', error.response?.data);
+  //       }
+  //     }
+  //     logger.error('Failed to fetch data', error);
+  //   }
+  // };
 
   const getCourses = async (): Promise<void> => {
     try {
@@ -143,15 +143,15 @@ export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Ele
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
       await getCourses();
-      if (user?.username) {
-        await getUser({ username: user.username });
-      }
+      // if (user?.username) {
+      //   await getUser({ username: user.username });
+      // }
     };
 
     fetchData().catch((error: unknown) => {
       logger.error('Failed to fetch data', error);
     });
-  }, [user]);
+  }, []);
   return (
     <form onSubmit={handleSubmit}>
       <Card>

@@ -46,7 +46,7 @@ export function CourseCard({
                 <Typography sx={{ mb: 1.5 }} color="text.secondary">
                   {course.code}
                 </Typography>
-                <Chip label={course.status} sx={{ mb: 1.5 }} color="success"/>
+                <Chip label={course.status} sx={{ mb: 1.5 }} color="success" size="small"/>
                 <Typography variant="subtitle1">
                   AY {course.term.academic_year.start_year}-{course.term.academic_year.end_year}
                 </Typography>

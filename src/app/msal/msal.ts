@@ -6,58 +6,19 @@ import { logger } from '@/lib/default-logger';
 export const msalInstance = new PublicClientApplication(msalConfig);
 
 export async function initializeMsal() : Promise<void>{
-  logger.debug("Initializing MSAL..");
+  logger.debug("MSAL: Initializing...");
   await msalInstance.initialize();
-  logger.debug("MSAL initialized")
-  // Account selection logic is app dependent. Adjust as needed for different use cases.
+  logger.debug("MSAL: Initialized.")
   const accounts = msalInstance.getAllAccounts();
   if (accounts.length > 0) {
     msalInstance.setActiveAccount(accounts[0]);
-
   }
-
   const loginResponse = await msalInstance.handleRedirectPromise();
   if (loginResponse !== null) {
+    logger.debug("MSAL: Login response received");
     await handleLoginResponse(loginResponse);
   }
-
-  // msalInstance.addEventCallback(async (event) => {
-  //   if (event.eventType === EventType.LOGIN_SUCCESS && event.payload) {
-  //     const payload = event.payload as AuthenticationResult;
-  //     const account = payload.account;
-  //     msalInstance.setActiveAccount(account);
-  //     logger.debug("Event callback, active account set:", account);
-  //
-  //   }
-  // });
-
-
 }
-
-// export async function getToken(): Promise<string | null>{
-//   const authToken = await getCurrentToken(msalInstance);
-//   logger.debug("AUTH TOKEN:", authToken);
-//
-//   return authToken;
-// }
-//
-// export async function getUser() :Promise<AccountInfo | null> {
-//   const user = msalInstance.getActiveAccount();
-//   logger.debug("USER:", user);
-//   return user;
-// }
-//
-// export const handleLogin = (loginType = "redirect") => {
-//   if (loginType === "popup") {
-//     msalInstance.loginPopup().catch((e: unknown) => {
-//       logger.error("loginPopup failed: ", e);
-//     });
-//   } else if (loginType === "redirect") {
-//     msalInstance.loginRedirect().catch((e: unknown) => {
-//       logger.error("loginRedirect failed: ", e);
-//     });
-//   }
-// };
 
 export async function getToken(): Promise<string | null> {
   try {
@@ -68,12 +29,13 @@ export async function getToken(): Promise<string | null> {
         account: accounts[0],
         scopes: [loginRequest.scopes[0]],
       });
+      logger.debug("MSAL: Token acquired");
       return response.accessToken;
     }
-    logger.debug('No accounts found.');
+    logger.debug('MSAL: No accounts found.');
     return null;
   } catch (error) {
-    logger.error('Token acquisition failed.', error);
+    logger.error('MSAL: Token acquisition failed.', error);
     return null;
   }
 }
@@ -81,20 +43,13 @@ export async function getToken(): Promise<string | null> {
 export async function handleLoginResponse(loginResponse: AuthenticationResult): Promise<void> {
     const account = loginResponse.account;
     msalInstance.setActiveAccount(account);
-    logger.debug("Active account set:", account);
+    logger.debug("MSAL: Active account set:", account);
     const token = await getToken();
     if (token !== null) {
         localStorage.setItem('access-token', token);
       }
 }
 
-
-// export async function handleLoginPopupNew(): Promise<void> {
-//   const loginResponse = await msalInstance.loginPopup(loginRequest);
-//   if (loginResponse) {
-//     await handleLoginResponse(loginResponse);
-//   }
-// }
 
 export async function handleLoginRedirectNew() : Promise<void>{
   await msalInstance.loginRedirect(loginRequest);

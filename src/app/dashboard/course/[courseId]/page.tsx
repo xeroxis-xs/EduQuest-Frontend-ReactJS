@@ -172,7 +172,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
   return (
     <Stack spacing={3}>
       <Stack direction="row" spacing={3} sx={{justifyContent: 'space-between'}}>
-          <Button startIcon={<CaretLeftIcon fontSize="var(--icon-fontSize-md)"/>} component={RouterLink} href={paths.dashboard.course}>Back to Courses</Button>
+          <Button startIcon={<CaretLeftIcon fontSize="var(--icon-fontSize-md)"/>} component={RouterLink} href={paths.dashboard.course}>View all Courses</Button>
         <Button startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PenIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
           {showForm ? 'Close' : 'Edit Course'}
         </Button>
@@ -198,7 +198,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
               </Grid>
               <Grid md={6} xs={12}>
                 <Typography variant="subtitle2">Course Status</Typography>
-                <Chip label={course.status} sx={{ mt: 1 }} color="success"/>
+                <Chip label={course.status} sx={{ mt: 1 }} color="success" size="small"/>
               </Grid>
               <Grid xs={12}>
                 <Typography variant="subtitle2">Course Description</Typography>
