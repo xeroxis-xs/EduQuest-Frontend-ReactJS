@@ -1,13 +1,13 @@
 "use client"
 import * as React from 'react';
 import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
+// import Typography from '@mui/material/Typography';
 import { CaretLeft as CaretLeftIcon } from "@phosphor-icons/react/dist/ssr/CaretLeft";
 import { Pen as PenIcon } from "@phosphor-icons/react/dist/ssr/Pen";
-import { FloppyDisk as FloppyDiskIcon } from "@phosphor-icons/react/dist/ssr/FloppyDisk";
-import { Trash as TrashIcon } from "@phosphor-icons/react/dist/ssr/Trash";
-import { GameController as GameControllerIcon } from "@phosphor-icons/react/dist/ssr/GameController";
-import type { Course } from '@/types/course';
+// import { FloppyDisk as FloppyDiskIcon } from "@phosphor-icons/react/dist/ssr/FloppyDisk";
+// import { Trash as TrashIcon } from "@phosphor-icons/react/dist/ssr/Trash";
+// import { GameController as GameControllerIcon } from "@phosphor-icons/react/dist/ssr/GameController";
+// import type { Course } from '@/types/course';
 import type { Question } from '@/types/question';
 import type { Quest } from '@/types/quest';
 import apiService from "@/api/api-service";
@@ -15,26 +15,26 @@ import type { AxiosResponse } from "axios";
 import { AxiosError } from "axios";
 import { logger } from '@/lib/default-logger'
 import { authClient } from "@/lib/auth/client";
-import Card from "@mui/material/Card";
-import CardHeader from "@mui/material/CardHeader";
-import Divider from "@mui/material/Divider";
-import CardContent from "@mui/material/CardContent";
-import Grid from "@mui/material/Unstable_Grid2";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import Select, { type SelectChangeEvent } from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import CardActions from "@mui/material/CardActions";
-import Link, { default as RouterLink } from "next/link";
-import {paths} from "@/paths";
-import Alert from "@mui/material/Alert";
+// import Card from "@mui/material/Card";
+// import CardHeader from "@mui/material/CardHeader";
+// import Divider from "@mui/material/Divider";
+// import CardContent from "@mui/material/CardContent";
+// import Grid from "@mui/material/Unstable_Grid2";
+// import FormControl from "@mui/material/FormControl";
+// import InputLabel from "@mui/material/InputLabel";
+// import OutlinedInput from "@mui/material/OutlinedInput";
+// import Select, { type SelectChangeEvent } from "@mui/material/Select";
+// import MenuItem from "@mui/material/MenuItem";
+// import CardActions from "@mui/material/CardActions";
+// import Link, { default as RouterLink } from "next/link";
+// import {paths} from "@/paths";
+// import Alert from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
 import {useRouter} from "next/navigation";
 import {XCircle as XCircleIcon} from "@phosphor-icons/react/dist/ssr/XCircle";
-import Chip from "@mui/material/Chip";
+// import Chip from "@mui/material/Chip";
 import {QuestionCard} from "@/components/dashboard/quest/question/question-card";
-import {Answer} from "@/types/answer";
+// import {Answer} from "@/types/answer";
 
 
 export default function Page({ params }: { params: { questId: string } }) : React.JSX.Element {
@@ -47,8 +47,8 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
   const [quest, setQuest] = React.useState<Quest>();
   // const [answers, setAnswers] = React.useState<Answer[]>();
   const [questionsAndAnswers, setQuestionsAndAnswers] = React.useState<Question[]>();
-  const [selectedCourse, setSelectedCourse] = React.useState<Course | null>(null);
-  const [submitStatus, setSubmitStatus] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  // const [selectedCourse, setSelectedCourse] = React.useState<Course | null>(null);
+  // const [submitStatus, setSubmitStatus] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [showForm, setShowForm] = React.useState(false);
 
   const toggleForm = (): void => {
