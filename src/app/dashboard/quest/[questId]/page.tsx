@@ -35,8 +35,6 @@ import {useRouter} from "next/navigation";
 import {XCircle as XCircleIcon} from "@phosphor-icons/react/dist/ssr/XCircle";
 import Chip from "@mui/material/Chip";
 import {useUser} from "@/hooks/use-user";
-import {EduquestUser} from "@/types/eduquest-user";
-import {QuestCard} from "@/components/dashboard/quest/quest-card";
 import {UserQuestAttemptTable} from "@/components/dashboard/quest/attempt/quest-attempt-table";
 
 export default function Page({ params }: { params: { questId: string } }) : React.JSX.Element {

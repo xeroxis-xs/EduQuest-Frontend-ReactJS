@@ -30,7 +30,7 @@ import { authClient } from "@/lib/auth/client";
 // import {paths} from "@/paths";
 // import Alert from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
-import {useRouter} from "next/navigation";
+// import {useRouter} from "next/navigation";
 import {XCircle as XCircleIcon} from "@phosphor-icons/react/dist/ssr/XCircle";
 // import Chip from "@mui/material/Chip";
 import {QuestionCard} from "@/components/dashboard/quest/question/question-card";
@@ -38,7 +38,7 @@ import {QuestionCard} from "@/components/dashboard/quest/question/question-card"
 
 
 export default function Page({ params }: { params: { questId: string } }) : React.JSX.Element {
-  const router = useRouter();
+  // const router = useRouter();
   // const questTypeRef = React.useRef<HTMLInputElement>(null);
   // const questNameRef = React.useRef<HTMLInputElement>(null);
   // const questDescriptionRef = React.useRef<HTMLInputElement>(null);

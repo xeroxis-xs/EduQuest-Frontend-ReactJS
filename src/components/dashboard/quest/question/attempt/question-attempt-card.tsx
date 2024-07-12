@@ -5,10 +5,10 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Pagination from '@mui/material/Pagination';
-import type { Question } from '@/types/question';
+// import type { Question } from '@/types/question';
 import CardHeader from "@mui/material/CardHeader";
-import Chip from "@mui/material/Chip";
-import {Answer} from "@/types/answer";
+// import Chip from "@mui/material/Chip";
+// import {Answer} from "@/types/answer";
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
@@ -17,12 +17,12 @@ import Button from "@mui/material/Button";
 import { FloppyDisk as FloppyDiskIcon } from "@phosphor-icons/react/dist/ssr/FloppyDisk";
 import { PaperPlaneTilt as PaperPlaneTiltIcon } from "@phosphor-icons/react/dist/ssr/PaperPlaneTilt";
 import {Divider} from "@mui/material";
-import type {Quest} from "@/types/quest";
-import apiService from "@/api/api-service";
-import {logger} from "@/lib/default-logger";
-import {authClient} from "@/lib/auth/client";
-import {Trash as TrashIcon} from "@phosphor-icons/react/dist/ssr/Trash";
-import {UserQuestQuestionAttempt} from "@/types/user-quest-question-attempt";
+// import type {Quest} from "@/types/quest";
+// import apiService from "@/api/api-service";
+// import {logger} from "@/lib/default-logger";
+// import {authClient} from "@/lib/auth/client";
+// import {Trash as TrashIcon} from "@phosphor-icons/react/dist/ssr/Trash";
+import { type UserQuestQuestionAttempt } from "@/types/user-quest-question-attempt";
 
 
 interface QuestionAttemptCardProps {

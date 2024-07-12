@@ -23,7 +23,6 @@ import Alert from "@mui/material/Alert";
 import type { Course } from "@/types/course";
 import type { Quest } from "@/types/quest";
 import { useUser } from "@/hooks/use-user";
-import { type EduquestUser } from "@/types/eduquest-user";
 import { FilePlus as FilePlusIcon } from '@phosphor-icons/react/dist/ssr/FilePlus';
 
 interface CourseFormProps {
