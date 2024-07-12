@@ -2,14 +2,14 @@
 import * as React from 'react';
 import Button from '@mui/material/Button';
 // import Typography from '@mui/material/Typography';
-import { CaretLeft as CaretLeftIcon } from "@phosphor-icons/react/dist/ssr/CaretLeft";
+// import { CaretLeft as CaretLeftIcon } from "@phosphor-icons/react/dist/ssr/CaretLeft";
 import { Pen as PenIcon } from "@phosphor-icons/react/dist/ssr/Pen";
 // import { FloppyDisk as FloppyDiskIcon } from "@phosphor-icons/react/dist/ssr/FloppyDisk";
 // import { Trash as TrashIcon } from "@phosphor-icons/react/dist/ssr/Trash";
 // import { GameController as GameControllerIcon } from "@phosphor-icons/react/dist/ssr/GameController";
 // import type { Course } from '@/types/course';
 // import type { Question } from '@/types/question';
-import type { Quest } from '@/types/quest';
+// import type { Quest } from '@/types/quest';
 import apiService from "@/api/api-service";
 import type { AxiosResponse } from "axios";
 import { AxiosError } from "axios";
@@ -30,23 +30,23 @@ import { authClient } from "@/lib/auth/client";
 // import {paths} from "@/paths";
 // import Alert from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
-import {useRouter} from "next/navigation";
+// import {useRouter} from "next/navigation";
 import {XCircle as XCircleIcon} from "@phosphor-icons/react/dist/ssr/XCircle";
 // import Chip from "@mui/material/Chip";
 // import {QuestionCard} from "@/components/dashboard/quest/question/question-card";
 // import {Answer} from "@/types/answer";
-import {UserQuestQuestionAttempt} from "@/types/user-quest-question-attempt";
+import type { UserQuestQuestionAttempt} from "@/types/user-quest-question-attempt";
 import { QuestionAttemptCard } from "@/components/dashboard/quest/question/attempt/question-attempt-card";
 
 
 export default function Page({ params }: { params: { userQuestAttemptId: string } }) : React.JSX.Element {
-  const router = useRouter();
+  // const router = useRouter();
   // const questTypeRef = React.useRef<HTMLInputElement>(null);
   // const questNameRef = React.useRef<HTMLInputElement>(null);
   // const questDescriptionRef = React.useRef<HTMLInputElement>(null);
   // const questStatusRef = React.useRef<HTMLInputElement>(null);
   // const questCourseIdRef = React.useRef<HTMLInputElement>(null);
-  const [quest, setQuest] = React.useState<Quest>();
+  // const [quest, setQuest] = React.useState<Quest>();
   // const [answers, setAnswers] = React.useState<Answer[]>();
   const [attemptedQuestionsAndAnswers, setAttemptedQuestionsAndAnswers] = React.useState<UserQuestQuestionAttempt[]>();
   // const [selectedCourse, setSelectedCourse] = React.useState<Course | null>(null);
@@ -184,9 +184,9 @@ export default function Page({ params }: { params: { userQuestAttemptId: string 
 
   return (
     <Stack spacing={3}>
-      {attemptedQuestionsAndAnswers &&
+      {attemptedQuestionsAndAnswers && attemptedQuestionsAndAnswers.length > 0 &&
         <Stack direction="row" spacing={3} sx={{justifyContent: 'space-between'}}>
-          <Button startIcon={<CaretLeftIcon fontSize="var(--icon-fontSize-md)"/>} href={`/dashboard/quest/${quest?.id.toString()}`}>Back to Quest {quest?.name} </Button>
+          {/*<Button startIcon={<CaretLeftIcon fontSize="var(--icon-fontSize-md)"/>} href={`/dashboard/quest/${attemptedQuestionsAndAnswers?[0]}`}>Return to Quest</Button>*/}
         <Button startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PenIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
           {showForm ? 'Close' : 'Edit Question'}
         </Button>
