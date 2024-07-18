@@ -4,5 +4,6 @@ import type { UserQuestQuestionAttempt } from "@/types/user-quest-question-attem
 export interface AttemptAnswerRecord {
   id: number
   answer: Answer
+  is_selected: boolean
   user_quest_question_attempt: UserQuestQuestionAttempt['id']
 }

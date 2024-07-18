@@ -9,6 +9,7 @@ import type { Quest } from '@/types/quest';
 import CardActionArea from "@mui/material/CardActionArea";
 import CardHeader from "@mui/material/CardHeader";
 import Chip from "@mui/material/Chip";
+import {CardMedia} from "@mui/material";
 
 interface QuestCardProps {
   rows?: Quest[];
@@ -39,13 +40,16 @@ export function QuestCard({
           <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <CardActionArea sx={{ height: '100%'}} href={`/dashboard/quest/${quest.id.toString()}`}>
             <CardHeader title={quest.name}/>
+              <CardMedia
+                component="img"
+                alt="Multiple Choice"
+                image={`/assets/${quest.image.filename}`}
+                sx={{ height: 160, objectFit: 'contain', p: 4, mt:1, backgroundColor: '#fafafa' }}
+              />
               <CardContent>
                 <Chip label={quest.status} sx={{ mb: 1.5 }} color="success" size="small"/>
                 <Typography variant="subtitle1">
-                  {quest.from_course.code}
-                </Typography>
-                <Typography variant="subtitle1" sx={{ mb: 1.5 }}>
-                  {quest.from_course.name}
+                  {quest.from_course.code} {quest.from_course.name}
                 </Typography>
                 <Typography variant="body2" sx={{ mb: 1.5 }}>
                   AY{quest.from_course.term.academic_year.start_year}-{quest.from_course.term.academic_year.end_year} {quest.from_course.term.name}

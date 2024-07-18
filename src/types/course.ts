@@ -1,4 +1,5 @@
 import type {Term} from "@/types/term";
+import type {Image} from "@/types/image";
 
 export interface Course {
   id: number;
@@ -7,4 +8,6 @@ export interface Course {
   code: string;
   description: string;
   status: string;
+  enrolled_users: number[];
+  image: Image;
 }

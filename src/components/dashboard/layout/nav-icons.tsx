@@ -7,6 +7,9 @@ import { Users as UsersIcon } from '@phosphor-icons/react/dist/ssr/Users';
 import { XSquare } from '@phosphor-icons/react/dist/ssr/XSquare';
 import { Book as BookIcon } from '@phosphor-icons/react/dist/ssr/Book';
 import { Sword as SwordIcon } from '@phosphor-icons/react/dist/ssr/Sword';
+import { MagicWand as MagicWandIcon } from "@phosphor-icons/react/dist/ssr/MagicWand";
+import { ShieldStar as ShieldStarIcon } from '@phosphor-icons/react/dist/ssr/ShieldStar';
+import { Upload as UploadIcon } from '@phosphor-icons/react/dist/ssr/Upload';
 
 export const navIcons = {
   'chart-pie': ChartPieIcon,
@@ -16,5 +19,8 @@ export const navIcons = {
   'user': UserIcon,
   'users': UsersIcon,
   'book': BookIcon,
-  'sword': SwordIcon
+  'sword': SwordIcon,
+  'badge': ShieldStarIcon,
+  'magic-wand': MagicWandIcon,
+  'upload': UploadIcon,
 } as Record<string, Icon>;

@@ -14,6 +14,9 @@ export const paths = {
     settings: '/dashboard/settings',
     course: '/dashboard/course',
     quest: '/dashboard/quest',
+    generator: '/dashboard/generator',
+    import: '/dashboard/import',
+    badge: '/dashboard/badge',
   },
   errors: {
     notFound: '/errors/not-found',

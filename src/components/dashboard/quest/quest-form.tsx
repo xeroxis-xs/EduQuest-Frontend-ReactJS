@@ -24,6 +24,8 @@ import type { Course } from "@/types/course";
 import type { Quest } from "@/types/quest";
 import { useUser } from "@/hooks/use-user";
 import { FilePlus as FilePlusIcon } from '@phosphor-icons/react/dist/ssr/FilePlus';
+import {CardMedia} from "@mui/material";
+import type {Image} from "@/types/image";
 
 interface CourseFormProps {
   onFormSubmitSuccess: () => void;
@@ -36,37 +38,20 @@ export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Ele
   const questDescriptionRef = React.useRef<HTMLInputElement>(null);
   const questStatusRef = React.useRef<HTMLInputElement>(null);
   const questCourseIdRef = React.useRef<HTMLInputElement>(null);
+  const questImageIdRef = React.useRef<HTMLInputElement>(null);
   const [courses, setCourses] = React.useState<Course[]>();
+  const [images, setImages] = React.useState<Image[]>();
   const [selectedCourse, setSelectedCourse] = React.useState<Course | null>(null);
+  const [selectedImage, setSelectedImage] = React.useState<Image | null>(null);
   const [submitStatus, setSubmitStatus] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
-  // const [eduquestUser, setEduquestUser] = React.useState<EduquestUser>();
 
-  // const getUser = async ({username}: { username: string }): Promise<void> => {
-  //   try {
-  //     const response: AxiosResponse<EduquestUser> = await apiService.get<EduquestUser>(`/api/EduquestUser/${username}`);
-  //     const data: EduquestUser = response.data;
-  //     setEduquestUser(data);
-  //     logger.debug('eduquest user', data);
-  //   } catch (error: unknown) {
-  //     if (error instanceof AxiosError) {
-  //       if (error.response?.status === 401) {
-  //         await authClient.signInWithMsal();
-  //       }
-  //       else {
-  //         logger.error('Code: ', error.response?.status);
-  //         logger.error('Message: ', error.response?.data);
-  //       }
-  //     }
-  //     logger.error('Failed to fetch data', error);
-  //   }
-  // };
 
-  const getCourses = async (): Promise<void> => {
+  const getImages = async (): Promise<void> => {
     try {
-      const response: AxiosResponse<Course[]> = await apiService.get<Course[]>(`/api/Course/`);
-      const data: Course[] = response.data;
-      setCourses(data);
-      logger.debug('courses', data);
+      const response: AxiosResponse<Image[]> = await apiService.get<Image[]>(`/api/Image/`);
+      const data: Image[] = response.data;
+      setImages(data);
+      logger.debug('Images', data);
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         if (error.response?.status === 401) {
@@ -81,8 +66,39 @@ export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Ele
     }
   };
 
+  const getCourses = async (): Promise<void> => {
+    try {
+      const response: AxiosResponse<Course[]> = await apiService.get<Course[]>(`/api/Course/`);
+      const data: Course[] = response.data;
+      setCourses(data);
+      logger.debug('Courses', data);
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 401) {
+          await authClient.signInWithMsal();
+        }
+        else {
+          logger.error('Code: ', error.response?.status);
+          logger.error('Message: ', error.response?.data);
+        }
+      }
+      logger.error('Failed to fetch data', error);
+    }
+  };
+
+  const handleImageChange = (event: SelectChangeEvent<number>) => {
+    const imageId = Number(event.target.value); // Convert the value to a number
+    const image = images?.find(i => i.id === imageId);
+    if (image) {
+      setSelectedImage({
+        id: image.id,
+        name: image.name,
+        filename: image.filename
+      });
+    }
+  };
+
   const handleCourseChange = (event: SelectChangeEvent<number>) => {
-    // Since the value is now explicitly a number, ensure that the state and logic that depend on this value are correctly typed and implemented.
     const courseId = Number(event.target.value); // Convert the value to a number
     const course = courses?.find(c => c.id === courseId);
     if (course) {
@@ -102,7 +118,13 @@ export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Ele
             start_year: course.term.academic_year.start_year,
             end_year: course.term.academic_year.end_year
           }
-        }
+        },
+        image: {
+          id: course.image.id,
+          name: course.image.name,
+          filename: course.image.filename
+        },
+        enrolled_users: course.enrolled_users
       });
     }
   };
@@ -115,7 +137,8 @@ export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Ele
       description: questDescriptionRef.current?.value,
       status: questStatusRef.current?.value,
       from_course: selectedCourse || courses?.[0],
-      organiser: eduquestUser
+      organiser: eduquestUser,
+      image: selectedImage || images?.[0]
     };
 
     try {
@@ -136,15 +159,12 @@ export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Ele
       }
       setSubmitStatus({ type: 'error', message: 'Create Failed. Please try again.' });
     }
-
   };
 
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
       await getCourses();
-      // if (user?.username) {
-      //   await getUser({ username: user.username });
-      // }
+      await getImages();
     };
 
     fetchData().catch((error: unknown) => {
@@ -182,17 +202,54 @@ export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Ele
                 <OutlinedInput defaultValue="" label="Status" name="status" inputRef={questStatusRef} />
               </FormControl>
             </Grid>
-
           </Grid>
-          <Typography sx={{my:3}} variant="h6">Course</Typography>
-          {courses && (
 
-            <Grid container spacing={3}>
-
+          <Typography sx={{my:3}} variant="h6">Thumbnail</Typography>
+          {images ?
+            <Grid container spacing={3} >
+              <Grid md={3} xs={12}>
+                <FormControl fullWidth required>
+                  <InputLabel>Thumbnail ID</InputLabel>
+                  <Select defaultValue={images[0]?.id} onChange={handleImageChange} inputRef={questImageIdRef}
+                          label="Image ID" variant="outlined" type="number">
+                    {images.map((option) => (
+                      <MenuItem key={option.id} value={option.id}>
+                        {option.id}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid md={9} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
               <Grid md={3} xs={6}>
+                <Typography variant="subtitle2">Thumbnail Name</Typography>
+                <Typography variant="body2">{selectedImage?.name || images[0].name}</Typography>
+              </Grid>
+              <Grid md={3} xs={6}>
+                <Typography variant="subtitle2">Thumbnail Filename</Typography>
+                <Typography variant="body2">{selectedImage?.filename || images[0].filename}</Typography>
+              </Grid>
+              <Grid xs={12}>
+                <Typography variant="subtitle2">Thumbnail Preview</Typography>
+                <CardMedia
+                  component="img"
+                  alt={selectedImage?.name || images[0].name}
+                  image={`/assets/${selectedImage?.filename || images[0].filename}`}
+                  sx={{ height: 160, objectFit: 'contain', p: 4, mt:1, backgroundColor: '#fafafa' }}
+                />
+              </Grid>
+            </Grid> : null}
+          <Divider sx={{my:3}}/>
+
+          <Typography sx={{my:3}} variant="h6">Course</Typography>
+
+          {courses ?
+            <Grid container spacing={3} >
+              <Grid md={3} xs={12}>
                 <FormControl fullWidth required>
                   <InputLabel>Course ID</InputLabel>
-                  <Select defaultValue={courses[0].id} onChange={handleCourseChange} inputRef={questCourseIdRef} label="Course ID" variant="outlined" type="number">
+                  <Select defaultValue={courses[0]?.id} onChange={handleCourseChange} inputRef={questCourseIdRef}
+                          label="Course ID" variant="outlined" type="number">
                     {courses.map((option) => (
                       <MenuItem key={option.id} value={option.id}>
                         {option.id}
@@ -201,34 +258,41 @@ export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Ele
                   </Select>
                 </FormControl>
               </Grid>
+              <Grid md={9} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
               <Grid md={3} xs={6}>
-                <FormControl fullWidth required>
-                  <InputLabel>Course Name</InputLabel>
-                  <OutlinedInput value={selectedCourse?.name || courses[0].name} label="Course Name" disabled/>
-                </FormControl>
+                <Typography variant="subtitle2">Course Name</Typography>
+                <Typography variant="body2">{selectedCourse?.name || courses[0]?.name }</Typography>
               </Grid>
               <Grid md={3} xs={6}>
-                <FormControl fullWidth required>
-                  <InputLabel>Course Code</InputLabel>
-                  <OutlinedInput value={selectedCourse?.code || courses[0].code}  label="Course Code"  disabled/>
-                </FormControl>
+                <Typography variant="subtitle2">Course Code</Typography>
+                <Typography variant="body2">{selectedCourse?.code || courses[0]?.code}</Typography>
               </Grid>
               <Grid md={3} xs={6}>
-                <FormControl fullWidth required>
-                  <InputLabel>Course Status</InputLabel>
-                  <OutlinedInput value={selectedCourse?.status || courses[0].status}  label="Course Status" disabled/>
-                </FormControl>
+                <Typography variant="subtitle2">Course Year / Term</Typography>
+                <Typography variant="body2">
+                  AY {selectedCourse?.term.academic_year.start_year || courses[0]?.term.academic_year.start_year}-{selectedCourse?.term.academic_year.end_year || courses[0].term.academic_year.end_year} / {selectedCourse?.term.name || courses[0].term.name}
+                </Typography>
+              </Grid>
+              <Grid md={3} xs={6}>
+                <Typography variant="subtitle2">Course Duration</Typography>
+                <Typography variant="body2">
+                  From {selectedCourse?.term.start_date || courses[0]?.term.start_date} to {selectedCourse?.term.end_date || courses[0].term.end_date}
+                </Typography>
               </Grid>
               <Grid xs={12}>
-                <FormControl fullWidth required>
-                  <InputLabel>Course Description</InputLabel>
-                  <OutlinedInput value={selectedCourse?.description || courses[0].description}  label="Course Description" disabled/>
-                </FormControl>
+                <Typography variant="subtitle2">Course Description</Typography>
+                <Typography variant="body2">{selectedCourse?.description || courses[0]?.description}</Typography>
               </Grid>
-
-
-            </Grid>
-          )}
+              <Grid xs={12}>
+                <Typography variant="subtitle2">Course Thumbnail</Typography>
+                <CardMedia
+                  component="img"
+                  alt={selectedCourse?.image.name || courses[0]?.image.name}
+                  image={`/assets/${selectedCourse?.image.filename || courses[0]?.image.filename}`}
+                  sx={{ height: 160, objectFit: 'contain', p: 4, mt:1, backgroundColor: '#fafafa' }}
+                />
+              </Grid>
+            </Grid> : null}
         </CardContent>
 
         <CardActions sx={{ justifyContent: 'flex-end' }}>

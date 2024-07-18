@@ -7,5 +7,6 @@ export interface UserQuestQuestionAttempt {
   selected_answers: AttemptAnswerRecord[],
   question: Question,
   score_achieved: number,
+  submitted: boolean,
   user_quest_attempt: UserQuestAttempt['id']
 }

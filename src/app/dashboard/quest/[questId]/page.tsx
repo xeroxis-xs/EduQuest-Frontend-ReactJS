@@ -8,7 +8,6 @@ import { FloppyDisk as FloppyDiskIcon } from "@phosphor-icons/react/dist/ssr/Flo
 import { Trash as TrashIcon } from "@phosphor-icons/react/dist/ssr/Trash";
 import { GameController as GameControllerIcon } from "@phosphor-icons/react/dist/ssr/GameController";
 import type { Course } from '@/types/course';
-import type { Question } from '@/types/question';
 import type { Quest } from '@/types/quest';
 import type { UserQuestAttempt } from '@/types/user-quest-attempt';
 import apiService from "@/api/api-service";
@@ -36,6 +35,28 @@ import {XCircle as XCircleIcon} from "@phosphor-icons/react/dist/ssr/XCircle";
 import Chip from "@mui/material/Chip";
 import {useUser} from "@/hooks/use-user";
 import {UserQuestAttemptTable} from "@/components/dashboard/quest/attempt/quest-attempt-table";
+import { CardMedia } from "@mui/material";
+import IconButton, { IconButtonProps } from '@mui/material/IconButton';
+import { CaretDown as CaretDownIcon } from "@phosphor-icons/react/dist/ssr/CaretDown";
+import { styled } from '@mui/material/styles';
+import Collapse from '@mui/material/Collapse';
+import {Image} from "@/types/image";
+
+interface ExpandMoreProps extends IconButtonProps {
+  expand: boolean;
+}
+
+const ExpandMore = styled((props: ExpandMoreProps) => {
+  // eslint-disable-next-line no-unused-vars -- expand is defined in props
+  const { expand, ...other } = props;
+  return <IconButton {...other} />;
+})(({ theme, expand }) => ({
+  transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
+  marginLeft: 'auto',
+  transition: theme.transitions.create('transform', {
+    duration: theme.transitions.duration.shortest,
+  }),
+}));
 
 export default function Page({ params }: { params: { questId: string } }) : React.JSX.Element {
   const router = useRouter();
@@ -45,24 +66,33 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
   const questDescriptionRef = React.useRef<HTMLInputElement>(null);
   const questStatusRef = React.useRef<HTMLInputElement>(null);
   const questCourseIdRef = React.useRef<HTMLInputElement>(null);
+  const questImageIdRef = React.useRef<HTMLInputElement>(null);
   const [quest, setQuest] = React.useState<Quest>();
   const [courses, setCourses] = React.useState<Course[]>();
-  const [questions, setQuestions] = React.useState<Question[]>();
+  const [course, setCourse] = React.useState<Course>();
+  const [images, setImages] = React.useState<Image[]>();
   const [userQuestAttempts, setUserQuestAttempts] = React.useState<UserQuestAttempt[]>();
   const [selectedCourse, setSelectedCourse] = React.useState<Course | null>(null);
+  const [selectedImage, setSelectedImage] = React.useState<Image | null>(null);
   const [submitStatus, setSubmitStatus] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [showForm, setShowForm] = React.useState(false);
+  const [expanded, setExpanded] = React.useState(false);
+
+  const handleExpandClick = () => {
+    setExpanded(!expanded);
+  };
 
   const toggleForm = (): void => {
     setShowForm(!showForm);
   };
 
-  const getQuest = async (): Promise<void> => {
+  const getQuest = async (): Promise<Quest | undefined> => {
     try {
       const response: AxiosResponse<Quest> = await apiService.get<Quest>(`/api/Quest/${params.questId}`);
       const data: Quest = response.data;
       setQuest(data);
       logger.debug('quest', data);
+      return data
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         if (error.response?.status === 401) {
@@ -70,15 +100,21 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
         }
       }
       logger.error('Failed to fetch data', error);
+      return undefined;
     }
   };
 
-  const getCourses = async (): Promise<void> => {
+  const getCourses = async (output:Quest | undefined): Promise<void> => {
     try {
       const response: AxiosResponse<Course[]> = await apiService.get<Course[]>(`/api/Course/`);
       const data: Course[] = response.data;
       setCourses(data);
       logger.debug('courses', data);
+      logger.debug('Quest from_course ID:', output?.from_course?.id);
+      const foundCourse = data?.find(c => c.id === output?.from_course?.id);
+      logger.debug('course', foundCourse);
+      setCourse(foundCourse);
+
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         if (error.response?.status === 401) {
@@ -89,12 +125,16 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
     }
   };
 
-  const getQuestions = async (): Promise<void> => {
+  // const filterCourses = async (): Promise<void> => {
+  //
+  // }
+
+  const getImages = async (): Promise<void> => {
     try {
-      const response: AxiosResponse<Question[]> = await apiService.get<Question[]>(`/api/Question/by-quest/${params.questId}`);
-      const data: Question[] = response.data;
-      setQuestions(data);
-      logger.debug('question', data);
+      const response: AxiosResponse<Image[]> = await apiService.get<Image[]>(`/api/Image/`);
+      const data: Image[] = response.data;
+      setImages(data);
+      logger.debug('images', data);
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         if (error.response?.status === 401) {
@@ -126,15 +166,29 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
   const handleCourseChange = (event: SelectChangeEvent<number>) => {
     // Since the value is now explicitly a number, ensure that the state and logic that depend on this value are correctly typed and implemented.
     const courseId = Number(event.target.value); // Convert the value to a number
-    const course = courses?.find(c => c.id === courseId);
-    if (course) {
+    const newCourse = courses?.find(c => c.id === courseId);
+    if (newCourse) {
       setSelectedCourse({
-        id: course.id,
-        name: course.name,
-        code: course.code,
-        description: course.description,
-        status: course.status,
-        term: course.term
+        id: newCourse.id,
+        name: newCourse.name,
+        code: newCourse.code,
+        description: newCourse.description,
+        status: newCourse.status,
+        term: newCourse.term,
+        enrolled_users: newCourse.enrolled_users,
+        image: newCourse.image,
+      });
+    }
+  };
+
+  const handleImageChange = (event: SelectChangeEvent<number>) => {
+    const imageId = Number(event.target.value); // Convert the value to a number
+    const image = images?.find(i => i.id === imageId);
+    if (image) {
+      setSelectedImage({
+        id: image.id,
+        name: image.name,
+        filename: image.filename
       });
     }
   };
@@ -146,7 +200,8 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
       name: questNameRef.current?.value,
       description: questDescriptionRef.current?.value,
       status: questStatusRef.current?.value,
-      from_course: selectedCourse || quest?.from_course
+      from_course: selectedCourse || quest?.from_course,
+      image: selectedImage || quest?.image
     };
 
     try {
@@ -155,10 +210,14 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
       setSubmitStatus({ type: 'success', message: 'Update Successful' });
       await getQuest();
       setShowForm(false)
-    } catch (error) {
-      logger.error('Submit Error:', error);
-      setSubmitStatus({ type: 'error', message: 'Update Failed. Please try again.' });
-
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 401) {
+          await authClient.signInWithMsal();
+        }
+        logger.error('Submit Error:', error);
+        setSubmitStatus({type: 'error', message: 'Update Failed. Please try again.'});
+      }
     }
 
   };
@@ -173,13 +232,30 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
     }
   };
 
+  const handleNewAttempt = async () => {
+    try {
+      const response: AxiosResponse<UserQuestAttempt> = await apiService.post(`/api/UserQuestAttempt/`, {
+        first_attempted_on: new Date().toISOString(),
+        last_attempted_on: new Date().toISOString(),
+        submitted: false,
+        time_taken: 0,
+        user: eduquestUser?.id,
+        quest: params.questId as unknown as number,
+      });
+      logger.debug('New Attempt created:', response.data);
+      router.push(`/dashboard/quest/${params.questId}/quest-attempt/${response.data.id.toString()}`);
+    } catch (error) {
+      logger.error('Failed to create a new attempt', error);
+      setSubmitStatus({ type: 'error', message: 'Failed to create a new attempt. Please try again.' });
+    }
+  }
+
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
-      await getQuest();
-      await getCourses();
-      await getQuestions();
+      const output = await getQuest();
+      await getCourses(output);
+      await getImages();
       await getUserQuestAttempts();
-
     };
 
     fetchData().catch((error: unknown) => {
@@ -202,8 +278,13 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
       {!showForm && quest ?
         <Card>
           <CardHeader title="Quest Details"/>
-          <Divider/>
-          <CardContent>
+          <CardMedia
+            component="img"
+            alt={quest.image.name}
+            image={`/assets/${quest.image.filename}`}
+            sx={{ height: 160, objectFit: 'contain', p: 4, mt:1, backgroundColor: '#fafafa' }}
+          />
+          <CardContent sx={{pb: '16px'}}>
             <Grid container spacing={3}>
               <Grid md={6} xs={12}>
                 <Typography variant="subtitle2">Quest ID</Typography>
@@ -219,24 +300,40 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
               </Grid>
               <Grid md={6} xs={12}>
                 <Typography variant="subtitle2">Number of Questions</Typography>
-                <Typography variant="body2">{questions?.length}</Typography>
+                <Typography variant="body2">{quest.total_questions}</Typography>
               </Grid>
-              <Grid xs={12}>
+              <Grid md={6} xs={12}>
                 <Typography variant="subtitle2">Quest Description</Typography>
                 <Typography variant="body2">{quest.description}</Typography>
+              </Grid>
+              <Grid md={6} xs={12}>
+                <Typography variant="subtitle2">Quest Maximum Score</Typography>
+                <Typography variant="body2">{quest.total_max_score}</Typography>
               </Grid>
               <Grid md={6} xs={12}>
                 <Typography variant="subtitle2">Quest Created By</Typography>
                 <Typography variant="body2">{quest.organiser.username}</Typography>
                 <Typography variant="body2">{quest.organiser.email}</Typography>
               </Grid>
+
               <Grid md={6} xs={12}>
                 <Typography variant="subtitle2">Quest Status</Typography>
                 <Chip label={quest.status} sx={{ mt: 1 }} color="success" size="small"/>
               </Grid>
 
             </Grid>
-            <Divider sx={{my: 3}}/>
+
+            <ExpandMore
+                expand={expanded}
+                onClick={handleExpandClick}
+                aria-expanded={expanded}
+                aria-label="show more"
+                sx={{ display: 'flex', mx: 'auto' }}
+              >
+                <CaretDownIcon />
+              </ExpandMore>
+
+            <Collapse in={expanded} timeout="auto" unmountOnExit>
             <Grid container spacing={3}>
               <Grid md={6} xs={12}>
                 <Typography variant="subtitle2">Course ID</Typography>
@@ -265,16 +362,34 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
                 <Typography variant="body2">From {quest.from_course.term.start_date} to {quest.from_course.term.end_date}</Typography>
               </Grid>
             </Grid>
+            </Collapse>
           </CardContent>
           <CardActions sx={{ justifyContent: 'center' }}>
-            <Button endIcon={<GameControllerIcon fontSize="var(--icon-fontSize-md)"/>}
-                    component={RouterLink}
-                    variant={'contained'}
-                    href={`/dashboard/quest/${params.questId}/question`}>
-              Start Quest</Button>
+
+            {course && eduquestUser && (
+              course.enrolled_users.includes(eduquestUser.id) ? (
+                <Button endIcon={<GameControllerIcon fontSize="var(--icon-fontSize-md)"/>}
+                        variant='contained'
+                        onClick={handleNewAttempt}
+                >
+                  Start New Attempt
+                </Button>
+              ) : (
+                <Button startIcon={<CaretLeftIcon fontSize="var(--icon-fontSize-md)" />}
+                        variant='outlined'
+                        component={RouterLink}
+                        href={`/dashboard/course/${quest.from_course.id.toString()}`}
+                >
+                  Enroll Course before attempting
+                </Button>
+              )
+            )}
+
+
           </CardActions>
         </Card> : null}
 
+      {/* FORM */}
       <form onSubmit={handleSubmit}>
         {showForm && quest ? <Card>
             <CardHeader title={`Quest ${quest.id.toString()}`}/>
@@ -333,30 +448,68 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
                     <Grid md={9} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
                   <Grid md={3} xs={6}>
                     <Typography variant="subtitle2">Course Name</Typography>
-                    <Typography variant="body2">{selectedCourse?.name || courses[0].name}</Typography>
+                    <Typography variant="body2">{selectedCourse?.name || quest.from_course.name }</Typography>
                   </Grid>
                   <Grid md={3} xs={6}>
                     <Typography variant="subtitle2">Course Code</Typography>
-                    <Typography variant="body2">{selectedCourse?.code || courses[0].code}</Typography>
+                    <Typography variant="body2">{selectedCourse?.code || quest.from_course.code}</Typography>
                   </Grid>
                   <Grid md={6} xs={12}>
                     <Typography variant="subtitle2">Course Description</Typography>
-                    <Typography variant="body2">{selectedCourse?.description || courses[0].description}</Typography>
+                    <Typography variant="body2">{selectedCourse?.description || quest.from_course.description}</Typography>
                   </Grid>
                   <Grid md={3} xs={6}>
                     <Typography variant="subtitle2">Course Year / Term</Typography>
                     <Typography variant="body2">
-                      AY {selectedCourse?.term.academic_year.start_year || courses[0].term.academic_year.start_year}-{selectedCourse?.term.academic_year.end_year || courses[0].term.academic_year.end_year} / {selectedCourse?.term.name || courses[0].term.name}
+                      AY {selectedCourse?.term.academic_year.start_year || quest.from_course.term.academic_year.start_year}-{selectedCourse?.term.academic_year.end_year || courses[0].term.academic_year.end_year} / {selectedCourse?.term.name || courses[0].term.name}
                     </Typography>
                   </Grid>
                   <Grid md={3} xs={6}>
                     <Typography variant="subtitle2">Course Duration</Typography>
                     <Typography variant="body2">
-                      From {selectedCourse?.term.start_date || courses[0].term.start_date} to {selectedCourse?.term.end_date || courses[0].term.end_date}
+                      From {selectedCourse?.term.start_date || quest.from_course.term.start_date} to {selectedCourse?.term.end_date || courses[0].term.end_date}
                     </Typography>
                   </Grid>
-
                 </Grid> : null}
+
+              <Divider sx={{my: 4}}/>
+
+              <Typography sx={{my: 3}} variant="h6">Thumbnail</Typography>
+
+              {images ?
+                <Grid container spacing={3} >
+                  <Grid md={3} xs={12}>
+                    <FormControl fullWidth required>
+                      <InputLabel>Thumbnail ID</InputLabel>
+                      <Select defaultValue={quest.image.id} onChange={handleImageChange} inputRef={questImageIdRef}
+                              label="Image ID" variant="outlined" type="number">
+                        {images.map((option) => (
+                          <MenuItem key={option.id} value={option.id}>
+                            {option.id}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid md={9} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
+                  <Grid md={3} xs={6}>
+                    <Typography variant="subtitle2">Thumbnail Name</Typography>
+                    <Typography variant="body2">{selectedImage?.name || quest.image.name}</Typography>
+                  </Grid>
+                  <Grid md={3} xs={6}>
+                    <Typography variant="subtitle2">Thumbnail Filename</Typography>
+                    <Typography variant="body2">{selectedImage?.filename || quest.image.filename}</Typography>
+                  </Grid>
+                  <Grid xs={12}>
+                    <Typography variant="subtitle2">Thumbnail Preview</Typography>
+                    <CardMedia
+                      component="img"
+                      alt={selectedImage?.name || quest.image.name}
+                      image={`/assets/${selectedImage?.filename || quest.image.filename}`}
+                      sx={{ height: 160, objectFit: 'contain', p: 4, mt:1, backgroundColor: '#fafafa' }}/>
+                  </Grid>
+                </Grid> : null}
+
             </CardContent>
 
             <Divider/>
@@ -372,10 +525,10 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
 
       </form>
 
-      <Typography variant="h5">My Attempts</Typography>
+      <Typography variant="h6">My Attempts</Typography>
 
         {userQuestAttempts && userQuestAttempts.length > 0 ? (
-          <UserQuestAttemptTable rows={userQuestAttempts} questId={params.questId}/>
+          <UserQuestAttemptTable rows={userQuestAttempts} questId={params.questId} totalMaxScore={quest?.total_max_score}/>
         ) : (
           <Typography variant="body1">You have not attempted this quest yet.</Typography>
         )}

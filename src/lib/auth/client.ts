@@ -34,6 +34,11 @@ class AuthClient {
     const token = localStorage.getItem('access-token');
     logger.debug('access-token', token)
 
+    if (token === null) {
+      logger.debug('No access token found, perform signInWithMsal');
+      await this.signInWithMsal();
+    }
+
     if (token !== null) {
       const msalUser = msalInstance.getActiveAccount();
       const eduquestUser = await this.getEduquestUser(msalUser?.username ?? '');

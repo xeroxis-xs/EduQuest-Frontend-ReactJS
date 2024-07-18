@@ -1,8 +1,6 @@
 "use client"
 import * as React from 'react';
-// import { useRouter } from 'next/router';
 import Button from '@mui/material/Button';
-// import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { CaretLeft as CaretLeftIcon } from "@phosphor-icons/react/dist/ssr/CaretLeft";
 import { Pen as PenIcon } from "@phosphor-icons/react/dist/ssr/Pen";
@@ -45,7 +43,7 @@ import IconButton, { IconButtonProps } from '@mui/material/IconButton';
 import { CaretDown as CaretDownIcon } from "@phosphor-icons/react/dist/ssr/CaretDown";
 import { styled } from '@mui/material/styles';
 import Collapse from '@mui/material/Collapse';
-import {Image} from "@/types/image";
+import type {Image} from "@/types/image";
 
 
 interface ExpandMoreProps extends IconButtonProps {
@@ -450,13 +448,13 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
 
               <Divider sx={{my: 4}}/>
 
-              <Typography sx={{my: 3}} variant="h6">Thumbnail</Typography>
+              <Typography sx={{my: 3}} variant="h6">Image</Typography>
 
               {images ?
                 <Grid container spacing={3} >
                   <Grid md={3} xs={12}>
                     <FormControl fullWidth required>
-                      <InputLabel>Thumbnail ID</InputLabel>
+                      <InputLabel>Image ID</InputLabel>
                       <Select defaultValue={course.image.id} onChange={handleImageChange} inputRef={courseImageIdRef}
                               label="Image ID" variant="outlined" type="number">
                         {images.map((option) => (
@@ -469,15 +467,15 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
                   </Grid>
                   <Grid md={9} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
                   <Grid md={3} xs={6}>
-                    <Typography variant="subtitle2">Thumbnail Name</Typography>
+                    <Typography variant="subtitle2">Image Name</Typography>
                     <Typography variant="body2">{selectedImage?.name || course.image.name}</Typography>
                   </Grid>
                   <Grid md={3} xs={6}>
-                    <Typography variant="subtitle2">Thumbnail Filename</Typography>
+                    <Typography variant="subtitle2">Image Filename</Typography>
                     <Typography variant="body2">{selectedImage?.filename || course.image.filename}</Typography>
                   </Grid>
                   <Grid xs={12}>
-                    <Typography variant="subtitle2">Thumbnail Preview</Typography>
+                    <Typography variant="subtitle2">Image Preview</Typography>
                     <CardMedia
                       component="img"
                       alt={selectedImage?.name || images[0].name}

@@ -13,19 +13,37 @@ import TableRow from '@mui/material/TableRow';
 import RouterLink from "next/link";
 import type { UserQuestAttempt } from '@/types/user-quest-attempt';
 import Button from "@mui/material/Button";
+import Chip from "@mui/material/Chip";
+import LinearProgress from "@mui/material/LinearProgress";
 
 interface UserQuestAttemptTableProps {
   questId?: string;
   rows?: UserQuestAttempt[];
+  totalMaxScore?: number;
 }
 
-export function UserQuestAttemptTable({
-  questId = '0',
-  rows = [],
-}: UserQuestAttemptTableProps): React.JSX.Element {
+export function UserQuestAttemptTable({ questId = '0', rows = [], totalMaxScore = 0 }: UserQuestAttemptTableProps): React.JSX.Element {
 
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
+  const formatTime = (milliseconds:number) => {
+    const oneSecond = 1000;
+    const oneMinute = 60 * oneSecond;
+    const oneHour = 60 * oneMinute;
+    const oneDay = 24 * oneHour;
+
+    const days = Math.floor(milliseconds / oneDay);
+    const daysRemainder = milliseconds % oneDay;
+    const hours = Math.floor(daysRemainder / oneHour);
+    const hoursRemainder = daysRemainder % oneHour;
+    const minutes = Math.floor(hoursRemainder / oneMinute);
+    const minutesRemainder = hoursRemainder % oneMinute;
+    const seconds = Math.floor(minutesRemainder / oneSecond);
+    const millisecondsLeft = minutesRemainder % oneSecond;
+
+    return `${days.toString()}d ${hours.toString()}h ${minutes.toString()}m ${seconds.toString()}s ${millisecondsLeft.toString()}ms`;
+  };
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
@@ -49,8 +67,9 @@ export function UserQuestAttemptTable({
               <TableCell>ID</TableCell>
               <TableCell>First Attempted On</TableCell>
               <TableCell>Last Attempted On</TableCell>
-              <TableCell>Graded</TableCell>
               <TableCell>Time Taken</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell>Score</TableCell>
               <TableCell>Action</TableCell>
             </TableRow>
           </TableHead>
@@ -79,11 +98,23 @@ export function UserQuestAttemptTable({
                       second: '2-digit'
                     })}
                   </TableCell>
-                  <TableCell>{row.graded}</TableCell>
-                  <TableCell>{row.time_taken}</TableCell>
+                  <TableCell>{formatTime(row.time_taken)}</TableCell>
                   <TableCell>
-                    <Button component={RouterLink} href={`/dashboard/quest/${questId}/quest-attempt/${row.id.toString()}`}>
-                      View
+                    <Chip label={row.submitted ? "Submitted" : "In Progress"} color={row.submitted ? "success" : "warning"} size="small"/>
+                  </TableCell>
+                  <TableCell>
+                    {row.submitted ? `${parseFloat(row.total_score_achieved.toFixed(2)).toString()} / ${totalMaxScore?.toString()}` : "In Progress"}
+                    {row.submitted &&
+                    <LinearProgress
+                      variant="determinate"
+                      value={(row.total_score_achieved / totalMaxScore) * 100}
+                    />}
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      component={RouterLink}
+                      href={`/dashboard/quest/${questId}/quest-attempt/${row.id.toString()}`}>
+                      {row.submitted ? "View" : "Continue"}
                     </Button>
                   </TableCell>
                 </TableRow>

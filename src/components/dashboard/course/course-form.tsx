@@ -23,6 +23,8 @@ import Select, { type SelectChangeEvent} from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import Alert from "@mui/material/Alert";
 import { FilePlus as FilePlusIcon } from '@phosphor-icons/react/dist/ssr/FilePlus';
+import type {Image} from "@/types/image";
+import {CardMedia} from "@mui/material";
 
 interface CourseFormProps {
   onFormSubmitSuccess: () => void;
@@ -34,8 +36,11 @@ export function CourseForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.
   const courseDescriptionRef = React.useRef<HTMLInputElement>(null);
   const courseStatusRef = React.useRef<HTMLInputElement>(null);
   const courseTermIdRef = React.useRef<HTMLInputElement>(null);
+  const courseImageIdRef = React.useRef<HTMLInputElement>(null);
+  const [images, setImages] = React.useState<Image[]>();
   const [terms, setTerms] = React.useState<Term[]>();
   const [selectedTerm, setSelectedTerm] = React.useState<Term | null>(null);
+  const [selectedImage, setSelectedImage] = React.useState<Image | null>(null);
   const [submitStatus, setSubmitStatus] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const getTerms = async (): Promise<void> => {
@@ -58,8 +63,39 @@ export function CourseForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.
     }
   };
 
+  const getImages = async (): Promise<void> => {
+    try {
+      const response: AxiosResponse<Image[]> = await apiService.get<Image[]>(`/api/Image/`);
+      const data: Image[] = response.data;
+      setImages(data);
+      logger.debug('images', data);
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 401) {
+          await authClient.signInWithMsal();
+        }
+        else {
+          logger.error('Code: ', error.response?.status);
+          logger.error('Message: ', error.response?.data);
+        }
+      }
+      logger.error('Failed to fetch data', error);
+    }
+  }
+
+  const handleImageChange = (event: SelectChangeEvent<number>) => {
+    const imageId = Number(event.target.value); // Convert the value to a number
+    const image = images?.find(i => i.id === imageId);
+    if (image) {
+      setSelectedImage({
+        id: image.id,
+        name: image.name,
+        filename: image.filename
+      });
+    }
+  };
+
   const handleTermChange = (event: SelectChangeEvent<number>) => {
-    // Since the value is now explicitly a number, ensure that the state and logic that depend on this value are correctly typed and implemented.
     const termId = Number(event.target.value); // Convert the value to a number
     const term = terms?.find(t => t.id === termId);
     if (term) {
@@ -84,7 +120,8 @@ export function CourseForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.
       name: courseNameRef.current?.value,
       description: courseDescriptionRef.current?.value,
       status: courseStatusRef.current?.value,
-      term: selectedTerm || terms?.[0]
+      term: selectedTerm || terms?.[0],
+      image: selectedImage || images?.[0]
     };
 
     try {
@@ -111,6 +148,7 @@ export function CourseForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
       await getTerms();
+      await getImages();
     };
 
     fetchData().catch((error: unknown) => {
@@ -150,12 +188,50 @@ export function CourseForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.
             </Grid>
 
           </Grid>
-          <Typography sx={{my:3}} variant="h6">Term</Typography>
-          {terms && (
 
-            <Grid container spacing={3}>
-
+          <Typography sx={{my:3}} variant="h6">Thumbnail</Typography>
+          {images ?
+            <Grid container spacing={3} >
+              <Grid md={3} xs={12}>
+                <FormControl fullWidth required>
+                  <InputLabel>Thumbnail ID</InputLabel>
+                  <Select defaultValue={images[0]?.id} onChange={handleImageChange} inputRef={courseImageIdRef}
+                          label="Image ID" variant="outlined" type="number">
+                    {images.map((option) => (
+                      <MenuItem key={option.id} value={option.id}>
+                        {option.id}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid md={9} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
               <Grid md={3} xs={6}>
+                <Typography variant="subtitle2">Thumbnail Name</Typography>
+                <Typography variant="body2">{selectedImage?.name || images[0].name}</Typography>
+              </Grid>
+              <Grid md={3} xs={6}>
+                <Typography variant="subtitle2">Thumbnail Filename</Typography>
+                <Typography variant="body2">{selectedImage?.filename || images[0].filename}</Typography>
+              </Grid>
+              <Grid xs={12}>
+                <Typography variant="subtitle2">Thumbnail Preview</Typography>
+                <CardMedia
+                  component="img"
+                  alt={selectedImage?.name || images[0].name}
+                  image={`/assets/${selectedImage?.filename || images[0].filename}`}
+                  sx={{ height: 160, objectFit: 'contain', p: 4, mt:1, backgroundColor: '#fafafa' }}
+                />
+              </Grid>
+            </Grid> : null}
+
+          <Divider sx={{my:3}}/>
+
+          <Typography sx={{my:3}} variant="h6">Term</Typography>
+
+          {terms ?
+            <Grid container spacing={3} >
+              <Grid md={3} xs={12}>
                 <FormControl fullWidth required>
                   <InputLabel>Term ID</InputLabel>
                   <Select defaultValue={terms[0].id} onChange={handleTermChange} inputRef={courseTermIdRef} label="Term ID" variant="outlined" type="number">
@@ -167,44 +243,33 @@ export function CourseForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid md={3} xs={6}>
-                <FormControl fullWidth required>
-                  <InputLabel>Term Name</InputLabel>
-                  <OutlinedInput value={selectedTerm?.name || terms[0].name} label="Term Name" disabled/>
-                </FormControl>
+              <Grid md={9} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
+              <Grid md={4} xs={12}>
+                <Typography variant="subtitle2">Term Name</Typography>
+                <Typography variant="body2">{selectedTerm?.name || terms[0]?.name }</Typography>
               </Grid>
-              <Grid md={3} xs={6}>
-                <FormControl fullWidth required>
-                  <InputLabel>Term Start Date</InputLabel>
-                  <OutlinedInput value={selectedTerm?.start_date || terms[0].start_date}  label="Term Start Date" type="date" disabled/>
-                </FormControl>
+              <Grid md={4} xs={12}>
+                <Typography variant="subtitle2">Term Code</Typography>
+                <Typography variant="body2">{selectedTerm?.start_date || terms[0]?.start_date}</Typography>
               </Grid>
-              <Grid md={3} xs={6}>
-                <FormControl fullWidth required>
-                  <InputLabel>Term End Date</InputLabel>
-                  <OutlinedInput value={selectedTerm?.end_date || terms[0].end_date}  label="Term End Date" type="date" disabled/>
-                </FormControl>
+              <Grid md={4} xs={12}>
+                <Typography variant="subtitle2">Term End Date</Typography>
+                <Typography variant="body2">{selectedTerm?.end_date || terms[0]?.end_date}</Typography>
               </Grid>
-              <Grid xs={4}>
-                <FormControl fullWidth required>
-                  <InputLabel>Academic Year ID</InputLabel>
-                  <OutlinedInput value={selectedTerm?.academic_year.id || terms[0].academic_year.id}  label="Term End Date" type="number" disabled/>
-                </FormControl>
+              <Grid md={4} xs={12}>
+                <Typography variant="subtitle2">Academic Year ID</Typography>
+                <Typography variant="body2">{selectedTerm?.academic_year.id || terms[0]?.academic_year.id}</Typography>
               </Grid>
-              <Grid xs={4}>
-                <FormControl fullWidth required>
-                  <InputLabel>Start Year</InputLabel>
-                  <OutlinedInput value={selectedTerm?.academic_year.start_year || terms[0].academic_year.start_year} label="Term End Date" type="number" disabled/>
-                </FormControl>
+              <Grid md={4} xs={12}>
+                <Typography variant="subtitle2">Start Year</Typography>
+                <Typography variant="body2">{selectedTerm?.academic_year.start_year || terms[0]?.academic_year.start_year}</Typography>
               </Grid>
-              <Grid xs={4}>
-                <FormControl fullWidth required>
-                  <InputLabel>End Year</InputLabel>
-                  <OutlinedInput value={selectedTerm?.academic_year.end_year || terms[0].academic_year.end_year}  label="Term End Date" type="number" disabled/>
-                </FormControl>
+              <Grid md={4} xs={12}>
+                <Typography variant="subtitle2">End Year</Typography>
+                <Typography variant="body2">{selectedTerm?.academic_year.end_year || terms[0]?.academic_year.end_year}</Typography>
               </Grid>
-            </Grid>
-          )}
+            </Grid> : null}
+
         </CardContent>
 
         <CardActions sx={{ justifyContent: 'flex-end' }}>
