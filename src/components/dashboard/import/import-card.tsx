@@ -52,6 +52,8 @@ export function ImportCard(): React.JSX.Element {
   const [images, setImages] = React.useState<Image[]>([]);
   const [selectedCourse, setSelectedCourse] = React.useState<Course | null>(null);
   const [selectedImage, setSelectedImage] = React.useState<Image | null>(null);
+  const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
+
   // const [selectedQuest, setSelectedQuest] = React.useState<Quest | null>(null);
 
 
@@ -87,6 +89,14 @@ export function ImportCard(): React.JSX.Element {
       logger.error('Error: ', error);
     }
   }
+
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files ? event.target.files[0] : null;
+    setSelectedFile(file);
+    logger.debug('Selected File:', file);
+  };
+
 
   const handleImageChange = (event: SelectChangeEvent<number>) => {
     const imageId = Number(event.target.value); // Convert the value to a number
@@ -133,20 +143,42 @@ export function ImportCard(): React.JSX.Element {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const newQuest = {
-      type: questTypeRef.current?.value,
-      name: questNameRef.current?.value,
-      description: questDescriptionRef.current?.value,
-      status: questStatusRef.current?.value,
-      from_course: selectedCourse || courses?.[0],
-      organiser: eduquestUser,
-      image: selectedImage || images?.[0]
-    };
+    // const newQuest = {
+    //   type: questTypeRef.current?.value,
+    //   name: questNameRef.current?.value,
+    //   description: questDescriptionRef.current?.value,
+    //   status: questStatusRef.current?.value,
+    //   from_course: selectedCourse || courses?.[0],
+    //   organiser: eduquestUser,
+    //   image: selectedImage || images?.[0]
+    // };
+
+    // Create FormData
+    const formData = new FormData();
+    if (selectedFile) {
+      formData.append('file', selectedFile);
+    }
+    else {
+      logger.error('No file selected');
+    }
+    // Append other data as needed
+    formData.append('type', questTypeRef.current?.value || '');
+    formData.append('name', questNameRef.current?.value || '');
+    formData.append('description', questDescriptionRef.current?.value || '');
+    formData.append('status', questStatusRef.current?.value || '');
+    // Assuming selectedCourse and selectedImage are objects, you might need to stringify them or just append their IDs
+    formData.append('from_course', JSON.stringify(selectedCourse || courses?.[0]));
+    formData.append('organiser', JSON.stringify(eduquestUser));
+    formData.append('image', JSON.stringify(selectedImage || images?.[0]));
 
     try {
-      const response: AxiosResponse<Quest> = await apiService.post(`/api/Quest/`, newQuest);
+      const response: AxiosResponse<Quest> = await apiService.post(`/api/Quest/Upload/`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
       // onFormSubmitSuccess();
-      logger.debug('Create Success:', response.data);
+      logger.debug('Upload Success:', response.data);
       // setSubmitStatus({type: 'success', message: 'Create Successful'});
     }
     catch (error: unknown) {
@@ -184,7 +216,7 @@ export function ImportCard(): React.JSX.Element {
 
         <Grid container spacing={3}>
           <Grid md={3} xs={6}>
-            <FormControl fullWidth required>
+            <FormControl fullWidth required sx={{height: '100%'}}>
               <Button
                 component="label"
                 role={undefined}
@@ -194,8 +226,8 @@ export function ImportCard(): React.JSX.Element {
                 size='large'
                 sx={{height: '100%'}}
               >
-                Upload file
-                <VisuallyHiddenInput type="file" />
+                { selectedFile ? selectedFile.name : 'Upload File' }
+                <VisuallyHiddenInput type="file" onChange={handleFileChange} />
               </Button>
             </FormControl>
           </Grid>
