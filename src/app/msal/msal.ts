@@ -51,8 +51,12 @@ export async function handleLoginResponse(loginResponse: AuthenticationResult): 
 }
 
 
-export async function handleLoginRedirectNew() : Promise<void>{
-  await msalInstance.loginRedirect(loginRequest);
+export async function handleLoginRedirect() : Promise<void>{
+  try {
+    await msalInstance.loginRedirect(loginRequest);
+  } catch (error) {
+    logger.error("MSAL: Error handling login redirect: ", error);
+  }
 }
 
 export const handleLogout = (logoutType = "redirect") => {

@@ -1,8 +1,8 @@
 'use client';
 
-import {handleLoginRedirectNew, handleLogout, msalInstance} from "@/app/msal/msal";
+import {handleLoginRedirect, handleLogout, msalInstance} from "@/app/msal/msal";
 import apiService from "@/api/api-service";
-import type {AxiosResponse} from "axios";
+import {AxiosError, AxiosResponse} from "axios";
 import {type EduquestUser} from "@/types/eduquest-user";
 import {logger} from '@/lib/default-logger';
 import {type AccountInfo} from "@azure/msal-browser";
@@ -15,7 +15,7 @@ class AuthClient {
       localStorage.removeItem('access-token');
       msalInstance.setActiveAccount(null);
 
-      await handleLoginRedirectNew();
+      await handleLoginRedirect();
       return {};
     } catch (error) {
       const err = error as Error;
@@ -58,7 +58,12 @@ class AuthClient {
       const response: AxiosResponse<EduquestUser> = await apiService.get<EduquestUser>(`/api/EduquestUser/${username}`);
       return response.data ;
     } catch (error: unknown) {
-      logger.error('Failed to fetch data', error);
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 401) {
+          await authClient.signInWithMsal();
+        }
+      }
+      logger.error('Failed to fetch Eduquest User: ', error);
       return null;
     }
   }
