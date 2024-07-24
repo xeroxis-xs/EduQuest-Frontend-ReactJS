@@ -55,7 +55,7 @@ class AuthClient {
 
   async getEduquestUser(username: string): Promise<EduquestUser | null> {
     try {
-      const response: AxiosResponse<EduquestUser> = await apiService.get<EduquestUser>(`/api/EduquestUser/${username}`);
+      const response: AxiosResponse<EduquestUser> = await apiService.get<EduquestUser>(`/api/EduquestUser/${username.toUpperCase()}`);
       return response.data ;
     } catch (error: unknown) {
       if (error instanceof AxiosError) {

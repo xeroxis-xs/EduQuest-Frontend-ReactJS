@@ -64,6 +64,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
   const questTypeRef = React.useRef<HTMLInputElement>(null);
   const questNameRef = React.useRef<HTMLInputElement>(null);
   const questDescriptionRef = React.useRef<HTMLInputElement>(null);
+  const questMaxAttemptsRef = React.useRef<HTMLInputElement>(null);
   const questStatusRef = React.useRef<HTMLInputElement>(null);
   const questCourseIdRef = React.useRef<HTMLInputElement>(null);
   const questImageIdRef = React.useRef<HTMLInputElement>(null);
@@ -200,6 +201,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
       name: questNameRef.current?.value,
       description: questDescriptionRef.current?.value,
       status: questStatusRef.current?.value,
+      max_attempts: questMaxAttemptsRef.current?.value,
       from_course: selectedCourse || quest?.from_course,
       image: selectedImage || quest?.image
     };
@@ -311,14 +313,17 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
                 <Typography variant="body2">{quest.total_max_score}</Typography>
               </Grid>
               <Grid md={6} xs={12}>
+                <Typography variant="subtitle2">Quest Status</Typography>
+                <Chip label={quest.status} sx={{ mt: 1 }} color="success" size="small"/>
+              </Grid>
+              <Grid md={6} xs={12}>
+                <Typography variant="subtitle2">Quest Maximum Attempts</Typography>
+                <Typography variant="body2">{quest.max_attempts}</Typography>
+              </Grid>
+              <Grid md={6} xs={12}>
                 <Typography variant="subtitle2">Quest Created By</Typography>
                 <Typography variant="body2">{quest.organiser.username}</Typography>
                 <Typography variant="body2">{quest.organiser.email}</Typography>
-              </Grid>
-
-              <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Quest Status</Typography>
-                <Chip label={quest.status} sx={{ mt: 1 }} color="success" size="small"/>
               </Grid>
 
             </Grid>
@@ -366,8 +371,12 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
           </CardContent>
           <CardActions sx={{ justifyContent: 'center' }}>
 
-            {course && eduquestUser && (
-              course.enrolled_users.includes(eduquestUser.id) ? (
+            {course && eduquestUser && userQuestAttempts && (
+              userQuestAttempts.length >= quest.max_attempts ? (
+                <Button disabled variant='contained'>
+                  No more attempts available
+                </Button>
+              ) : course.enrolled_users.includes(eduquestUser.id) ? (
                 <Button endIcon={<GameControllerIcon fontSize="var(--icon-fontSize-md)"/>}
                         variant='contained'
                         onClick={handleNewAttempt}
@@ -398,23 +407,29 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
             <CardContent>
 
               <Grid container spacing={3}>
-                <Grid md={4} xs={12}>
-                  <FormControl fullWidth required>
-                    <InputLabel>Quest Type</InputLabel>
-                    <OutlinedInput defaultValue={quest.type} label="Quest Type" inputRef={questTypeRef} name="code"/>
-                  </FormControl>
-                </Grid>
-                <Grid md={4} xs={12}>
+                <Grid md={3} xs={12}>
                   <FormControl fullWidth required>
                     <InputLabel>Quest Name</InputLabel>
                     <OutlinedInput defaultValue={quest.name} label="Quest Name" inputRef={questNameRef} name="name"/>
                   </FormControl>
                 </Grid>
-                <Grid md={4} xs={12}>
+                <Grid md={3} xs={12}>
+                  <FormControl fullWidth required>
+                    <InputLabel>Quest Type</InputLabel>
+                    <OutlinedInput defaultValue={quest.type} label="Quest Type" inputRef={questTypeRef} name="code"/>
+                  </FormControl>
+                </Grid>
+                <Grid md={3} xs={12}>
                   <FormControl fullWidth required>
                     <InputLabel>Quest Status</InputLabel>
                     <OutlinedInput defaultValue={quest.status} label="Quest Status" inputRef={questStatusRef}
                                    name="status"/>
+                  </FormControl>
+                </Grid>
+                <Grid md={3} xs={12}>
+                  <FormControl fullWidth required>
+                    <InputLabel>Quest Maximum Attempts</InputLabel>
+                    <OutlinedInput defaultValue={quest.max_attempts} label="Quest Maximum Attempts" inputRef={questMaxAttemptsRef} name="max_attempts" type="number"/>
                   </FormControl>
                 </Grid>
                 <Grid xs={12}>

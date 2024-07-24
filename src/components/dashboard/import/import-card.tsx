@@ -12,9 +12,9 @@ import InputLabel from "@mui/material/InputLabel";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import Select, {type SelectChangeEvent} from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
-import CardActions from "@mui/material/CardActions";
 import Button from "@mui/material/Button";
 import {FloppyDisk as FloppyDiskIcon} from "@phosphor-icons/react/dist/ssr/FloppyDisk";
+import {CaretRight as CaretRightIcon} from "@phosphor-icons/react/dist/ssr/CaretRight";
 import { CloudArrowUp as CloudArrowUpIcon } from "@phosphor-icons/react/dist/ssr/CloudArrowUp";
 import {AxiosError, type AxiosResponse} from "axios";
 import type {Course} from "@/types/course";
@@ -22,8 +22,11 @@ import apiService from "@/api/api-service";
 import {logger} from "@/lib/default-logger";
 import {authClient} from "@/lib/auth/client";
 import type {Image} from "@/types/image";
+import type {Question} from "@/types/question";
 import {styled} from "@mui/material/styles";
 import {useUser} from "@/hooks/use-user";
+import Box from "@mui/material/Box";
+import Alert from "@mui/material/Alert";
 
 
 const VisuallyHiddenInput = styled('input')({
@@ -38,8 +41,12 @@ const VisuallyHiddenInput = styled('input')({
   width: 1,
 });
 
+interface ImportCardProps {
+  onImportSuccess: (questions : Question[]) => void;
+}
 
-export function ImportCard(): React.JSX.Element {
+
+export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Element {
   const { eduquestUser} = useUser();
   const questTypeRef = React.useRef<HTMLInputElement>(null);
   const questNameRef = React.useRef<HTMLInputElement>(null);
@@ -53,8 +60,7 @@ export function ImportCard(): React.JSX.Element {
   const [selectedCourse, setSelectedCourse] = React.useState<Course | null>(null);
   const [selectedImage, setSelectedImage] = React.useState<Image | null>(null);
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
-
-  // const [selectedQuest, setSelectedQuest] = React.useState<Quest | null>(null);
+  const [submitStatus, setSubmitStatus] = React.useState< { type: 'success' | 'error'; message: unknown } | null>(null);
 
 
   const getCourses = async (): Promise<void> => {
@@ -143,56 +149,53 @@ export function ImportCard(): React.JSX.Element {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // const newQuest = {
-    //   type: questTypeRef.current?.value,
-    //   name: questNameRef.current?.value,
-    //   description: questDescriptionRef.current?.value,
-    //   status: questStatusRef.current?.value,
-    //   from_course: selectedCourse || courses?.[0],
-    //   organiser: eduquestUser,
-    //   image: selectedImage || images?.[0]
-    // };
 
     // Create FormData
     const formData = new FormData();
-    if (selectedFile) {
-      formData.append('file', selectedFile);
-    }
-    else {
-      logger.error('No file selected');
-    }
+
     // Append other data as needed
     formData.append('type', questTypeRef.current?.value || '');
     formData.append('name', questNameRef.current?.value || '');
     formData.append('description', questDescriptionRef.current?.value || '');
     formData.append('status', questStatusRef.current?.value || '');
+    formData.append('max_attempts', '1');
     // Assuming selectedCourse and selectedImage are objects, you might need to stringify them or just append their IDs
     formData.append('from_course', JSON.stringify(selectedCourse || courses?.[0]));
     formData.append('organiser', JSON.stringify(eduquestUser));
     formData.append('image', JSON.stringify(selectedImage || images?.[0]));
 
-    try {
-      const response: AxiosResponse<Quest> = await apiService.post(`/api/Quest/Upload/`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
-        }
-      });
-      // onFormSubmitSuccess();
-      logger.debug('Upload Success:', response.data);
-      // setSubmitStatus({type: 'success', message: 'Create Successful'});
-    }
-    catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-        else {
-          logger.error('Code: ', error.response?.status);
-          logger.error('Message: ', error.response?.data);
+    if (selectedFile) {
+      formData.append('file', selectedFile);
+
+      try {
+        const response: AxiosResponse<Question[]> = await apiService.post(`/api/Quest/import/`, formData, {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        logger.debug('Upload Success:', response.data);
+        setSubmitStatus({ type: 'success', message: 'Quest Import Successful' });
+        onImportSuccess(response.data);
+      }
+      catch (error: unknown) {
+        if (error instanceof AxiosError) {
+          if (error.response?.status === 401) {
+            await authClient.signInWithMsal();
+          }
+          else {
+            logger.error('Code: ', error.response?.status);
+            logger.error('Message: ', error.response?.data);
+          }
+          setSubmitStatus({ type: 'error', message: error.response?.data || 'Quest Import Failed. Please try again.' });
         }
       }
-      // setSubmitStatus({ type: 'error', message: 'Create Failed. Please try again.' });
     }
+    else {
+      logger.error('No file selected');
+      setSubmitStatus({ type: 'error', message: 'No file selected' });
+    }
+
+
   };
 
   React.useEffect(() => {
@@ -209,7 +212,7 @@ export function ImportCard(): React.JSX.Element {
   return (
     <form onSubmit={handleSubmit}>
     <Card>
-      <CardHeader title="Import Quest Attempts from External Source"/>
+      <CardHeader title="New Quest" subheader="Create a new Quest for this Import"/>
       <Divider/>
 
       <CardContent sx={{pb:'16px'}}>
@@ -261,8 +264,13 @@ export function ImportCard(): React.JSX.Element {
             </FormControl>
           </Grid>
         </Grid>
+      </CardContent>
+    </Card>
 
-        <Typography sx={{my:3}} variant="h6">Thumbnail</Typography>
+    <Card sx={{mt: 6}}>
+      <CardHeader title="Quest Thumbnail" subheader="Select a Thumbnail for this Quest"/>
+      <Divider/>
+      <CardContent sx={{pb:'16px'}}>
         {images && images.length>0 ?
           <Grid container spacing={3} >
             <Grid md={3} xs={12}>
@@ -297,11 +305,13 @@ export function ImportCard(): React.JSX.Element {
               />
             </Grid>
           </Grid> : null}
+      </CardContent>
+    </Card>
 
-        <Divider sx={{my: 4}}/>
-
-
-          <Typography sx={{my: 3}} variant="h6">Course</Typography>
+      <Card sx={{mt: 6}}>
+        <CardHeader title="Associated Course" subheader="Select an associated Course for this Quest"/>
+        <Divider/>
+        <CardContent sx={{pb:'16px'}}>
           {courses && courses.length > 0 ?
             <Grid container spacing={3} >
               <Grid md={3} xs={12}>
@@ -355,11 +365,17 @@ export function ImportCard(): React.JSX.Element {
 
 
       </CardContent>
-
-      <CardActions sx={{justifyContent: 'center'}}>
-        <Button startIcon={<FloppyDiskIcon/>} type="submit" variant="contained">Import Quest Attempts</Button>
-      </CardActions>
     </Card>
+
+    {submitStatus && (
+      <Alert severity={submitStatus.type} sx={{ mt: 4 }}>
+        {typeof submitStatus.message === 'string' ? submitStatus.message : 'An error occurred'}
+      </Alert>
+    )}
+
+    <Box sx={{display: "flex", justifyContent: "center", mt: 6}}>
+      <Button endIcon={<CaretRightIcon/>} type="submit" variant="contained">Next: Edit Question</Button>
+    </Box>
     </form>
     // {submitStatus ? <Alert severity={submitStatus.type} sx={{marginTop: 2}}>
     //   {submitStatus.message}

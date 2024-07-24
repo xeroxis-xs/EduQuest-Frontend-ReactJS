@@ -1,6 +1,6 @@
 import type { EduquestUser } from './eduquest-user';
 import type { Course } from './course';
-import {Image} from "@/types/image";
+import type { Image } from "@/types/image";
 
 export interface Quest {
   id: number
@@ -9,6 +9,7 @@ export interface Quest {
   description: string;
   type: string;
   status: string;
+  max_attempts: number;
   organiser: EduquestUser;
   total_max_score: number;
   total_questions: number;
