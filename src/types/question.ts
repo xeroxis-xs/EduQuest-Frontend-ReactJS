@@ -4,7 +4,7 @@ import type { Answer } from "@/types/answer";
 export interface Question {
   id: number;
   number: number;
-  from_quest: Quest;
+  from_quest: Quest['id'];
   text: string;
   correct_answer: string;
   max_score: number;

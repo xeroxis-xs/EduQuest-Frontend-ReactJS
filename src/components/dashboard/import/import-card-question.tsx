@@ -30,16 +30,16 @@ import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Alert from "@mui/material/Alert";
-
-
-
+import {useRouter} from "next/navigation";
 
 
 export function ImportCardQuestion({questions}: {questions: Question[]}): React.JSX.Element {
 
   const [updatedQuestions, setUpdatedQuestions] = React.useState(questions);
+  const router = useRouter();
 
   const handleAnswerChange = (questionId: number, answerId: number, isCorrect: boolean) => {
+    logger.debug('handleAnswerChange', questionId, answerId, isCorrect);
     const newQuestions = updatedQuestions.map((question) => {
       if (question.id === questionId) {
         return {
@@ -54,6 +54,7 @@ export function ImportCardQuestion({questions}: {questions: Question[]}): React.
       }
       return question;
     });
+    logger.debug('newQuestions', newQuestions);
     setUpdatedQuestions(newQuestions);
   };
 
@@ -66,6 +67,7 @@ export function ImportCardQuestion({questions}: {questions: Question[]}): React.
       if (response.status === 200) {
         logger.debug('Update Success:', response.data);
         // onSaveResult({ type: 'success', message: 'Save Successful' });
+        router.push(`/dashboard/quest/${updatedQuestions[0].from_quest.toString()}`);
       }
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
