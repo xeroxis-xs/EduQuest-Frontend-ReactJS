@@ -3,40 +3,29 @@ import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
-import type { Quest } from '@/types/quest';
 import CardHeader from "@mui/material/CardHeader";
-import {CardMedia} from "@mui/material";
 import Divider from "@mui/material/Divider";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import Select, {type SelectChangeEvent} from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
 import {FloppyDisk as FloppyDiskIcon} from "@phosphor-icons/react/dist/ssr/FloppyDisk";
-import {CaretRight as CaretRightIcon} from "@phosphor-icons/react/dist/ssr/CaretRight";
-import { CloudArrowUp as CloudArrowUpIcon } from "@phosphor-icons/react/dist/ssr/CloudArrowUp";
-import {AxiosError, type AxiosResponse} from "axios";
-import type {Course} from "@/types/course";
+import { CaretRight as CaretRightIcon } from "@phosphor-icons/react/dist/ssr/CaretRight";
+import { AxiosError } from "axios";
 import apiService from "@/api/api-service";
 import {logger} from "@/lib/default-logger";
 import {authClient} from "@/lib/auth/client";
-import type {Image} from "@/types/image";
-import {styled} from "@mui/material/styles";
-import {useUser} from "@/hooks/use-user";
 import type { Question } from '@/types/question';
 import Box from "@mui/material/Box";
-import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import Alert from "@mui/material/Alert";
 import {useRouter} from "next/navigation";
 
 
-export function ImportCardQuestion({questions}: {questions: Question[]}): React.JSX.Element {
+interface ImportCardQuestionProps {
+  questions: Question[];
+  onQuestionUpdateSuccess: (questId: number) => void;
+}
 
+export function ImportCardQuestion({ questions, onQuestionUpdateSuccess }: ImportCardQuestionProps): React.JSX.Element {
   const [updatedQuestions, setUpdatedQuestions] = React.useState(questions);
-  const router = useRouter();
 
   const handleAnswerChange = (questionId: number, answerId: number, isCorrect: boolean) => {
     logger.debug('handleAnswerChange', questionId, answerId, isCorrect);
@@ -66,8 +55,7 @@ export function ImportCardQuestion({questions}: {questions: Question[]}): React.
       const response = await apiService.patch(`/api/Question/bulk-update/`, updatedQuestions);
       if (response.status === 200) {
         logger.debug('Update Success:', response.data);
-        // onSaveResult({ type: 'success', message: 'Save Successful' });
-        router.push(`/dashboard/quest/${updatedQuestions[0].from_quest.toString()}`);
+        onQuestionUpdateSuccess(updatedQuestions[0].from_quest);
       }
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
@@ -132,7 +120,7 @@ export function ImportCardQuestion({questions}: {questions: Question[]}): React.
 
 
     <Box sx={{display: "flex", justifyContent: "center", mt: 6}}>
-      <Button startIcon={<FloppyDiskIcon/>} type="submit" variant="contained">Update Question and Grade Attempts</Button>
+      <Button endIcon={<CaretRightIcon/>} type="submit" variant="contained">Next: View Attempts</Button>
     </Box>
       </form>
     // {submitStatus ? <Alert severity={submitStatus.type} sx={{marginTop: 2}}>

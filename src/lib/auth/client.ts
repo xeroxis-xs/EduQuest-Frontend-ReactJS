@@ -32,7 +32,7 @@ class AuthClient {
     error?: string
   }> {
     const token = localStorage.getItem('access-token');
-    logger.debug('access-token', token)
+    logger.debug('access-token obtained from localStorage');
 
     if (token === null) {
       logger.debug('No access token found, perform signInWithMsal');

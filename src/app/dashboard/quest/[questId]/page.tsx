@@ -228,27 +228,35 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
     try {
       await apiService.delete(`/api/Quest/${params.questId}`);
       router.push(paths.dashboard.quest);
-    } catch (error) {
-      logger.error('Failed to delete the quest', error);
-      setSubmitStatus({ type: 'error', message: 'Delete Failed. Please try again.' });
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 401) {
+          await authClient.signInWithMsal();
+        }
+        logger.error('Failed to delete the quest', error);
+        setSubmitStatus({type: 'error', message: 'Delete Failed. Please try again.'});
+      }
     }
   };
 
   const handleNewAttempt = async () => {
     try {
       const response: AxiosResponse<UserQuestAttempt> = await apiService.post(`/api/UserQuestAttempt/`, {
-        first_attempted_on: new Date().toISOString(),
         last_attempted_on: new Date().toISOString(),
-        submitted: false,
-        time_taken: 0,
+        all_questions_submitted: false,
         user: eduquestUser?.id,
         quest: params.questId as unknown as number,
       });
       logger.debug('New Attempt created:', response.data);
       router.push(`/dashboard/quest/${params.questId}/quest-attempt/${response.data.id.toString()}`);
-    } catch (error) {
-      logger.error('Failed to create a new attempt', error);
-      setSubmitStatus({ type: 'error', message: 'Failed to create a new attempt. Please try again.' });
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 401) {
+          await authClient.signInWithMsal();
+        }
+        logger.error('Failed to create a new attempt', error);
+        setSubmitStatus({type: 'error', message: 'Failed to create a new attempt. Please try again.'});
+      }
     }
   }
 
@@ -376,7 +384,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
                 <Button disabled variant='contained'>
                   No more attempts available
                 </Button>
-              ) : course.enrolled_users.includes(eduquestUser.id) ? (
+              ) : course.enrolled_users.find(user => user.user === eduquestUser?.id) ? (
                 <Button endIcon={<GameControllerIcon fontSize="var(--icon-fontSize-md)"/>}
                         variant='contained'
                         onClick={handleNewAttempt}

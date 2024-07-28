@@ -8,7 +8,7 @@ import { XSquare } from '@phosphor-icons/react/dist/ssr/XSquare';
 import { Book as BookIcon } from '@phosphor-icons/react/dist/ssr/Book';
 import { Sword as SwordIcon } from '@phosphor-icons/react/dist/ssr/Sword';
 import { MagicWand as MagicWandIcon } from "@phosphor-icons/react/dist/ssr/MagicWand";
-import { ShieldStar as ShieldStarIcon } from '@phosphor-icons/react/dist/ssr/ShieldStar';
+import { Medal as MedalIcon } from '@phosphor-icons/react/dist/ssr/Medal';
 import { Upload as UploadIcon } from '@phosphor-icons/react/dist/ssr/Upload';
 
 export const navIcons = {
@@ -20,7 +20,7 @@ export const navIcons = {
   'users': UsersIcon,
   'book': BookIcon,
   'sword': SwordIcon,
-  'badge': ShieldStarIcon,
+  'badge': MedalIcon,
   'magic-wand': MagicWandIcon,
   'upload': UploadIcon,
 } as Record<string, Icon>;

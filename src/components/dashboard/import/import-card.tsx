@@ -65,7 +65,7 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
 
   const getCourses = async (): Promise<void> => {
     try {
-      const response: AxiosResponse<Course[]> = await apiService.get<Course[]>('/api/Course/');
+      const response: AxiosResponse = await apiService.get<Course[]>('/api/Course/');
       const data: Course[] = response.data;
       setCourses(data);
       logger.debug('Courses', data);
@@ -82,7 +82,7 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
 
   const getImages = async (): Promise<void> => {
     try {
-      const response: AxiosResponse<Image[]> = await apiService.get<Image[]>('/api/Image/');
+      const response: AxiosResponse = await apiService.get<Image[]>('/api/Image/');
       const data: Image[] = response.data;
       setImages(data);
       logger.debug('Images', data);
@@ -152,7 +152,6 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
 
     // Create FormData
     const formData = new FormData();
-
     // Append other data as needed
     formData.append('type', questTypeRef.current?.value || '');
     formData.append('name', questNameRef.current?.value || '');
@@ -168,12 +167,12 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
       formData.append('file', selectedFile);
 
       try {
-        const response: AxiosResponse<Question[]> = await apiService.post(`/api/Quest/import/`, formData, {
+        const response= await apiService.post(`/api/Quest/import/`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
         });
-        logger.debug('Upload Success:', response.data);
+        logger.debug('Upload Success, Question data: ', response.data);
         setSubmitStatus({ type: 'success', message: 'Quest Import Successful' });
         onImportSuccess(response.data);
       }

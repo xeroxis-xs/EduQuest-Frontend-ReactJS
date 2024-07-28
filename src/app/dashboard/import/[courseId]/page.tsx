@@ -224,10 +224,11 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
 
   const handleEnroll = async () => {
     try {
-      const data ={
-        user_ids: [ eduquestUser?.id ]
+      const data = {
+        user: eduquestUser?.id,
+        course: params.courseId
       }
-      const response = await apiService.post(`/api/Course/${params.courseId.toString()}/enroll/`, data);
+      const response = await apiService.post(`/api/UserCourse/`, data);
       if (response.status === 200) {
         logger.debug('Enrolled successfully');
         await getCourse();
@@ -348,7 +349,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
                 {course.enrolled_users.length.toString()}
               </Typography>
             </Box>
-            {eduquestUser && course.enrolled_users.includes(eduquestUser?.id) ? (
+            {eduquestUser && course.enrolled_users.find(user => user.user === eduquestUser?.id) ? (
               <Button endIcon={<CheckIcon/>} disabled>Enrolled</Button>
             ) : (
               <Button endIcon={<SignInIcon/>} onClick={() => handleEnroll()} variant="contained">Enroll</Button>

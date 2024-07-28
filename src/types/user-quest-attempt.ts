@@ -5,7 +5,7 @@ export interface UserQuestAttempt {
   id: number
   first_attempted_on: string // ISO 8601 datetime string
   last_attempted_on: string // ISO 8601 datetime string
-  submitted: boolean
+  all_questions_submitted: boolean
   time_taken: number
   total_score_achieved: number
   user: EduquestUser['id']

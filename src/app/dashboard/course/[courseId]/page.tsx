@@ -46,6 +46,7 @@ import { CaretDown as CaretDownIcon } from "@phosphor-icons/react/dist/ssr/Caret
 import { styled } from '@mui/material/styles';
 import Collapse from '@mui/material/Collapse';
 import {Image} from "@/types/image";
+import {UserCourse} from "@/types/user-course";
 
 
 interface ExpandMoreProps extends IconButtonProps {
@@ -75,6 +76,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
   const courseTermIdRef = React.useRef<HTMLInputElement>(null);
   const courseImageIdRef = React.useRef<HTMLInputElement>(null);
   const [course, setCourse] = React.useState<Course>();
+  const [userCourse, setUserCourse] = React.useState<UserCourse>();
   const [terms, setTerms] = React.useState<Term[]>();
   const [quests, setQuests] = React.useState<Quest[]>();
   const [images, setImages] = React.useState<Image[]>();
@@ -98,6 +100,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
       const response: AxiosResponse<Course> = await apiService.get<Course>(`/api/Course/${params.courseId}`);
       const data: Course = response.data;
       setCourse(data);
+      setUserCourse(data.enrolled_users.find(user => user.user === eduquestUser?.id));
       logger.debug('course', data);
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
@@ -108,6 +111,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
       logger.error('Failed to fetch data', error);
     }
   };
+
 
   const getTerms = async (): Promise<void> => {
     try {
@@ -226,11 +230,12 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
 
   const handleEnroll = async () => {
     try {
-      const data ={
-        user_ids: [ eduquestUser?.id ]
+      const data = {
+        user: eduquestUser?.id,
+        course: params.courseId
       }
-      const response = await apiService.post(`/api/Course/${params.courseId.toString()}/enroll/`, data);
-      if (response.status === 200) {
+      const response = await apiService.post(`/api/UserCourse/`, data);
+      if (response.status === 201) {
         logger.debug('Enrolled successfully');
         await getCourse();
       }
@@ -298,10 +303,6 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
                 <Typography variant="subtitle2">Course Description</Typography>
                 <Typography variant="body2">{course.description}</Typography>
               </Grid>
-              <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Enrollment Status</Typography>
-
-              </Grid>
             </Grid>
             <ExpandMore
               expand={expanded}
@@ -350,7 +351,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
                 {course.enrolled_users.length.toString()}
               </Typography>
             </Box>
-            {eduquestUser && course.enrolled_users.includes(eduquestUser?.id) ? (
+            {eduquestUser && userCourse && course.enrolled_users.includes(userCourse) ? (
               <Button endIcon={<CheckIcon/>} disabled>Enrolled</Button>
             ) : (
               <Button endIcon={<SignInIcon/>} onClick={() => handleEnroll()} variant="contained">Enroll</Button>

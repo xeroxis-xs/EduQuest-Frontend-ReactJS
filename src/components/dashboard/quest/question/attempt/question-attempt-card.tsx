@@ -37,67 +37,74 @@ interface QuestionAttemptCardProps {
   onSaveResult: (status: { type: 'success' | 'error'; message: string }) => void;
 }
 
-function removeQuestionField(data: UserQuestQuestionAttempt[]) {
-  return data.map(attempt => ({
-    ...attempt,
-    selected_answers: attempt.selected_answers.map(sa => ({
-      ...sa,
-      answer: { ...sa.answer, question: undefined } // Remove the question field
-    })),
-    question: {
-      ...attempt.question,
-      answers: attempt.question.answers.map(ans => ({
-        ...ans,
-        question: undefined // Remove the question field
-      }))
-    }
-  }));
-}
+// function removeQuestionField(data: UserQuestQuestionAttempt[]) {
+//   return data.map(attempt => ({
+//     ...attempt,
+//     selected_answers: attempt.selected_answers.map(sa => ({
+//       ...sa,
+//       answer: { ...sa.answer, question: undefined } // Remove the question field
+//     })),
+//     question: {
+//       ...attempt.question,
+//       answers: attempt.question.answers.map(ans => ({
+//         ...ans,
+//         question: undefined // Remove the question field
+//       }))
+//     }
+//   }));
+// }
 
-function setSubmitted(data: UserQuestQuestionAttempt[], submitted: boolean) {
+export function setSubmitted(data: UserQuestQuestionAttempt[], submitted: boolean) : UserQuestQuestionAttempt[] {
   return data.map(attempt => ({
     ...attempt,
     submitted
   }));
-
 }
 
-/* eslint-disable camelcase -- Disabling camelcase rule because the API response uses snake_case, and we need to match those property names exactly. */
-function calculateScore(data: UserQuestQuestionAttempt): number {
-
-  const { selected_answers, question } = data;
-  const total_answers = question.answers;
-
-  const num_correct = total_answers.filter(answer => answer.is_correct).length;
-  const num_incorrect = total_answers.length - num_correct;
-
-  const num_correct_selected = selected_answers.filter(answer => answer.is_selected && answer.answer.is_correct).length;
-  const num_incorrect_selected = selected_answers.filter(answer => answer.is_selected && !answer.answer.is_correct).length;
-
-  if (num_correct_selected === 0 && num_incorrect_selected > 0) {
-    return 0;
-  }
-
-  // Calculate the score
-  const correct_score = num_correct > 0 ? num_correct_selected / num_correct : 0;
-  const penalty = num_incorrect > 0 ? num_incorrect_selected / num_incorrect : 0;
-
-  // Use the question's max_score to determine the final score achieved
-  const score_achieved = correct_score * (1 - penalty) * question.max_score;
-
-  return score_achieved;
+export function setLastAttemptedOn(data: UserQuestQuestionAttempt[]) : UserQuestQuestionAttempt[] {
+  return data.map(attempt => ({
+    ...attempt,
+    last_attempted_on: new Date().toISOString()
+  }));
 }
-/* eslint-enable camelcase -- Enabling rule back*/
 
-function calculateScoresForData(data: UserQuestQuestionAttempt[]): UserQuestQuestionAttempt[] {
-  return data.map(userQuestQuestionAttempt => {
-    const score = calculateScore(userQuestQuestionAttempt);
-    return {
-      ...userQuestQuestionAttempt,
-      score_achieved: score
-    };
-  });
-}
+
+// /* eslint-disable camelcase -- Disabling camelcase rule because the API response uses snake_case, and we need to match those property names exactly. */
+// function calculateScore(data: UserQuestQuestionAttempt): number {
+//
+//   const { selected_answers, question } = data;
+//   const total_answers = question.answers;
+//
+//   const num_correct = total_answers.filter(answer => answer.is_correct).length;
+//   const num_incorrect = total_answers.length - num_correct;
+//
+//   const num_correct_selected = selected_answers.filter(answer => answer.is_selected && answer.answer.is_correct).length;
+//   const num_incorrect_selected = selected_answers.filter(answer => answer.is_selected && !answer.answer.is_correct).length;
+//
+//   if (num_correct_selected === 0 && num_incorrect_selected > 0) {
+//     return 0;
+//   }
+//
+//   // Calculate the score
+//   const correct_score = num_correct > 0 ? num_correct_selected / num_correct : 0;
+//   const penalty = num_incorrect > 0 ? num_incorrect_selected / num_incorrect : 0;
+//
+//   // Use the question's max_score to determine the final score achieved
+//   const score_achieved = correct_score * (1 - penalty) * question.max_score;
+//
+//   return score_achieved;
+// }
+// /* eslint-enable camelcase -- Enabling rule back*/
+//
+// export function calculateScoresForData(data: UserQuestQuestionAttempt[]): UserQuestQuestionAttempt[] {
+//   return data.map(userQuestQuestionAttempt => {
+//     const score = calculateScore(userQuestQuestionAttempt);
+//     return {
+//       ...userQuestQuestionAttempt,
+//       score_achieved: score
+//     };
+//   });
+// }
 
 export function QuestionAttemptCard({ data = [], onDataChange, onSubmitResult, onSaveResult }: QuestionAttemptCardProps): React.JSX.Element {
   const [page, setPage] = React.useState(1);
@@ -120,11 +127,12 @@ export function QuestionAttemptCard({ data = [], onDataChange, onSubmitResult, o
 
   const handleSave = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    const modifiedData = removeQuestionField(data);
-    logger.debug("Save button clicked, updated data: ", modifiedData);
+    // Update last_attempted_on to the current date
+    const updatedData = setLastAttemptedOn(data);
+    logger.debug("Save button clicked, updated data: ", updatedData);
 
     try {
-      const response = await apiService.patch(`/api/UserQuestQuestionAttempt/bulk-update/`, modifiedData);
+      const response = await apiService.patch(`/api/UserQuestQuestionAttempt/bulk-update/`, updatedData);
       if (response.status === 200) {
         logger.debug('Update Success:', response.data);
         onSaveResult({ type: 'success', message: 'Save Successful' });
@@ -142,14 +150,15 @@ export function QuestionAttemptCard({ data = [], onDataChange, onSubmitResult, o
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const calculatedData = calculateScoresForData(data);
-    const submittedData = setSubmitted(calculatedData, true);
-    const modifiedData = removeQuestionField(submittedData);
-    logger.debug("Submit button clicked, updated data ", modifiedData);
+    // Update last_attempted_on to the current date
+    const updatedData = setLastAttemptedOn(data);
+    const submittedData = setSubmitted(updatedData, true);
+    // const modifiedData = removeQuestionField(submittedData);
+    logger.debug("Submit button clicked, updated data ", submittedData);
 
     // Update UserQuestQuestionAttempt to set 'submitted' to true
     try {
-      const response = await apiService.patch(`/api/UserQuestQuestionAttempt/bulk-update/`, modifiedData);
+      const response = await apiService.patch(`/api/UserQuestQuestionAttempt/bulk-update/`, submittedData);
       if (response.status === 200) {
         logger.debug('Submit Success:', response.data);
         onSubmitResult({ type: 'success', message: 'Submit Successful' });

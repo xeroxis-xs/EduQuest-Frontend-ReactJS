@@ -11,8 +11,8 @@ export const MuiCard = {
         [`&.${paperClasses.elevation1}`]: {
           boxShadow:
             theme.palette.mode === 'dark'
-              ? '0 3px 18px 0 rgba(0, 0, 0, 0.24), 0 0 0 0px rgba(255, 255, 255, 0.1)'
-              : '0 5px 18px 0 rgba(0, 0, 0, 0.1), 0 0 0 0px rgba(0, 0, 0, 0.04)',
+              ? '0 3px 12px 0 rgba(0, 0, 0, 0.08), 0 0 0 0px rgba(255, 255, 255, 0.1)'
+              : '0 3px 12px 0 rgba(0, 0, 0, 0.08), 0 0 0 0px rgba(0, 0, 0, 0.05)',
         },
       };
     },

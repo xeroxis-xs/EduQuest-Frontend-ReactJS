@@ -15,6 +15,7 @@ import type { UserQuestAttempt } from '@/types/user-quest-attempt';
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
 import LinearProgress from "@mui/material/LinearProgress";
+import Typography from "@mui/material/Typography";
 
 interface UserQuestAttemptTableProps {
   questId?: string;
@@ -40,7 +41,7 @@ export function UserQuestAttemptTable({ questId = '0', rows = [], totalMaxScore 
     const minutes = Math.floor(hoursRemainder / oneMinute);
     const minutesRemainder = hoursRemainder % oneMinute;
     const seconds = Math.floor(minutesRemainder / oneSecond);
-    const millisecondsLeft = minutesRemainder % oneSecond;
+    const millisecondsLeft = Math.round(minutesRemainder % oneSecond);
 
     return `${days.toString()}d ${hours.toString()}h ${minutes.toString()}m ${seconds.toString()}s ${millisecondsLeft.toString()}ms`;
   };
@@ -79,32 +80,44 @@ export function UserQuestAttemptTable({ questId = '0', rows = [], totalMaxScore 
                 <TableRow hover key={row.id}>
                   <TableCell>{row.id}</TableCell>
                   <TableCell>
-                    {new Date(row.first_attempted_on).toLocaleString("en-SG", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      second: '2-digit'
-                    })}
+                    <Typography variant="body2">
+                      {new Date(row.first_attempted_on).toLocaleTimeString("en-SG", {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                      })}
+                    </Typography>
+                    <Typography variant="body2">
+                      {new Date(row.first_attempted_on).toLocaleDateString("en-SG", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric"
+                      })}
+                    </Typography>
                   </TableCell>
                   <TableCell>
-                    {new Date(row.last_attempted_on).toLocaleString("en-SG", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      second: '2-digit'
-                    })}
+                    <Typography variant="body2">
+                      {new Date(row.last_attempted_on).toLocaleTimeString("en-SG", {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                      })}
+                    </Typography>
+                    <Typography variant="body2">
+                      {new Date(row.last_attempted_on).toLocaleDateString("en-SG", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric"
+                      })}
+                    </Typography>
                   </TableCell>
                   <TableCell>{formatTime(row.time_taken)}</TableCell>
                   <TableCell>
-                    <Chip label={row.submitted ? "Submitted" : "In Progress"} color={row.submitted ? "success" : "warning"} size="small"/>
+                    <Chip label={row.all_questions_submitted ? "Submitted" : "In Progress"} color={row.all_questions_submitted ? "success" : "warning"} size="small"/>
                   </TableCell>
-                  <TableCell>
-                    {row.submitted ? `${parseFloat(row.total_score_achieved.toFixed(2)).toString()} / ${totalMaxScore?.toString()}` : "In Progress"}
-                    {row.submitted &&
+                  <TableCell sx={{ width: '15%'}}>
+                    {row.all_questions_submitted ? `${parseFloat(row.total_score_achieved.toFixed(2)).toString()} / ${totalMaxScore?.toString()}` : "In Progress"}
+                    {row.all_questions_submitted &&
                     <LinearProgress
                       variant="determinate"
                       value={(row.total_score_achieved / totalMaxScore) * 100}
@@ -114,7 +127,7 @@ export function UserQuestAttemptTable({ questId = '0', rows = [], totalMaxScore 
                     <Button
                       component={RouterLink}
                       href={`/dashboard/quest/${questId}/quest-attempt/${row.id.toString()}`}>
-                      {row.submitted ? "View" : "Continue"}
+                      {row.all_questions_submitted ? "View" : "Continue"}
                     </Button>
                   </TableCell>
                 </TableRow>

@@ -45,7 +45,7 @@ export default function Page({ params }: { params: { userQuestAttemptId: string,
     }
   };
 
-  const updateUserQuestAttempt = async (updatedUserQuestAttempt: { submitted:boolean, last_attempted_on:string}): Promise<void> => {
+  const updateUserQuestAttempt = async (updatedUserQuestAttempt: { all_questions_submitted:boolean, last_attempted_on:string}): Promise<void> => {
     try {
       const response = await apiService.patch(`/api/UserQuestAttempt/${params.userQuestAttemptId}/`, updatedUserQuestAttempt);
       if (response.status === 200) {
@@ -65,7 +65,7 @@ export default function Page({ params }: { params: { userQuestAttemptId: string,
     if (status.type === 'success') {
       setSubmitStatus(status);
       const updatedUserQuestAttempt = {
-        submitted: true,
+        all_questions_submitted: true,
         last_attempted_on: new Date().toISOString(),
       }
       // Update UserQuestAttempt to set 'submitted' to true and last_attempted_on to current datetime
@@ -82,7 +82,7 @@ export default function Page({ params }: { params: { userQuestAttemptId: string,
     if (status.type === 'success') {
       setSaveStatus(status);
       const updatedUserQuestAttempt = {
-        submitted: false,
+        all_questions_submitted: false,
         last_attempted_on: new Date().toISOString(),
       }
       // Update UserQuestAttempt to set 'submitted' to false and last_attempted_on to current datetime

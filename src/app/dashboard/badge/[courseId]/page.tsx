@@ -227,7 +227,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
   const handleEnroll = async () => {
     try {
       const data ={
-        user_ids: [ eduquestUser?.id ]
+        user_ids: eduquestUser?.id
       }
       const response = await apiService.post(`/api/Course/${params.courseId.toString()}/enroll/`, data);
       if (response.status === 200) {
