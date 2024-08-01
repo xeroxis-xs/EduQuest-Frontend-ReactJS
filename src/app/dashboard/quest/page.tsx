@@ -13,10 +13,13 @@ import { authClient } from "@/lib/auth/client";
 import { QuestForm } from "@/components/dashboard/quest/quest-form";
 import { QuestCard } from "@/components/dashboard/quest/quest-card";
 import type { Quest } from '@/types/quest';
+import { SkeletonQuestCard } from "@/components/dashboard/skeleton/skeleton-quest-card";
 
 export default function Page(): React.JSX.Element {
   const [quests, setQuests] = React.useState<Quest[]>([]);
   const [showForm, setShowForm] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
+
 
   const toggleForm = (): void => {
     setShowForm(!showForm);
@@ -35,6 +38,8 @@ export default function Page(): React.JSX.Element {
         }
       }
       logger.error('Error: ', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -66,7 +71,11 @@ export default function Page(): React.JSX.Element {
         </Stack>
       </Stack>
       {showForm && <QuestForm onFormSubmitSuccess={getQuests}/>} {/* Conditional rendering */}
-      {quests &&<QuestCard rows={quests}/>}
+      {loading ? (
+        <SkeletonQuestCard />
+      ) : (
+        <QuestCard rows={quests}/>
+      )}
     </Stack>
   );
 }

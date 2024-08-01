@@ -7,6 +7,7 @@ export interface Course {
   term: Term;
   name: string;
   code: string;
+  type: string;
   description: string;
   status: string;
   enrolled_users: UserCourse[];

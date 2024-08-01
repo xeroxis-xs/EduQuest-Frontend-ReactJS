@@ -5,5 +5,6 @@ export interface Badge {
   name: string;
   description: string;
   type: string;
+  condition: string;
   image: Image;
 }

@@ -21,9 +21,10 @@ interface UserQuestAttemptTableProps {
   questId?: string;
   rows?: UserQuestAttempt[];
   totalMaxScore?: number;
+  questStatus?: string;
 }
 
-export function UserQuestAttemptTable({ questId = '0', rows = [], totalMaxScore = 0 }: UserQuestAttemptTableProps): React.JSX.Element {
+export function UserQuestAttemptTable({ questId = '0', rows = [], totalMaxScore = 0, questStatus }: UserQuestAttemptTableProps): React.JSX.Element {
 
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -113,10 +114,14 @@ export function UserQuestAttemptTable({ questId = '0', rows = [], totalMaxScore 
                   </TableCell>
                   <TableCell>{formatTime(row.time_taken)}</TableCell>
                   <TableCell>
-                    <Chip label={row.all_questions_submitted ? "Submitted" : "In Progress"} color={row.all_questions_submitted ? "success" : "warning"} size="small"/>
+                    <Chip
+                      label={row.all_questions_submitted ? "Submitted" : "In Progress"}
+                      color={row.all_questions_submitted ? "success" : "primary"}
+                      variant="outlined"
+                      size="small"/>
                   </TableCell>
                   <TableCell sx={{ width: '15%'}}>
-                    {row.all_questions_submitted ? `${parseFloat(row.total_score_achieved.toFixed(2)).toString()} / ${totalMaxScore?.toString()}` : "In Progress"}
+                    {row.all_questions_submitted ? `${parseFloat(row.total_score_achieved.toFixed(2)).toString()} / ${totalMaxScore?.toString()}` : "Not Available"}
                     {row.all_questions_submitted &&
                     <LinearProgress
                       variant="determinate"
@@ -126,7 +131,8 @@ export function UserQuestAttemptTable({ questId = '0', rows = [], totalMaxScore 
                   <TableCell>
                     <Button
                       component={RouterLink}
-                      href={`/dashboard/quest/${questId}/quest-attempt/${row.id.toString()}`}>
+                      href={`/dashboard/quest/${questId}/quest-attempt/${row.id.toString()}`}
+                      disabled={questStatus === 'Expired'}>
                       {row.all_questions_submitted ? "View" : "Continue"}
                     </Button>
                   </TableCell>

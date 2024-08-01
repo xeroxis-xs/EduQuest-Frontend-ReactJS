@@ -38,9 +38,13 @@ import {UserQuestAttemptTable} from "@/components/dashboard/quest/attempt/quest-
 import { CardMedia } from "@mui/material";
 import IconButton, { IconButtonProps } from '@mui/material/IconButton';
 import { CaretDown as CaretDownIcon } from "@phosphor-icons/react/dist/ssr/CaretDown";
+import { CalendarX as CalendarXIcon } from "@phosphor-icons/react/dist/ssr/CalendarX";
 import { styled } from '@mui/material/styles';
 import Collapse from '@mui/material/Collapse';
 import {Image} from "@/types/image";
+import { SkeletonQuestDetailCard } from "@/components/dashboard/skeleton/skeleton-quest-detail-card";
+import { SkeletonQuestAttemptTable } from "@/components/dashboard/skeleton/skeleton-quest-attempt-table";
+
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
@@ -66,6 +70,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
   const questDescriptionRef = React.useRef<HTMLInputElement>(null);
   const questMaxAttemptsRef = React.useRef<HTMLInputElement>(null);
   const questStatusRef = React.useRef<HTMLInputElement>(null);
+  const questExpirationDateRef = React.useRef<HTMLInputElement>(null);
   const questCourseIdRef = React.useRef<HTMLInputElement>(null);
   const questImageIdRef = React.useRef<HTMLInputElement>(null);
   const [quest, setQuest] = React.useState<Quest>();
@@ -78,6 +83,8 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
   const [submitStatus, setSubmitStatus] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [showForm, setShowForm] = React.useState(false);
   const [expanded, setExpanded] = React.useState(false);
+  const [loadingQuest, setLoadingQuest] = React.useState(true);
+  const [loadingQuestAttemptTable, setLoadingQuestAttemptTable] = React.useState(true);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -102,6 +109,8 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
       }
       logger.error('Failed to fetch data', error);
       return undefined;
+    } finally {
+      setLoadingQuest(false);
     }
   };
 
@@ -160,6 +169,8 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
           }
         }
         logger.error('Failed to fetch data', error);
+      } finally {
+        setLoadingQuestAttemptTable(false);
       }
     }
   }
@@ -175,6 +186,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
         code: newCourse.code,
         description: newCourse.description,
         status: newCourse.status,
+        type: newCourse.type,
         term: newCourse.term,
         enrolled_users: newCourse.enrolled_users,
         image: newCourse.image,
@@ -201,6 +213,9 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
       name: questNameRef.current?.value,
       description: questDescriptionRef.current?.value,
       status: questStatusRef.current?.value,
+      expiration_date: questExpirationDateRef.current?.value
+        ? new Date(questExpirationDateRef.current.value).toISOString()
+        : null,
       max_attempts: questMaxAttemptsRef.current?.value,
       from_course: selectedCourse || quest?.from_course,
       image: selectedImage || quest?.image
@@ -241,7 +256,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
 
   const handleNewAttempt = async () => {
     try {
-      const response: AxiosResponse<UserQuestAttempt> = await apiService.post(`/api/UserQuestAttempt/`, {
+      const response: AxiosResponse = await apiService.post(`/api/UserQuestAttempt/`, {
         last_attempted_on: new Date().toISOString(),
         all_questions_submitted: false,
         user: eduquestUser?.id,
@@ -256,6 +271,23 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
         }
         logger.error('Failed to create a new attempt', error);
         setSubmitStatus({type: 'error', message: 'Failed to create a new attempt. Please try again.'});
+      }
+    }
+  }
+
+  const handleExpires = async () => {
+    try {
+      const data = { status: 'Expired' }
+      const response = await apiService.patch(`/api/Quest/${params.questId}/`, data);
+      setQuest(response.data);
+      setSubmitStatus({ type: 'success', message: 'Quest has been set to expired' });
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 401) {
+          await authClient.signInWithMsal();
+        }
+        logger.error('Failed to expire quest', error);
+        setSubmitStatus({type: 'error', message: 'Failed to expire quest. Please try again.'});
       }
     }
   }
@@ -277,17 +309,24 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
   return (
     <Stack spacing={3}>
       {quest &&
-      <Stack direction="row" spacing={3} sx={{justifyContent: 'space-between'}}>
-          <Button startIcon={<CaretLeftIcon fontSize="var(--icon-fontSize-md)"/>} component={RouterLink} href={`/dashboard/course/${quest?.from_course.id.toString()}`}>View Quests for {quest.from_course.code} {quest.from_course.name}</Button>
-        <Button startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PenIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
-          {showForm ? 'Close' : 'Edit Quest'}
-        </Button>
+      <Stack direction="row" sx={{justifyContent: 'space-between'}}>
+        <Button startIcon={<CaretLeftIcon fontSize="var(--icon-fontSize-md)"/>} component={RouterLink} href={`/dashboard/course/${quest?.from_course.id.toString()}`}>View Quests for {quest.from_course.code} {quest.from_course.name}</Button>
+        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }} color="error">
+          <Button startIcon={<CalendarXIcon fontSize="var(--icon-fontSize-md)"/>} onClick={handleExpires} color="error" >Expires Quest</Button>
+          <Button startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PenIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
+            {showForm ? 'Close' : 'Edit Quest'}
+          </Button>
+        </Stack>
       </Stack>
       }
 
-      {!showForm && quest ?
+      {!showForm && (
+        loadingQuest ? (
+          <SkeletonQuestDetailCard />
+        ) : (
+          quest ? (
         <Card>
-          <CardHeader title="Quest Details"/>
+          <CardHeader title="Quest Details" subheader={`ID: ${quest.id}`}/>
           <CardMedia
             component="img"
             alt={quest.image.name}
@@ -297,39 +336,66 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
           <CardContent sx={{pb: '16px'}}>
             <Grid container spacing={3}>
               <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Quest ID</Typography>
-                <Typography variant="body2">{quest.id}</Typography>
-              </Grid>
-              <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Quest Type</Typography>
-                <Typography variant="body2">{quest.type}</Typography>
-              </Grid>
-              <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Quest Name</Typography>
+                <Typography gutterBottom variant="overline">Name</Typography>
                 <Typography variant="body2">{quest.name}</Typography>
               </Grid>
               <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Number of Questions</Typography>
-                <Typography variant="body2">{quest.total_questions}</Typography>
-              </Grid>
-              <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Quest Description</Typography>
+                <Typography gutterBottom variant="overline">Description</Typography>
                 <Typography variant="body2">{quest.description}</Typography>
               </Grid>
               <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Quest Maximum Score</Typography>
+                <Typography gutterBottom variant="overline" display="block">Type</Typography>
+                <Chip variant="outlined" label={quest.type} color={
+                  quest.type === 'Eduquest MCQ' ? 'primary' :
+                    quest.type === 'Wooclap' ? 'info' :
+                      quest.type === 'Kahoot!' ? 'info' :
+                        quest.type === 'Other' ? 'default' : 'default'
+                } size="small"/>
+              </Grid>
+              <Grid md={6} xs={12}>
+                <Typography gutterBottom variant="overline" display="block">Status</Typography>
+                <Chip variant="outlined" label={quest.status} color={
+                  quest.status === 'Draft' ? 'default' :
+                    quest.status === 'Active' ? 'success' :
+                      quest.status === 'Expired' ? 'default' : 'default'
+                  } size="small"/>
+              </Grid>
+              <Grid md={6} xs={12}>
+                <Typography gutterBottom variant="overline">Number of Questions</Typography>
+                <Typography variant="body2">{quest.total_questions}</Typography>
+              </Grid>
+
+              <Grid md={6} xs={12}>
+                <Typography gutterBottom variant="overline">Maximum Score</Typography>
                 <Typography variant="body2">{quest.total_max_score}</Typography>
               </Grid>
+
               <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Quest Status</Typography>
-                <Chip label={quest.status} sx={{ mt: 1 }} color="success" size="small"/>
-              </Grid>
-              <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Quest Maximum Attempts</Typography>
+                <Typography gutterBottom variant="overline">Maximum Number of Attempts</Typography>
                 <Typography variant="body2">{quest.max_attempts}</Typography>
               </Grid>
               <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Quest Created By</Typography>
+                <Typography gutterBottom variant="overline">Expiry Date</Typography>
+                {quest.expiration_date ? (
+                  <Typography variant="body2">
+                    {new Date(quest.expiration_date).toLocaleDateString("en-SG", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit'
+                    })}
+                  </Typography>
+                ) : (
+                  <Typography variant="body2">
+                    No Expiry Date Set
+                  </Typography>
+                )}
+
+              </Grid>
+              <Grid md={6} xs={12}>
+                <Typography gutterBottom variant="overline">Created By</Typography>
                 <Typography variant="body2">{quest.organiser.username}</Typography>
                 <Typography variant="body2">{quest.organiser.email}</Typography>
               </Grid>
@@ -380,7 +446,11 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
           <CardActions sx={{ justifyContent: 'center' }}>
 
             {course && eduquestUser && userQuestAttempts && (
-              userQuestAttempts.length >= quest.max_attempts ? (
+              quest.status !== 'Active' ? (
+                <Button disabled variant='contained'>
+                  Quest has Expired
+                </Button>
+              ) : userQuestAttempts.length >= quest.max_attempts ? (
                 <Button disabled variant='contained'>
                   No more attempts available
                 </Button>
@@ -404,7 +474,12 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
 
 
           </CardActions>
-        </Card> : null}
+        </Card>
+          ) : (
+            <Typography variant="body1">Quest details not available.</Typography>
+          )
+        )
+      )}
 
       {/* FORM */}
       <form onSubmit={handleSubmit}>
@@ -424,20 +499,40 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
                 <Grid md={3} xs={12}>
                   <FormControl fullWidth required>
                     <InputLabel>Quest Type</InputLabel>
-                    <OutlinedInput defaultValue={quest.type} label="Quest Type" inputRef={questTypeRef} name="code"/>
+                    <Select defaultValue={quest.type} label="Quest Type" inputRef={questTypeRef} name="type">
+                      <MenuItem value="Eduquest MCQ"><Chip variant="outlined" label="Eduquest MCQ" color="primary"/></MenuItem>
+                      <MenuItem value="Private"><Chip variant="outlined" label="Private" color="default" size="small"/></MenuItem>
+                      <MenuItem value="Kahoot!"><Chip variant="outlined" label="Kahoot!" color="info" size="small"/></MenuItem>
+                      <MenuItem value="Wooclap"><Chip variant="outlined" label="Wooclap" color="info" size="small"/></MenuItem>
+                    </Select>
+
                   </FormControl>
                 </Grid>
                 <Grid md={3} xs={12}>
                   <FormControl fullWidth required>
                     <InputLabel>Quest Status</InputLabel>
-                    <OutlinedInput defaultValue={quest.status} label="Quest Status" inputRef={questStatusRef}
-                                   name="status"/>
+                    <Select defaultValue={quest.status} label="Quest Status" inputRef={questStatusRef} name="status">
+                      <MenuItem value="Active"><Chip variant="outlined" label="Active" color="success" size="small"/></MenuItem>
+                      <MenuItem value="Expired"><Chip variant="outlined" label="Expired" color="default" size="small"/></MenuItem>
+                    </Select>
                   </FormControl>
                 </Grid>
                 <Grid md={3} xs={12}>
                   <FormControl fullWidth required>
                     <InputLabel>Quest Maximum Attempts</InputLabel>
                     <OutlinedInput defaultValue={quest.max_attempts} label="Quest Maximum Attempts" inputRef={questMaxAttemptsRef} name="max_attempts" type="number"/>
+                  </FormControl>
+                </Grid>
+                <Grid md={3} xs={12}>
+                  <FormControl fullWidth>
+                    <InputLabel shrink>Quest Expiry Date</InputLabel>
+                    <OutlinedInput
+                      label="Quest Expiry Date"
+                      defaultValue={quest.expiration_date ? quest.expiration_date : ''}
+                      inputRef={questExpirationDateRef}
+                      name="expiration_date"
+                      type="datetime-local"
+                    />
                   </FormControl>
                 </Grid>
                 <Grid xs={12}>
@@ -455,20 +550,20 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
               <Typography sx={{my: 3}} variant="h6">Course</Typography>
               {courses ?
                 <Grid container spacing={3} >
-                  <Grid md={3} xs={12}>
+                  <Grid md={6} xs={12}>
                     <FormControl fullWidth required>
                       <InputLabel>Course ID</InputLabel>
                       <Select defaultValue={quest.from_course.id} onChange={handleCourseChange} inputRef={questCourseIdRef}
                               label="Course ID" variant="outlined" type="number">
                         {courses.map((option) => (
                           <MenuItem key={option.id} value={option.id}>
-                            {option.id}
+                            {option.id} - {option.code} {option.name}
                           </MenuItem>
                         ))}
                       </Select>
                     </FormControl>
                     </Grid>
-                    <Grid md={9} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
+                    <Grid md={6} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
                   <Grid md={3} xs={6}>
                     <Typography variant="subtitle2">Course Name</Typography>
                     <Typography variant="body2">{selectedCourse?.name || quest.from_course.name }</Typography>
@@ -508,7 +603,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
                               label="Image ID" variant="outlined" type="number">
                         {images.map((option) => (
                           <MenuItem key={option.id} value={option.id}>
-                            {option.id}
+                            {option.id} - {option.name}
                           </MenuItem>
                         ))}
                       </Select>
@@ -550,11 +645,20 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
 
       <Typography variant="h6">My Attempts</Typography>
 
-        {userQuestAttempts && userQuestAttempts.length > 0 ? (
-          <UserQuestAttemptTable rows={userQuestAttempts} questId={params.questId} totalMaxScore={quest?.total_max_score}/>
+      {loadingQuestAttemptTable ? (
+        <SkeletonQuestAttemptTable />
+      ) : (
+        userQuestAttempts && userQuestAttempts.length > 0 ? (
+          <UserQuestAttemptTable
+            rows={userQuestAttempts}
+            questId={params.questId}
+            totalMaxScore={quest?.total_max_score}
+            questStatus={quest?.status}
+          />
         ) : (
           <Typography variant="body1">You have not attempted this quest yet.</Typography>
-        )}
+        )
+      )}
 
 
     </Stack>

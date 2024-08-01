@@ -3,13 +3,9 @@ import * as React from 'react';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-// import { Download as DownloadIcon } from '@phosphor-icons/react/dist/ssr/Download';
 import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
 import { Upload as UploadIcon } from '@phosphor-icons/react/dist/ssr/Upload';
 import { XCircle as XCircleIcon } from '@phosphor-icons/react/dist/ssr/XCircle';
-
-// import { CourseFilters } from '@/components/dashboard/course/course-filters';
-// import { CourseTable } from '@/components/dashboard/course/course-table';
 import type { Course } from '@/types/course';
 import apiService from "@/api/api-service";
 import {AxiosError, type AxiosResponse} from "axios";
@@ -17,11 +13,15 @@ import { logger } from '@/lib/default-logger'
 import { authClient } from "@/lib/auth/client";
 import { CourseForm } from "@/components/dashboard/course/course-form";
 import { CourseCard } from "@/components/dashboard/course/course-card";
+import { SkeletonCourseCard } from "@/components/dashboard/skeleton/skeleton-course-card";
+
 
 
 export default function Page(): React.JSX.Element {
   const [courses, setCourses] = React.useState<Course[]>([]);
   const [showForm, setShowForm] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
+
 
   const toggleForm = (): void => {
     setShowForm(!showForm);
@@ -40,6 +40,8 @@ export default function Page(): React.JSX.Element {
         }
       }
       logger.error('Error: ', error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -72,7 +74,11 @@ export default function Page(): React.JSX.Element {
         </Stack>
       </Stack>
       {showForm && <CourseForm onFormSubmitSuccess={getCourse} />}
-      <CourseCard rows={courses} onEnrolledSuccess={getCourse}/>
+      {loading ? (
+        <SkeletonCourseCard />
+      ) : (
+        <CourseCard rows={courses} onEnrolledSuccess={getCourse} />
+      )}
     </Stack>
   );
 }

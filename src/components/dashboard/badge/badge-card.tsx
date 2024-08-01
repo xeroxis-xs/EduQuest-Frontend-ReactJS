@@ -4,6 +4,7 @@ import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
+import { CheckCircle as CheckCircleIcon } from "@phosphor-icons/react/dist/ssr/CheckCircle";
 import Pagination from '@mui/material/Pagination';
 import type { Course } from '@/types/course';
 import CardActionArea from "@mui/material/CardActionArea";
@@ -21,6 +22,8 @@ import {AxiosError} from "axios";
 import {authClient} from "@/lib/auth/client";
 import {useUser} from "@/hooks/use-user";
 import type {Badge} from "@/types/badge";
+import Stack from "@mui/material/Stack";
+
 
 interface BadgeCardProps {
   badges?: Badge[];
@@ -48,16 +51,26 @@ export function BadgeCard({ badges = [] }: BadgeCardProps): React.JSX.Element {
                 <Typography variant="subtitle1">
                   {badge.name}
                 </Typography>
-                <Typography variant="body2">
+                <Typography variant="body2" mt={2}>
                   {badge.description}
                 </Typography>
+
+                <Typography variant="subtitle2" mt={2}>Condition:</Typography>
+                <Stack component="ul" spacing={1} style={{listStyleType: 'none', paddingLeft: 0}}>
+                  {badge.condition.split(',').map((condition, index) => (
+                    <li key={index} style={{display: 'flex', alignItems: 'center', }}>
+                      <CheckCircleIcon size={22} style={{marginRight: '8px'}} color="#66bb6a"/>
+                      <Typography variant="body2">{condition.trim()}</Typography>
+                    </li>
+                  ))}
+                </Stack>
               </CardContent>
             </CardActionArea>
             {/*<Box>*/}
-              {/*<Divider/>*/}
-              {/*<CardActions sx={{ justifyContent: 'space-between'}}>*/}
-              {/*  <Box sx={{ mx: '16px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>*/}
-              {/*    <UsersIcon size={20}/>*/}
+            {/*<Divider/>*/}
+            {/*<CardActions sx={{ justifyContent: 'space-between'}}>*/}
+            {/*  <Box sx={{ mx: '16px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>*/}
+            {/*    <UsersIcon size={20}/>*/}
               {/*    <Typography sx={{ marginLeft: '10px' }} variant="body1">*/}
               {/*      {course.enrolled_users.length.toString()}*/}
               {/*    </Typography>*/}

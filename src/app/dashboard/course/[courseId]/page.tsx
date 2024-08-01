@@ -1,8 +1,6 @@
 "use client"
 import * as React from 'react';
-// import { useRouter } from 'next/router';
 import Button from '@mui/material/Button';
-// import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { CaretLeft as CaretLeftIcon } from "@phosphor-icons/react/dist/ssr/CaretLeft";
 import { Pen as PenIcon } from "@phosphor-icons/react/dist/ssr/Pen";
@@ -36,7 +34,7 @@ import {XCircle as XCircleIcon} from "@phosphor-icons/react/dist/ssr/XCircle";
 import Chip from "@mui/material/Chip";
 import {QuestCard} from "@/components/dashboard/quest/quest-card";
 import {useUser} from "@/hooks/use-user";
-import {CardMedia} from "@mui/material";
+import {CardMedia, TextField} from "@mui/material";
 import {Check as CheckIcon} from "@phosphor-icons/react/dist/ssr/Check";
 import {SignIn as SignInIcon} from "@phosphor-icons/react/dist/ssr/SignIn";
 import Box from "@mui/material/Box";
@@ -47,6 +45,8 @@ import { styled } from '@mui/material/styles';
 import Collapse from '@mui/material/Collapse';
 import {Image} from "@/types/image";
 import {UserCourse} from "@/types/user-course";
+import { SkeletonQuestCard } from "@/components/dashboard/skeleton/skeleton-quest-card";
+import { SkeletonCourseDetailCard } from "@/components/dashboard/skeleton/skeleton-course-detail-card";
 
 
 interface ExpandMoreProps extends IconButtonProps {
@@ -73,6 +73,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
   const courseNameRef = React.useRef<HTMLInputElement>(null);
   const courseDescriptionRef = React.useRef<HTMLInputElement>(null);
   const courseStatusRef = React.useRef<HTMLInputElement>(null);
+  const courseTypeRef = React.useRef<HTMLInputElement>(null);
   const courseTermIdRef = React.useRef<HTMLInputElement>(null);
   const courseImageIdRef = React.useRef<HTMLInputElement>(null);
   const [course, setCourse] = React.useState<Course>();
@@ -85,6 +86,8 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
   const [selectedImage, setSelectedImage] = React.useState<Image | null>(null);
   const [showForm, setShowForm] = React.useState(false);
   const [expanded, setExpanded] = React.useState(false);
+  const [loadingQuests, setLoadingQuests] = React.useState(true);
+  const [loadingCourse, setLoadingCourse] = React.useState(true);
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
@@ -109,6 +112,8 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
         }
       }
       logger.error('Failed to fetch data', error);
+    } finally {
+      setLoadingCourse(false);
     }
   };
 
@@ -142,6 +147,8 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
         }
       }
       logger.error('Failed to fetch data', error);
+    } finally {
+      setLoadingQuests(false);
     }
   };
 
@@ -272,9 +279,13 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
         </Button>
       </Stack>
 
-      {!showForm && course && (
+      {!showForm && (
+        loadingCourse ? (
+          <SkeletonCourseDetailCard />
+        ) : (
+          course ? (
         <Card>
-          <CardHeader title="Course Details"/>
+          <CardHeader title="Course Details" subheader={`ID: ${course.id}`}/>
           <CardMedia
             component="img"
             alt="cloud computing"
@@ -284,25 +295,34 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
           <CardContent sx={{pb: '16px'}}>
             <Grid container spacing={3}>
               <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Course ID</Typography>
-                <Typography variant="body2">{course.id}</Typography>
-              </Grid>
-              <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Course Code</Typography>
+                <Typography variant="subtitle2">Code</Typography>
                 <Typography variant="body2">{course.code}</Typography>
               </Grid>
               <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Course Name</Typography>
+                <Typography variant="subtitle2">Name</Typography>
                 <Typography variant="body2">{course.name}</Typography>
               </Grid>
               <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Course Status</Typography>
-                <Chip label={course.status} sx={{ mt: 1 }} color="success" size="small"/>
+                <Typography variant="subtitle2">Type</Typography>
+                <Chip label={course.type} sx={{ mt: 1 }} color={
+                  course.type === 'Private' ? 'error' :
+                    course.type === 'Eduquest' ? 'primary' :
+                      course.type === 'Others' ? 'error' : 'default'
+                  } size="small" variant="outlined"/>
               </Grid>
               <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Course Description</Typography>
+                <Typography variant="subtitle2">Status</Typography>
+                <Chip label={course.status} sx={{ mt: 1 }} color={
+                  course.status === 'Draft' ? 'info' :
+                    course.status === 'Active' ? 'success' :
+                      course.status === 'Expired' ? 'error' : 'default'
+                } size="small" variant="outlined"/>
+              </Grid>
+              <Grid md={6} xs={12}>
+                <Typography variant="subtitle2">Description</Typography>
                 <Typography variant="body2">{course.description}</Typography>
               </Grid>
+
             </Grid>
             <ExpandMore
               expand={expanded}
@@ -358,6 +378,10 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
             )}
           </CardActions>
         </Card>
+          ) : (
+            <Typography variant="body1">Course details not available.</Typography>
+          )
+        )
       )}
 
       <form onSubmit={handleSubmit}>
@@ -375,34 +399,52 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
                     <OutlinedInput defaultValue={course.id} label="Course ID" name="id" disabled/>
                   </FormControl>
                 </Grid>
-                <Grid md={6} xs={12}>
+                <Grid md={6} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}>
                 </Grid>
-                <Grid md={6} xs={12}>
+                <Grid md={3} xs={12}>
                   <FormControl fullWidth required>
                     <InputLabel>Course Code</InputLabel>
                     <OutlinedInput defaultValue={course.code} label="Course Code" inputRef={courseCodeRef} name="code"/>
                   </FormControl>
                 </Grid>
-                <Grid md={6} xs={12}>
+                <Grid md={3} xs={12}>
                   <FormControl fullWidth required>
                     <InputLabel>Course Name</InputLabel>
                     <OutlinedInput defaultValue={course.name} label="Course Name" inputRef={courseNameRef} name="name"/>
                   </FormControl>
                 </Grid>
-                <Grid xs={12}>
+                <Grid md={3} xs={12}>
                   <FormControl fullWidth required>
-                    <InputLabel>Course Description</InputLabel>
-                    <OutlinedInput defaultValue={course.description} label="Course Description"
-                                   inputRef={courseDescriptionRef} name="description"/>
+                    <InputLabel>Course Type</InputLabel>
+                    <Select defaultValue={course.type} label="Course Type" inputRef={courseTypeRef} name="type">
+                      <MenuItem value="Eduquest"><Chip variant="outlined" label="Eduquest" color="primary" size="small"/></MenuItem>
+                      <MenuItem value="Private"><Chip variant="outlined" label="Private" color="default" size="small"/></MenuItem>
+                    </Select>
                   </FormControl>
                 </Grid>
-                <Grid md={6} xs={12}>
+                <Grid md={3} xs={12}>
                   <FormControl fullWidth required>
                     <InputLabel>Course Status</InputLabel>
-                    <OutlinedInput defaultValue={course.status} label="Course Status" inputRef={courseStatusRef}
-                                   name="status"/>
+                    <Select defaultValue={course.status} label="Course Status" inputRef={courseStatusRef} name="status">
+                      <MenuItem value="Active"><Chip variant="outlined" label="Active" color="success" size="small"/></MenuItem>
+                      <MenuItem value="Inactive"><Chip variant="outlined" label="Inactive" color="default" size="small"/></MenuItem>
+                    </Select>
                   </FormControl>
                 </Grid>
+                <Grid xs={12}>
+                  <FormControl fullWidth required>
+                    <TextField
+                      defaultValue={course.description}
+                      label="Course Description"
+                      inputRef={courseDescriptionRef}
+                      name="description"
+                      multiline
+                      required
+                      rows={3}
+                    />
+                  </FormControl>
+                </Grid>
+
               </Grid>
 
               <Typography sx={{my: 3}} variant="h6">Term</Typography>
@@ -410,20 +452,20 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
 
                 <Grid container spacing={3}>
 
-                  <Grid md={3} xs={12}>
+                  <Grid md={6} xs={12}>
                     <FormControl fullWidth required>
                       <InputLabel>Term ID</InputLabel>
                       <Select defaultValue={course.term.id} onChange={handleTermChange} inputRef={courseTermIdRef}
                               label="Term ID" variant="outlined" type="number">
                         {terms.map((option) => (
                           <MenuItem key={option.id} value={option.id}>
-                            {option.id}
+                            {option.id} - AY{option.academic_year.start_year}-{option.academic_year.end_year} {option.name}
                           </MenuItem>
                         ))}
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid md={9} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
+                  <Grid md={6} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
                   <Grid md={3} xs={6}>
                       <Typography variant="subtitle2">Term Name</Typography>
                       <Typography variant="body2">{selectedTerm?.name || course.term.name}</Typography>
@@ -455,20 +497,20 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
 
               {images ?
                 <Grid container spacing={3} >
-                  <Grid md={3} xs={12}>
+                  <Grid md={6} xs={12}>
                     <FormControl fullWidth required>
                       <InputLabel>Thumbnail ID</InputLabel>
                       <Select defaultValue={course.image.id} onChange={handleImageChange} inputRef={courseImageIdRef}
                               label="Image ID" variant="outlined" type="number">
                         {images.map((option) => (
                           <MenuItem key={option.id} value={option.id}>
-                            {option.id}
+                            {option.id} - {option.name}
                           </MenuItem>
                         ))}
                       </Select>
                     </FormControl>
                   </Grid>
-                  <Grid md={9} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
+                  <Grid md={6} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
                   <Grid md={3} xs={6}>
                     <Typography variant="subtitle2">Thumbnail Name</Typography>
                     <Typography variant="body2">{selectedImage?.name || course.image.name}</Typography>
@@ -505,10 +547,14 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
 
       </form>
       <Typography variant="h5">Quests</Typography>
-      {quests && quests.length > 0 ? (
-        <QuestCard rows={quests}/>
+      {loadingQuests ? (
+        <SkeletonQuestCard />
       ) : (
-        <Typography variant="body1">New quests coming soon for this course!</Typography>
+        quests && quests.length > 0 ? (
+          <QuestCard rows={quests}/>
+        ) : (
+          <Typography variant="body1">New quests are coming soon for this course!</Typography>
+        )
       )}
 
     </Stack>

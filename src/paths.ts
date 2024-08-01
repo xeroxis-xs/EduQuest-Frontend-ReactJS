@@ -2,8 +2,6 @@ export const paths = {
   home: '/',
   auth: {
     signIn: '/auth/sign-in',
-    // signUp: '/auth/sign-up',
-    // resetPassword: '/auth/reset-password'
   },
   dashboard: {
     overview: '/dashboard',
@@ -16,7 +14,10 @@ export const paths = {
     quest: '/dashboard/quest',
     generator: '/dashboard/generator',
     import: '/dashboard/import',
-    badge: '/dashboard/badge',
+    badge: {
+      catalogue: '/dashboard/badge/badge-catalogue',
+      my: '/dashboard/badge/my-badge',
+    },
   },
   errors: {
     notFound: '/errors/not-found',

@@ -24,8 +24,9 @@ import type { Course } from "@/types/course";
 import type { Quest } from "@/types/quest";
 import { useUser } from "@/hooks/use-user";
 import { FilePlus as FilePlusIcon } from '@phosphor-icons/react/dist/ssr/FilePlus';
-import {CardMedia} from "@mui/material";
+import {CardMedia, TextField} from "@mui/material";
 import type {Image} from "@/types/image";
+import Chip from "@mui/material/Chip";
 
 interface CourseFormProps {
   onFormSubmitSuccess: () => void;
@@ -108,6 +109,7 @@ export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Ele
         name: course.name,
         description: course.description,
         status: course.status,
+        type: course.type,
         term: {
           id: course.term.id,
           name: course.term.name,
@@ -178,28 +180,43 @@ export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Ele
         <Divider />
         <CardContent>
           <Grid container spacing={3}>
-            <Grid md={3} xs={6}>
+            <Grid md={4} xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>Name</InputLabel>
+                <InputLabel>Quest Name</InputLabel>
                 <OutlinedInput defaultValue="" label="Name" name="name" inputRef={questNameRef} />
               </FormControl>
             </Grid>
-            <Grid md={3} xs={6}>
+            <Grid md={4} xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>Type</InputLabel>
-                <OutlinedInput defaultValue="" label="Type" name="type" inputRef={questTypeRef} />
+                <InputLabel>Quest Type</InputLabel>
+                <Select defaultValue="" label="Quest Type" inputRef={questTypeRef} name="type">
+                  <MenuItem value="Eduquest MCQ"><Chip variant="outlined" label="Eduquest MCQ" color="primary" size="small"/></MenuItem>
+                  <MenuItem value="Private"><Chip variant="outlined" label="Private" color="default" size="small"/></MenuItem>
+                  <MenuItem value="Kahoot!"><Chip variant="outlined" label="Kahoot!" color="info" size="small"/></MenuItem>
+                  <MenuItem value="Wooclap"><Chip variant="outlined" label="Wooclap" color="info" size="small"/></MenuItem>
+                </Select>
               </FormControl>
             </Grid>
-            <Grid md={3} xs={6}>
+            <Grid md={4} xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>Description</InputLabel>
-                <OutlinedInput defaultValue="" label="Description" name="description" inputRef={questDescriptionRef}/>
+                <InputLabel>Quest Status</InputLabel>
+                <Select defaultValue="" label="Quest Status" inputRef={questStatusRef} name="status">
+                  <MenuItem value="Active"><Chip variant="outlined" label="Active" color="success" size="small"/></MenuItem>
+                  <MenuItem value="Expired"><Chip variant="outlined" label="Expired" color="default" size="small"/></MenuItem>
+                </Select>
               </FormControl>
             </Grid>
-            <Grid md={3} xs={6}>
+            <Grid xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>Status</InputLabel>
-                <OutlinedInput defaultValue="" label="Status" name="status" inputRef={questStatusRef} />
+                <TextField
+                  defaultValue=""
+                  label="Quest Description"
+                  inputRef={questDescriptionRef}
+                  name="description"
+                  multiline
+                  required
+                  rows={4}
+                />
               </FormControl>
             </Grid>
           </Grid>
@@ -207,20 +224,28 @@ export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Ele
           <Typography sx={{my:3}} variant="h6">Thumbnail</Typography>
           {images ?
             <Grid container spacing={3} >
-              <Grid md={3} xs={12}>
+              <Grid md={6} xs={12}>
                 <FormControl fullWidth required>
-                  <InputLabel>Thumbnail ID</InputLabel>
-                  <Select defaultValue={images[0]?.id} onChange={handleImageChange} inputRef={questImageIdRef}
-                          label="Image ID" variant="outlined" type="number">
+                  <InputLabel id="thumbnail-label">Thumbnail ID</InputLabel>
+                  <Select
+                    labelId="thumbnail-label"
+                    id="thumbnail"
+                    defaultValue={images[0]?.id}
+                    onChange={handleImageChange}
+                    inputRef={questImageIdRef}
+                    variant="outlined"
+                    type="number"
+                    label="Thumbnail ID"
+                  >
                     {images.map((option) => (
                       <MenuItem key={option.id} value={option.id}>
-                        {option.id}
+                        {option.id} - {option.name}
                       </MenuItem>
                     ))}
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid md={9} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
+              <Grid md={6} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
               <Grid md={3} xs={6}>
                 <Typography variant="subtitle2">Thumbnail Name</Typography>
                 <Typography variant="body2">{selectedImage?.name || images[0].name}</Typography>
@@ -245,20 +270,20 @@ export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Ele
 
           {courses ?
             <Grid container spacing={3} >
-              <Grid md={3} xs={12}>
+              <Grid md={6} xs={12}>
                 <FormControl fullWidth required>
                   <InputLabel>Course ID</InputLabel>
                   <Select defaultValue={courses[0]?.id} onChange={handleCourseChange} inputRef={questCourseIdRef}
                           label="Course ID" variant="outlined" type="number">
                     {courses.map((option) => (
                       <MenuItem key={option.id} value={option.id}>
-                        {option.id}
+                        {option.id} - {option.code} {option.name}
                       </MenuItem>
                     ))}
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid md={9} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
+              <Grid md={6} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
               <Grid md={3} xs={6}>
                 <Typography variant="subtitle2">Course Name</Typography>
                 <Typography variant="body2">{selectedCourse?.name || courses[0]?.name }</Typography>

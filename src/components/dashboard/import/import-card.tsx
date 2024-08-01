@@ -246,6 +246,8 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
                       label="Type" variant="outlined" type="number">
                   <MenuItem value="Kahoot!">Kahoot!</MenuItem>
                   <MenuItem value="Wooclap">Wooclap</MenuItem>
+                  <MenuItem value="Eduquest MCQ">Eduquest MCQ</MenuItem>
+                  <MenuItem value="Private">Private</MenuItem>
               </Select>
             </FormControl>
           </Grid>

@@ -13,5 +13,6 @@ export interface Quest {
   organiser: EduquestUser;
   total_max_score: number;
   total_questions: number;
+  expiration_date: string | null;
   image: Image;
 }

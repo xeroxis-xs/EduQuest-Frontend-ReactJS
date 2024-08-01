@@ -20,6 +20,7 @@ import {logger} from "@/lib/default-logger";
 import {AxiosError} from "axios";
 import {authClient} from "@/lib/auth/client";
 import {useUser} from "@/hooks/use-user";
+import RouterLink from "next/link";
 
 interface CourseCardProps {
   rows?: Course[];
@@ -73,8 +74,8 @@ export function CourseCard({ rows = [], onEnrolledSuccess }: CourseCardProps): R
       {currentCourses.map((course) => (
         <Grid key={course.id} lg={4} md={6} xs={12} >
           <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-            <CardActionArea href={`/dashboard/course/${course.id.toString()}` } sx={{ height: '100%', borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}>
-              <CardHeader title={course.name}/>
+            <CardActionArea href={`/dashboard/course/${course.id.toString()}` } sx={{ height: '100%', borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }} component={RouterLink}>
+              <CardHeader title={course.name} subheader={course.code}/>
               <CardMedia
                 component="img"
                 alt={course.image.name}
@@ -82,15 +83,18 @@ export function CourseCard({ rows = [], onEnrolledSuccess }: CourseCardProps): R
                 sx={{ height: 160, objectFit: 'contain', p: 4, mt:1, backgroundColor: '#fafafa' }}
               />
               <CardContent sx={{ flex: 1 }}>
-                <Typography sx={{ mb: 1.5 }} color="text.secondary">
-                  {course.code}
-                </Typography>
-                <Chip label={course.status} sx={{ mb: 1.5 }} color="success" size="small"/>
-                <Typography variant="subtitle1">
-                  AY {course.term.academic_year.start_year}-{course.term.academic_year.end_year}
-                </Typography>
-                <Typography variant="subtitle1" sx={{ mb: 1.5 }}>
-                  {course.term.name}
+                <Chip label={course.type} sx={{ mb: 1.5, mr: 1 }} color={
+                  course.type === 'Private' ? 'default' :
+                    course.type === 'Eduquest' ? 'primary' :
+                      course.type === 'Others' ? 'default' : 'default'
+                } size="small" variant="outlined"/>
+                <Chip label={course.status} sx={{ mb: 1.5 }} color={
+                  course.status === 'Draft' ? 'default' :
+                    course.status === 'Active' ? 'success' :
+                      course.status === 'Expired' ? 'default' : 'default'
+                } size="small" variant="outlined"/>
+                <Typography variant="subtitle1" mb={1}>
+                  AY {course.term.academic_year.start_year}-{course.term.academic_year.end_year} {course.term.name}
                 </Typography>
                 <Typography variant="body2">
                   {course.description}
