@@ -32,7 +32,8 @@ import type { Document } from "@/types/document";
 import type { GeneratedQuestion } from "@/types/generated-question";
 import type { GeneratedQuestions } from "@/types/generated-questions";
 import type { EduquestUser } from "@/types/eduquest-user";
-
+import LinearProgress, { type LinearProgressProps } from '@mui/material/LinearProgress';
+import Box from '@mui/material/Box';
 
 
 
@@ -51,6 +52,21 @@ interface NewQuestType {
   image: Image | undefined;
 }
 
+function LinearProgressWithLabel(props: LinearProgressProps & { value: number }) {
+  return (
+    <Box sx={{ display: 'flex', alignItems: 'center' }}>
+      <Box sx={{ width: '100%', mr: 1 }}>
+        <LinearProgress variant="determinate" {...props} />
+      </Box>
+      <Box sx={{ minWidth: 35 }}>
+        <Typography variant="body2" color="text.secondary">{`${Math.round(
+          props.value
+        ).toString()}%`}</Typography>
+      </Box>
+    </Box>
+  );
+}
+
 export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Element {
   const { eduquestUser} = useUser();
   const questTypeRef = React.useRef<HTMLInputElement>(null);
@@ -66,7 +82,8 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
   const [images, setImages] = React.useState<Image[]>();
   const [selectedDocument, setSelectedDocument] = React.useState<Document | null>(null);
   const [submitStatus, setSubmitStatus] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
-
+  const [progress, setProgress] = React.useState(0);
+  const [showProgress, setShowProgress] = React.useState(false); // State to control progress bar visibility
 
   const getImages = async (): Promise<void> => {
     try {
@@ -147,6 +164,8 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setSubmitStatus(null); // Reset submit status
+    setProgress(10); // Initial progress
+    setShowProgress(true); // Show progress bar
 
     const newQuest: NewQuestType = {
       type: questTypeRef.current?.value,
@@ -163,6 +182,7 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
     const createdQuestId = await createQuest(newQuest);
 
     if (createdQuestId) {
+      setProgress(30); // Progress after quest creation
       logger.debug('Calling generateQuestions');
       const generatedQuestions = await generateQuestions(
         filename?.split('/').pop() || '',
@@ -174,9 +194,10 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
         logger.debug('Generated questions is null');
         setSubmitStatus({ type: 'error', message: 'Generate Failed. Please try again.' });
       } else if (Array.isArray(generatedQuestions)) {
+        setProgress(70); // Progress after questions generation
         logger.debug('Generated questions is an array');
-
         await bulkCreateQuestions(generatedQuestions, createdQuestId);
+        setProgress(100); // Final progress
       } else {
         logger.debug('Generated questions is not an array:', generatedQuestions);
         setSubmitStatus({ type: 'error', message: 'Generate Failed. Please try again.' });
@@ -184,8 +205,9 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
     } else {
       setSubmitStatus({ type: 'error', message: 'Quest creation failed. Please try again.' });
     }
-  };
 
+    setShowProgress(false); // Hide progress bar after submission
+  };
 
 
   const createQuest = async (newQuest: NewQuestType): Promise<number | null> => {
@@ -265,6 +287,8 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
       logger.error('Failed to fetch data', error);
     });
   }, []);
+
+
   return (
     <form onSubmit={handleSubmit}>
       <Card>
@@ -385,6 +409,11 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
               </Grid>
             </Grid> : null}
 
+          {showProgress && ( // Conditionally render progress bar
+            <Box sx={{ width: '100%', mt: 5}}>
+              <LinearProgressWithLabel value={progress} />
+            </Box>
+          )}
         </CardContent>
 
         <CardActions sx={{ justifyContent: 'flex-end' }}>
@@ -397,7 +426,6 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
           {submitStatus.message}
         </Alert>
       )}
-
     </form>
   );
 }
