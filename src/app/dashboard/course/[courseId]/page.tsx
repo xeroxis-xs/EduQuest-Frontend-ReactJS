@@ -285,7 +285,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
         ) : (
           course ? (
         <Card>
-          <CardHeader title="Course Details" subheader={`ID: ${course.id}`}/>
+          <CardHeader title="Course Details" subheader={`ID: ${course.id.toString()}`}/>
           <CardMedia
             component="img"
             alt="cloud computing"
@@ -295,31 +295,31 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
           <CardContent sx={{pb: '16px'}}>
             <Grid container spacing={3}>
               <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Code</Typography>
+                <Typography variant="overline" color="text.secondary">Code</Typography>
                 <Typography variant="body2">{course.code}</Typography>
               </Grid>
               <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Name</Typography>
+                <Typography variant="overline" color="text.secondary">Name</Typography>
                 <Typography variant="body2">{course.name}</Typography>
               </Grid>
               <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Type</Typography>
-                <Chip label={course.type} sx={{ mt: 1 }} color={
-                  course.type === 'Private' ? 'error' :
-                    course.type === 'Eduquest' ? 'primary' :
+                <Typography variant="overline" color="text.secondary" display="block">Type</Typography>
+                <Chip label={course.type} color={
+                  course.type === 'Private' ? 'secondary' :
+                    course.type === 'Public' ? 'primary' :
                       course.type === 'Others' ? 'error' : 'default'
                   } size="small" variant="outlined"/>
               </Grid>
               <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Status</Typography>
-                <Chip label={course.status} sx={{ mt: 1 }} color={
+                <Typography variant="overline" color="text.secondary" display="block">Status</Typography>
+                <Chip label={course.status} color={
                   course.status === 'Draft' ? 'info' :
                     course.status === 'Active' ? 'success' :
-                      course.status === 'Expired' ? 'error' : 'default'
+                      course.status === 'Expired' ? 'secondary' : 'default'
                 } size="small" variant="outlined"/>
               </Grid>
               <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Description</Typography>
+                <Typography variant="overline" color="text.secondary">Description</Typography>
                 <Typography variant="body2">{course.description}</Typography>
               </Grid>
 
@@ -337,27 +337,27 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
             <Collapse in={expanded} timeout="auto" unmountOnExit>
             <Grid container spacing={3}>
               <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Term ID</Typography>
+                <Typography variant="overline" color="text.secondary">Term ID</Typography>
                 <Typography variant="body2">{course.term.id}</Typography>
               </Grid>
               <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Term Name</Typography>
+                <Typography variant="overline" color="text.secondary">Term Name</Typography>
                 <Typography variant="body2">{course.term.name}</Typography>
               </Grid>
               <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Term Start Date</Typography>
+                <Typography variant="overline" color="text.secondary">Term Start Date</Typography>
                 <Typography variant="body2">{course.term.start_date}</Typography>
               </Grid>
               <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Term End Date</Typography>
+                <Typography variant="overline" color="text.secondary">Term End Date</Typography>
                 <Typography variant="body2">{course.term.end_date}</Typography>
               </Grid>
               <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Academic Year ID</Typography>
+                <Typography variant="overline" color="text.secondary">Academic Year ID</Typography>
                 <Typography variant="body2">{course.term.academic_year.id}</Typography>
               </Grid>
               <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Academic Year</Typography>
+                <Typography variant="overline" color="text.secondary">Academic Year</Typography>
                 <Typography variant="body2">AY {course.term.academic_year.start_year}-{course.term.academic_year.end_year}</Typography>
               </Grid>
             </Grid>
@@ -417,8 +417,8 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
                   <FormControl fullWidth required>
                     <InputLabel>Course Type</InputLabel>
                     <Select defaultValue={course.type} label="Course Type" inputRef={courseTypeRef} name="type">
-                      <MenuItem value="Eduquest"><Chip variant="outlined" label="Eduquest" color="primary" size="small"/></MenuItem>
-                      <MenuItem value="Private"><Chip variant="outlined" label="Private" color="default" size="small"/></MenuItem>
+                      <MenuItem value="Public"><Chip variant="outlined" label="Public" color="primary" size="small"/></MenuItem>
+                      <MenuItem value="Private"><Chip variant="outlined" label="Private" color="secondary" size="small"/></MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
@@ -427,7 +427,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
                     <InputLabel>Course Status</InputLabel>
                     <Select defaultValue={course.status} label="Course Status" inputRef={courseStatusRef} name="status">
                       <MenuItem value="Active"><Chip variant="outlined" label="Active" color="success" size="small"/></MenuItem>
-                      <MenuItem value="Inactive"><Chip variant="outlined" label="Inactive" color="default" size="small"/></MenuItem>
+                      <MenuItem value="Inactive"><Chip variant="outlined" label="Inactive" color="secondary" size="small"/></MenuItem>
                     </Select>
                   </FormControl>
                 </Grid>
@@ -467,25 +467,25 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
                   </Grid>
                   <Grid md={6} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
                   <Grid md={3} xs={6}>
-                      <Typography variant="subtitle2">Term Name</Typography>
+                      <Typography variant="overline" color="text.secondary">Term Name</Typography>
                       <Typography variant="body2">{selectedTerm?.name || course.term.name}</Typography>
                   </Grid>
                   <Grid md={3} xs={6}>
-                    <Typography variant="subtitle2">Term Start Date</Typography>
+                    <Typography variant="overline" color="text.secondary">Term Start Date</Typography>
                     <Typography variant="body2">{selectedTerm?.start_date || course.term.start_date}</Typography>
 
                   </Grid>
                   <Grid md={3} xs={6}>
-                    <Typography variant="subtitle2">Term End Date</Typography>
+                    <Typography variant="overline" color="text.secondary">Term End Date</Typography>
                     <Typography variant="body2">{selectedTerm?.end_date || course.term.end_date}</Typography>
 
                   </Grid>
                   <Grid md={3} xs={6}>
-                    <Typography variant="subtitle2">Academic Year ID</Typography>
+                    <Typography variant="overline" color="text.secondary">Academic Year ID</Typography>
                     <Typography variant="body2">{selectedTerm?.academic_year.id || course.term.academic_year.id}</Typography>
                   </Grid>
                   <Grid md={3} xs={6}>
-                    <Typography variant="subtitle2">Academic Year</Typography>
+                    <Typography variant="overline" color="text.secondary">Academic Year</Typography>
                     <Typography variant="body2">AY {selectedTerm?.academic_year.start_year || course.term.academic_year.start_year}-{selectedTerm?.academic_year.end_year || terms[0].academic_year.end_year}</Typography>
                   </Grid>
                 </Grid>
@@ -512,15 +512,15 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
                   </Grid>
                   <Grid md={6} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
                   <Grid md={3} xs={6}>
-                    <Typography variant="subtitle2">Thumbnail Name</Typography>
+                    <Typography variant="overline" color="text.secondary">Thumbnail Name</Typography>
                     <Typography variant="body2">{selectedImage?.name || course.image.name}</Typography>
                   </Grid>
                   <Grid md={3} xs={6}>
-                    <Typography variant="subtitle2">Thumbnail Filename</Typography>
+                    <Typography variant="overline" color="text.secondary">Thumbnail Filename</Typography>
                     <Typography variant="body2">{selectedImage?.filename || course.image.filename}</Typography>
                   </Grid>
                   <Grid xs={12}>
-                    <Typography variant="subtitle2">Thumbnail Preview</Typography>
+                    <Typography variant="overline" color="text.secondary">Thumbnail Preview</Typography>
                     <CardMedia
                       component="img"
                       alt={selectedImage?.name || images[0].name}
@@ -551,7 +551,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
         <SkeletonQuestCard />
       ) : (
         quests && quests.length > 0 ? (
-          <QuestCard rows={quests}/>
+          <QuestCard rows={quests} onQuestDeleteSuccess={getQuests}/>
         ) : (
           <Typography variant="body1">New quests are coming soon for this course!</Typography>
         )

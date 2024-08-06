@@ -12,7 +12,10 @@ export const paths = {
     settings: '/dashboard/settings',
     course: '/dashboard/course',
     quest: '/dashboard/quest',
-    generator: '/dashboard/generator',
+    generator: {
+      upload: '/dashboard/generator/my-upload',
+      quest: '/dashboard/generator/my-quest',
+    },
     import: '/dashboard/import',
     badge: {
       catalogue: '/dashboard/badge/badge-catalogue',

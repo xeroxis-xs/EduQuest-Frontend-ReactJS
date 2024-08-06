@@ -7,6 +7,6 @@ export interface Config {
 }
 
 export const config: Config = {
-  site: { name: 'EduQuest', description: 'Platform for learners to earn.', themeColor: '#090a0b', url: getSiteURL() },
+  site: { name: 'EduQuest', description: 'Platform for students to earn and learn.', themeColor: '#090a0b', url: getSiteURL() },
   logLevel: (process.env.NEXT_PUBLIC_LOG_LEVEL as keyof typeof LogLevel) ?? LogLevel.ALL,
 };

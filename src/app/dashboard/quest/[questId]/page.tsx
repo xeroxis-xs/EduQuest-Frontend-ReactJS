@@ -256,7 +256,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
 
   const handleNewAttempt = async () => {
     try {
-      const response: AxiosResponse = await apiService.post(`/api/UserQuestAttempt/`, {
+      const response: AxiosResponse<UserQuestAttempt> = await apiService.post(`/api/UserQuestAttempt/`, {
         last_attempted_on: new Date().toISOString(),
         all_questions_submitted: false,
         user: eduquestUser?.id,
@@ -278,7 +278,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
   const handleExpires = async () => {
     try {
       const data = { status: 'Expired' }
-      const response = await apiService.patch(`/api/Quest/${params.questId}/`, data);
+      const response : AxiosResponse<Quest> = await apiService.patch(`/api/Quest/${params.questId}/`, data);
       setQuest(response.data);
       setSubmitStatus({ type: 'success', message: 'Quest has been set to expired' });
     } catch (error: unknown) {
@@ -326,7 +326,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
         ) : (
           quest ? (
         <Card>
-          <CardHeader title="Quest Details" subheader={`ID: ${quest.id}`}/>
+          <CardHeader title="Quest Details" subheader={`ID: ${quest.id.toString()}`}/>
           <CardMedia
             component="img"
             alt={quest.image.name}
@@ -336,46 +336,46 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
           <CardContent sx={{pb: '16px'}}>
             <Grid container spacing={3}>
               <Grid md={6} xs={12}>
-                <Typography gutterBottom variant="overline">Name</Typography>
+                <Typography variant="overline" color="text.secondary">Name</Typography>
                 <Typography variant="body2">{quest.name}</Typography>
               </Grid>
               <Grid md={6} xs={12}>
-                <Typography gutterBottom variant="overline">Description</Typography>
+                <Typography variant="overline" color="text.secondary">Description</Typography>
                 <Typography variant="body2">{quest.description}</Typography>
               </Grid>
               <Grid md={6} xs={12}>
-                <Typography gutterBottom variant="overline" display="block">Type</Typography>
+                <Typography variant="overline" color="text.secondary" display="block">Type</Typography>
                 <Chip variant="outlined" label={quest.type} color={
                   quest.type === 'Eduquest MCQ' ? 'primary' :
                     quest.type === 'Wooclap' ? 'info' :
                       quest.type === 'Kahoot!' ? 'info' :
-                        quest.type === 'Other' ? 'default' : 'default'
+                        quest.type === 'Private' ? 'secondary' : 'default'
                 } size="small"/>
               </Grid>
               <Grid md={6} xs={12}>
-                <Typography gutterBottom variant="overline" display="block">Status</Typography>
+                <Typography variant="overline" color="text.secondary" display="block">Status</Typography>
                 <Chip variant="outlined" label={quest.status} color={
                   quest.status === 'Draft' ? 'default' :
                     quest.status === 'Active' ? 'success' :
-                      quest.status === 'Expired' ? 'default' : 'default'
+                      quest.status === 'Expired' ? 'secondary' : 'default'
                   } size="small"/>
               </Grid>
               <Grid md={6} xs={12}>
-                <Typography gutterBottom variant="overline">Number of Questions</Typography>
+                <Typography variant="overline" color="text.secondary">Number of Questions</Typography>
                 <Typography variant="body2">{quest.total_questions}</Typography>
               </Grid>
 
               <Grid md={6} xs={12}>
-                <Typography gutterBottom variant="overline">Maximum Score</Typography>
+                <Typography variant="overline" color="text.secondary">Maximum Score</Typography>
                 <Typography variant="body2">{quest.total_max_score}</Typography>
               </Grid>
 
               <Grid md={6} xs={12}>
-                <Typography gutterBottom variant="overline">Maximum Number of Attempts</Typography>
+                <Typography variant="overline" color="text.secondary">Maximum Number of Attempts</Typography>
                 <Typography variant="body2">{quest.max_attempts}</Typography>
               </Grid>
               <Grid md={6} xs={12}>
-                <Typography gutterBottom variant="overline">Expiry Date</Typography>
+                <Typography variant="overline" color="text.secondary">Expiry Date</Typography>
                 {quest.expiration_date ? (
                   <Typography variant="body2">
                     {new Date(quest.expiration_date).toLocaleDateString("en-SG", {
@@ -395,7 +395,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
 
               </Grid>
               <Grid md={6} xs={12}>
-                <Typography gutterBottom variant="overline">Created By</Typography>
+                <Typography variant="overline" color="text.secondary">Created By</Typography>
                 <Typography variant="body2">{quest.organiser.username}</Typography>
                 <Typography variant="body2">{quest.organiser.email}</Typography>
               </Grid>
@@ -415,29 +415,29 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
             <Collapse in={expanded} timeout="auto" unmountOnExit>
             <Grid container spacing={3}>
               <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Course ID</Typography>
+                <Typography variant="overline" color="text.secondary">Course ID</Typography>
                 <Typography variant="body2">
                   <Link href={`/dashboard/course/${quest.from_course.id.toString()}`}>{quest.from_course.id}</Link>
                 </Typography>
               </Grid>
               <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Course Code</Typography>
+                <Typography variant="overline" color="text.secondary">Course Code</Typography>
                 <Typography variant="body2">{quest.from_course.code}</Typography>
               </Grid>
               <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Course Name</Typography>
+                <Typography variant="overline" color="text.secondary">Course Name</Typography>
                 <Typography variant="body2">{quest.from_course.name}</Typography>
               </Grid>
               <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Course Description</Typography>
+                <Typography variant="overline" color="text.secondary">Course Description</Typography>
                 <Typography variant="body2">{quest.from_course.description}</Typography>
               </Grid>
               <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Course Year / Term</Typography>
+                <Typography variant="overline" color="text.secondary">Course Year / Term</Typography>
                 <Typography variant="body2">AY {quest.from_course.term.academic_year.start_year}-{quest.from_course.term.academic_year.end_year} / {quest.from_course.term.name}</Typography>
               </Grid>
               <Grid md={6} xs={12}>
-                <Typography variant="subtitle2">Course Duration</Typography>
+                <Typography variant="overline" color="text.secondary">Course Duration</Typography>
                 <Typography variant="body2">From {quest.from_course.term.start_date} to {quest.from_course.term.end_date}</Typography>
               </Grid>
             </Grid>
@@ -501,7 +501,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
                     <InputLabel>Quest Type</InputLabel>
                     <Select defaultValue={quest.type} label="Quest Type" inputRef={questTypeRef} name="type">
                       <MenuItem value="Eduquest MCQ"><Chip variant="outlined" label="Eduquest MCQ" color="primary"/></MenuItem>
-                      <MenuItem value="Private"><Chip variant="outlined" label="Private" color="default" size="small"/></MenuItem>
+                      <MenuItem value="Private"><Chip variant="outlined" label="Private" color="secondary" size="small"/></MenuItem>
                       <MenuItem value="Kahoot!"><Chip variant="outlined" label="Kahoot!" color="info" size="small"/></MenuItem>
                       <MenuItem value="Wooclap"><Chip variant="outlined" label="Wooclap" color="info" size="small"/></MenuItem>
                     </Select>
@@ -565,25 +565,25 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
                     </Grid>
                     <Grid md={6} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
                   <Grid md={3} xs={6}>
-                    <Typography variant="subtitle2">Course Name</Typography>
+                    <Typography variant="overline" color="text.secondary">Course Name</Typography>
                     <Typography variant="body2">{selectedCourse?.name || quest.from_course.name }</Typography>
                   </Grid>
                   <Grid md={3} xs={6}>
-                    <Typography variant="subtitle2">Course Code</Typography>
+                    <Typography variant="overline" color="text.secondary">Course Code</Typography>
                     <Typography variant="body2">{selectedCourse?.code || quest.from_course.code}</Typography>
                   </Grid>
                   <Grid md={6} xs={12}>
-                    <Typography variant="subtitle2">Course Description</Typography>
+                    <Typography variant="overline" color="text.secondary">Course Description</Typography>
                     <Typography variant="body2">{selectedCourse?.description || quest.from_course.description}</Typography>
                   </Grid>
                   <Grid md={3} xs={6}>
-                    <Typography variant="subtitle2">Course Year / Term</Typography>
+                    <Typography variant="overline" color="text.secondary">Course Year / Term</Typography>
                     <Typography variant="body2">
                       AY {selectedCourse?.term.academic_year.start_year || quest.from_course.term.academic_year.start_year}-{selectedCourse?.term.academic_year.end_year || courses[0].term.academic_year.end_year} / {selectedCourse?.term.name || courses[0].term.name}
                     </Typography>
                   </Grid>
                   <Grid md={3} xs={6}>
-                    <Typography variant="subtitle2">Course Duration</Typography>
+                    <Typography variant="overline" color="text.secondary">Course Duration</Typography>
                     <Typography variant="body2">
                       From {selectedCourse?.term.start_date || quest.from_course.term.start_date} to {selectedCourse?.term.end_date || courses[0].term.end_date}
                     </Typography>
@@ -611,15 +611,15 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
                   </Grid>
                   <Grid md={9} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
                   <Grid md={3} xs={6}>
-                    <Typography variant="subtitle2">Thumbnail Name</Typography>
+                    <Typography variant="overline" color="text.secondary">Thumbnail Name</Typography>
                     <Typography variant="body2">{selectedImage?.name || quest.image.name}</Typography>
                   </Grid>
                   <Grid md={3} xs={6}>
-                    <Typography variant="subtitle2">Thumbnail Filename</Typography>
+                    <Typography variant="overline" color="text.secondary">Thumbnail Filename</Typography>
                     <Typography variant="body2">{selectedImage?.filename || quest.image.filename}</Typography>
                   </Grid>
                   <Grid xs={12}>
-                    <Typography variant="subtitle2">Thumbnail Preview</Typography>
+                    <Typography variant="overline" color="text.secondary">Thumbnail Preview</Typography>
                     <CardMedia
                       component="img"
                       alt={selectedImage?.name || quest.image.name}

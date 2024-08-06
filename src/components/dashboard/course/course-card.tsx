@@ -84,14 +84,14 @@ export function CourseCard({ rows = [], onEnrolledSuccess }: CourseCardProps): R
               />
               <CardContent sx={{ flex: 1 }}>
                 <Chip label={course.type} sx={{ mb: 1.5, mr: 1 }} color={
-                  course.type === 'Private' ? 'default' :
-                    course.type === 'Eduquest' ? 'primary' :
+                  course.type === 'Private' ? 'secondary' :
+                    course.type === 'Public' ? 'primary' :
                       course.type === 'Others' ? 'default' : 'default'
                 } size="small" variant="outlined"/>
                 <Chip label={course.status} sx={{ mb: 1.5 }} color={
                   course.status === 'Draft' ? 'default' :
                     course.status === 'Active' ? 'success' :
-                      course.status === 'Expired' ? 'default' : 'default'
+                      course.status === 'Expired' ? 'secondary' : 'default'
                 } size="small" variant="outlined"/>
                 <Typography variant="subtitle1" mb={1}>
                   AY {course.term.academic_year.start_year}-{course.term.academic_year.end_year} {course.term.name}

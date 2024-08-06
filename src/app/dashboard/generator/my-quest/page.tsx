@@ -3,18 +3,20 @@ import * as React from 'react';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
+import { MagicWand as MagicWandIcon } from '@phosphor-icons/react/dist/ssr/MagicWand';
 import { XCircle as XCircleIcon } from '@phosphor-icons/react/dist/ssr/XCircle';
 import apiService from "@/api/api-service";
 import {AxiosError, type AxiosResponse} from "axios";
 import { logger } from '@/lib/default-logger'
 import { authClient } from "@/lib/auth/client";
-import { QuestForm } from "@/components/dashboard/quest/quest-form";
 import { QuestCard } from "@/components/dashboard/quest/quest-card";
 import type { Quest } from '@/types/quest';
 import { SkeletonQuestCard } from "@/components/dashboard/skeleton/skeleton-quest-card";
+import {GenerateQuestForm} from "@/components/dashboard/generator/generate-quest-form";
+import {useUser} from "@/hooks/use-user";
 
 export default function Page(): React.JSX.Element {
+  const { eduquestUser } = useUser();
   const [quests, setQuests] = React.useState<Quest[]>([]);
   const [showForm, setShowForm] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
@@ -24,28 +26,29 @@ export default function Page(): React.JSX.Element {
     setShowForm(!showForm);
   };
 
-  const getQuests = async (): Promise<void> => {
-    try {
-      const response: AxiosResponse<Quest[]> = await apiService.get<Quest[]>('/api/Quest/');
-      const data: Quest[] = response.data;
-      const filteredData = data.filter((quest) => quest.type !== 'Private');
-      setQuests(filteredData);
-      logger.debug('Filtered Quests', filteredData);
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
+  const getPrivateQuests = async (): Promise<void> => {
+    if (eduquestUser) {
+      try {
+        const response: AxiosResponse<Quest[]> = await apiService.get<Quest[]>(`/api/Quest/private/by-user/${eduquestUser.id.toString()}/`);
+        const data: Quest[] = response.data;
+        setQuests(data);
+        logger.debug('Private Quests', data);
+      } catch (error: unknown) {
+        if (error instanceof AxiosError) {
+          if (error.response?.status === 401) {
+            await authClient.signInWithMsal();
+          }
         }
+        logger.error('Error: ', error);
+      } finally {
+        setLoading(false);
       }
-      logger.error('Error: ', error);
-    } finally {
-      setLoading(false);
     }
   };
 
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
-      await getQuests();
+      await getPrivateQuests();
     };
 
     fetchData().catch((error: unknown) => {
@@ -58,20 +61,23 @@ export default function Page(): React.JSX.Element {
     <Stack spacing={3}>
       <Stack direction="row" spacing={3}>
         <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
-          <Typography variant="h4">Quests</Typography>
-
+          <Typography variant="h4">Generated Quests</Typography>
         </Stack>
         <Stack direction="row" sx={{ alignItems: 'center' }}>
-          <Button startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
-            {showForm ? 'Close' : 'Create'}
+          <Button startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <MagicWandIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
+            {showForm ? 'Close' : 'Generate New Quest'}
           </Button>
         </Stack>
       </Stack>
-      {showForm && <QuestForm onFormSubmitSuccess={getQuests}/>} {/* Conditional rendering */}
+      {showForm && <GenerateQuestForm onFormSubmitSuccess={getPrivateQuests} />}
       {loading ? (
         <SkeletonQuestCard />
       ) : (
-        <QuestCard rows={quests} onQuestDeleteSuccess={getQuests}/>
+        quests.length === 0 ? (
+          <Typography variant="body1">You have not generated any Quests yet.</Typography>
+        ) : (
+          <QuestCard rows={quests} onQuestDeleteSuccess={getPrivateQuests} />
+        )
       )}
     </Stack>
   );

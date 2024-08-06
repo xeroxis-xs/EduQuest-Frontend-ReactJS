@@ -10,6 +10,7 @@ import TableRow from "@mui/material/TableRow";
 import TableCell from "@mui/material/TableCell";
 import TableBody from "@mui/material/TableBody";
 import TablePagination from "@mui/material/TablePagination";
+import {noop} from "@babel/types";
 
 export function SkeletonQuestAttemptTable(): React.JSX.Element {
   return (
@@ -49,8 +50,8 @@ export function SkeletonQuestAttemptTable(): React.JSX.Element {
         page={0} // Arbitrary value for skeleton
         rowsPerPage={5}
         rowsPerPageOptions={[5, 10, 25]}
-        onPageChange={() => {}} // No-op function for skeleton
-        onRowsPerPageChange={() => {}} // No-op function for skeleton
+        onPageChange={() => {noop()}} // No-op function for skeleton
+        onRowsPerPageChange={() => {noop()}} // No-op function for skeleton
       />
     </Card>
   );

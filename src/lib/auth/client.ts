@@ -2,7 +2,7 @@
 
 import {handleLoginRedirect, handleLogout, msalInstance} from "@/app/msal/msal";
 import apiService from "@/api/api-service";
-import {AxiosError, AxiosResponse} from "axios";
+import { type AxiosResponse, AxiosError } from "axios";
 import {type EduquestUser} from "@/types/eduquest-user";
 import {logger} from '@/lib/default-logger';
 import {type AccountInfo} from "@azure/msal-browser";

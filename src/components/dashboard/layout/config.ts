@@ -23,7 +23,7 @@ export const navItems = [
     icon: 'badge',
     items: [
       {
-        key: 'badge-catalogue',
+        key: 'my-quest',
         title: 'Badge Catalogue',
         href: paths.dashboard.badge.catalogue
       },
@@ -37,9 +37,19 @@ export const navItems = [
   {
     key: 'generator',
     title: 'Quest Generator',
-    href: paths.dashboard.generator,
     icon: 'magic-wand',
-    matcher: { type: 'startsWith', href: paths.dashboard.generator },
+    items: [
+      {
+        key: 'my-upload',
+        title: 'Upload Document',
+        href: paths.dashboard.generator.upload
+      },
+      {
+        key: 'my-quest',
+        title: 'Generate Quest',
+        href: paths.dashboard.generator.quest
+      }
+    ],
   },
   {
     key: 'import',

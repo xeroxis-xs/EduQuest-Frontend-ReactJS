@@ -3,9 +3,8 @@ import Grid from '@mui/material/Unstable_Grid2'; // Grid version 2
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
-import type { Quest } from '@/types/quest';
 import CardHeader from "@mui/material/CardHeader";
-import {CardMedia} from "@mui/material";
+import {CardMedia, TextField} from "@mui/material";
 import Divider from "@mui/material/Divider";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
@@ -13,7 +12,6 @@ import OutlinedInput from "@mui/material/OutlinedInput";
 import Select, {type SelectChangeEvent} from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
-import {FloppyDisk as FloppyDiskIcon} from "@phosphor-icons/react/dist/ssr/FloppyDisk";
 import {CaretRight as CaretRightIcon} from "@phosphor-icons/react/dist/ssr/CaretRight";
 import { CloudArrowUp as CloudArrowUpIcon } from "@phosphor-icons/react/dist/ssr/CloudArrowUp";
 import {AxiosError, type AxiosResponse} from "axios";
@@ -27,6 +25,7 @@ import {styled} from "@mui/material/styles";
 import {useUser} from "@/hooks/use-user";
 import Box from "@mui/material/Box";
 import Alert from "@mui/material/Alert";
+import Chip from "@mui/material/Chip";
 
 
 const VisuallyHiddenInput = styled('input')({
@@ -51,7 +50,6 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
   const questTypeRef = React.useRef<HTMLInputElement>(null);
   const questNameRef = React.useRef<HTMLInputElement>(null);
   const questDescriptionRef = React.useRef<HTMLInputElement>(null);
-  const questStatusRef = React.useRef<HTMLInputElement>(null);
   const questCourseIdRef = React.useRef<HTMLInputElement>(null);
   const questImageIdRef = React.useRef<HTMLInputElement>(null);
 
@@ -65,10 +63,11 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
 
   const getCourses = async (): Promise<void> => {
     try {
-      const response: AxiosResponse = await apiService.get<Course[]>('/api/Course/');
+      const response: AxiosResponse<Course[]> = await apiService.get<Course[]>('/api/Course/');
       const data: Course[] = response.data;
-      setCourses(data);
-      logger.debug('Courses', data);
+      const filteredData = data.filter((course) => course.type !== 'Private');
+      setCourses(filteredData);
+      logger.debug('Filtered Courses', filteredData);
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         if (error.response?.status === 401) {
@@ -82,7 +81,7 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
 
   const getImages = async (): Promise<void> => {
     try {
-      const response: AxiosResponse = await apiService.get<Image[]>('/api/Image/');
+      const response: AxiosResponse<Image[]> = await apiService.get<Image[]>('/api/Image/');
       const data: Image[] = response.data;
       setImages(data);
       logger.debug('Images', data);
@@ -126,6 +125,7 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
         name: course.name,
         description: course.description,
         status: course.status,
+        type: course.type,
         term: {
           id: course.term.id,
           name: course.term.name,
@@ -156,7 +156,7 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
     formData.append('type', questTypeRef.current?.value || '');
     formData.append('name', questNameRef.current?.value || '');
     formData.append('description', questDescriptionRef.current?.value || '');
-    formData.append('status', questStatusRef.current?.value || '');
+    formData.append('status', 'Active');
     formData.append('max_attempts', '1');
     // Assuming selectedCourse and selectedImage are objects, you might need to stringify them or just append their IDs
     formData.append('from_course', JSON.stringify(selectedCourse || courses?.[0]));
@@ -167,7 +167,7 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
       formData.append('file', selectedFile);
 
       try {
-        const response= await apiService.post(`/api/Quest/import/`, formData, {
+        const response: AxiosResponse<Question[]> = await apiService.post(`/api/Quest/import/`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           }
@@ -217,7 +217,26 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
       <CardContent sx={{pb:'16px'}}>
 
         <Grid container spacing={3}>
-          <Grid md={3} xs={6}>
+
+          <Grid md={6} xs={12}>
+            <FormControl fullWidth required>
+              <InputLabel>Quest Name</InputLabel>
+              <OutlinedInput defaultValue="" label="Name" name="name" inputRef={questNameRef} />
+            </FormControl>
+          </Grid>
+          <Grid md={6} xs={12}>
+            <FormControl fullWidth required>
+              <InputLabel>Quest Type</InputLabel>
+              <Select defaultValue="Wooclap" label="Quest Type" inputRef={questTypeRef} name="type">
+                <MenuItem value="Eduquest MCQ"><Chip variant="outlined" label="Eduquest MCQ" color="primary" size="small"/></MenuItem>
+                <MenuItem value="Private"><Chip variant="outlined" label="Private" color="secondary" size="small"/></MenuItem>
+                <MenuItem value="Kahoot!"><Chip variant="outlined" label="Kahoot!" color="info" size="small"/></MenuItem>
+                <MenuItem value="Wooclap"><Chip variant="outlined" label="Wooclap" color="info" size="small"/></MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+
+          <Grid md={6} xs={12}>
             <FormControl fullWidth required sx={{height: '100%'}}>
               <Button
                 component="label"
@@ -233,35 +252,19 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
               </Button>
             </FormControl>
           </Grid>
-          <Grid md={3} xs={6}>
-            <FormControl fullWidth required>
-              <InputLabel>Quest Name</InputLabel>
-              <OutlinedInput defaultValue="" label="Name" name="name" inputRef={questNameRef} />
-            </FormControl>
-          </Grid>
-          <Grid md={3} xs={6}>
-            <FormControl fullWidth required>
-              <InputLabel>Quest Type</InputLabel>
-              <Select defaultValue="Kahoot!" inputRef={questTypeRef}
-                      label="Type" variant="outlined" type="number">
-                  <MenuItem value="Kahoot!">Kahoot!</MenuItem>
-                  <MenuItem value="Wooclap">Wooclap</MenuItem>
-                  <MenuItem value="Eduquest MCQ">Eduquest MCQ</MenuItem>
-                  <MenuItem value="Private">Private</MenuItem>
-              </Select>
-            </FormControl>
-          </Grid>
-          <Grid md={3} xs={6}>
-            <FormControl fullWidth required>
-              <InputLabel>Quest Status</InputLabel>
-              <OutlinedInput defaultValue="" label="Status" name="status" inputRef={questStatusRef} />
-            </FormControl>
-          </Grid>
+
 
           <Grid xs={12}>
             <FormControl fullWidth required>
-              <InputLabel>Quest Description</InputLabel>
-              <OutlinedInput defaultValue="" label="Description" name="description" inputRef={questDescriptionRef}/>
+              <TextField
+                defaultValue=""
+                label="Quest Description"
+                inputRef={questDescriptionRef}
+                name="description"
+                multiline
+                required
+                rows={3}
+              />
             </FormControl>
           </Grid>
         </Grid>
@@ -274,30 +277,30 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
       <CardContent sx={{pb:'16px'}}>
         {images && images.length>0 ?
           <Grid container spacing={3} >
-            <Grid md={3} xs={12}>
+            <Grid md={6} xs={12}>
               <FormControl fullWidth required>
                 <InputLabel>Thumbnail ID</InputLabel>
                 <Select defaultValue={images[0]?.id} onChange={handleImageChange} inputRef={questImageIdRef}
-                        label="Image ID" variant="outlined" type="number">
+                        label="Thumbnail ID" variant="outlined" type="number">
                   {images.map((option) => (
                     <MenuItem key={option.id} value={option.id}>
-                      {option.id}
+                      {option.id} - {option.name}
                     </MenuItem>
                   ))}
                 </Select>
               </FormControl>
             </Grid>
-            <Grid md={9} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
+            <Grid md={6} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
             <Grid md={3} xs={6}>
-              <Typography variant="subtitle2">Thumbnail Name</Typography>
+              <Typography variant="overline" color="text.secondary">Thumbnail Name</Typography>
               <Typography variant="body2">{selectedImage?.name || images[0].name}</Typography>
             </Grid>
             <Grid md={3} xs={6}>
-              <Typography variant="subtitle2">Thumbnail Filename</Typography>
+              <Typography variant="overline" color="text.secondary">Thumbnail Filename</Typography>
               <Typography variant="body2">{selectedImage?.filename || images[0].filename}</Typography>
             </Grid>
             <Grid xs={12}>
-              <Typography variant="subtitle2">Thumbnail Preview</Typography>
+              <Typography variant="overline" color="text.secondary">Thumbnail Preview</Typography>
               <CardMedia
                 component="img"
                 alt={selectedImage?.name || images[0].name}
@@ -315,46 +318,46 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
         <CardContent sx={{pb:'16px'}}>
           {courses && courses.length > 0 ?
             <Grid container spacing={3} >
-              <Grid md={3} xs={12}>
+              <Grid md={6} xs={12}>
                 <FormControl fullWidth required>
                   <InputLabel>Course ID</InputLabel>
                   <Select defaultValue={courses[0]?.id} onChange={handleCourseChange} inputRef={questCourseIdRef}
                           label="Course ID" variant="outlined" type="number">
                     {courses.map((option) => (
                       <MenuItem key={option.id} value={option.id}>
-                        {option.id}
+                        {option.id} - {option.code} {option.name}
                       </MenuItem>
                     ))}
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid md={9} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
+              <Grid md={6} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
               <Grid md={3} xs={6}>
-                <Typography variant="subtitle2">Course Name</Typography>
+                <Typography variant="overline" color="text.secondary">Course Name</Typography>
                 <Typography variant="body2">{selectedCourse?.name || courses[0].name }</Typography>
               </Grid>
               <Grid md={3} xs={6}>
-                <Typography variant="subtitle2">Course Code</Typography>
+                <Typography variant="overline" color="text.secondary">Course Code</Typography>
                 <Typography variant="body2">{selectedCourse?.code || courses[0].code}</Typography>
               </Grid>
               <Grid md={3} xs={6}>
-                <Typography variant="subtitle2">Course Year / Term</Typography>
+                <Typography variant="overline" color="text.secondary">Course Year / Term</Typography>
                 <Typography variant="body2">
                   AY {selectedCourse?.term.academic_year.start_year || courses[0].term.academic_year.start_year}-{selectedCourse?.term.academic_year.end_year || courses[0].term.academic_year.end_year} / {selectedCourse?.term.name || courses[0].term.name}
                 </Typography>
               </Grid>
               <Grid md={3} xs={6}>
-                <Typography variant="subtitle2">Course Duration</Typography>
+                <Typography variant="overline" color="text.secondary">Course Duration</Typography>
                 <Typography variant="body2">
                   From {selectedCourse?.term.start_date || courses[0].term.start_date} to {selectedCourse?.term.end_date || courses[0].term.end_date}
                 </Typography>
               </Grid>
               <Grid xs={12}>
-                <Typography variant="subtitle2">Course Description</Typography>
+                <Typography variant="overline" color="text.secondary">Course Description</Typography>
                 <Typography variant="body2">{selectedCourse?.description || courses[0].description}</Typography>
               </Grid>
               <Grid xs={12}>
-                <Typography variant="subtitle2">Course Thumbnail</Typography>
+                <Typography variant="overline" color="text.secondary">Course Thumbnail</Typography>
                 <CardMedia
                   component="img"
                   alt={selectedCourse?.image.name || courses[0].image.name}

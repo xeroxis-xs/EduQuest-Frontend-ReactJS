@@ -6,7 +6,6 @@ import Typography from '@mui/material/Typography';
 import CardHeader from "@mui/material/CardHeader";
 import Divider from "@mui/material/Divider";
 import Button from "@mui/material/Button";
-import {FloppyDisk as FloppyDiskIcon} from "@phosphor-icons/react/dist/ssr/FloppyDisk";
 import { CaretRight as CaretRightIcon } from "@phosphor-icons/react/dist/ssr/CaretRight";
 import { AxiosError } from "axios";
 import apiService from "@/api/api-service";
@@ -16,7 +15,6 @@ import type { Question } from '@/types/question';
 import Box from "@mui/material/Box";
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
-import {useRouter} from "next/navigation";
 
 
 interface ImportCardQuestionProps {

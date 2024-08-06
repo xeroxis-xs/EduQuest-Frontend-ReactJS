@@ -23,9 +23,11 @@ import { setSubmitted } from "@/components/dashboard/quest/question/attempt/ques
 import {authClient} from "@/lib/auth/client";
 
 
+// eslint-disable-next-line camelcase -- 'all_questions_submitted' is a backend field and must match the API response
 export function setAllQuestionsSubmitted(data: UserQuestAttempt[], all_questions_submitted: boolean) : UserQuestAttempt[] {
   return data.map(attempt => ({
     ...attempt,
+    // eslint-disable-next-line camelcase -- 'all_questions_submitted' is a backend field and must match the API response
     all_questions_submitted
   }));
 }
@@ -91,7 +93,7 @@ export function ImportCardUserAttempt(
   }
 
   // Aggregate data to calculate the percentage of each selected answer
-  const aggregateData = userQuestQuestionAttempts.reduce((acc, attempt) => {
+  const aggregateData = userQuestQuestionAttempts.reduce<Record<string, Record<string, { count: number, total: number }>>>((acc, attempt) => {
     attempt.selected_answers.forEach(answer => {
       if (!acc[attempt.question.text]) {
         acc[attempt.question.text] = {};
@@ -105,7 +107,7 @@ export function ImportCardUserAttempt(
       }
     });
     return acc;
-  }, {} as Record<string, Record<string, { count: number, total: number }>>);
+  }, {});
 
   const aggregatedResults = Object.entries(aggregateData).map(([questionText, answers]) => ({
     questionText,

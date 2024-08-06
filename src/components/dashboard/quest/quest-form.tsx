@@ -71,8 +71,9 @@ export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Ele
     try {
       const response: AxiosResponse<Course[]> = await apiService.get<Course[]>(`/api/Course/`);
       const data: Course[] = response.data;
-      setCourses(data);
-      logger.debug('Courses', data);
+      const filteredData = data.filter((course) => course.type !== 'Private');
+      setCourses(filteredData);
+      logger.debug('Filtered Courses', filteredData);
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         if (error.response?.status === 401) {
@@ -191,7 +192,7 @@ export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Ele
                 <InputLabel>Quest Type</InputLabel>
                 <Select defaultValue="" label="Quest Type" inputRef={questTypeRef} name="type">
                   <MenuItem value="Eduquest MCQ"><Chip variant="outlined" label="Eduquest MCQ" color="primary" size="small"/></MenuItem>
-                  <MenuItem value="Private"><Chip variant="outlined" label="Private" color="default" size="small"/></MenuItem>
+                  <MenuItem value="Private"><Chip variant="outlined" label="Private" color="secondary" size="small"/></MenuItem>
                   <MenuItem value="Kahoot!"><Chip variant="outlined" label="Kahoot!" color="info" size="small"/></MenuItem>
                   <MenuItem value="Wooclap"><Chip variant="outlined" label="Wooclap" color="info" size="small"/></MenuItem>
                 </Select>
@@ -202,7 +203,7 @@ export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Ele
                 <InputLabel>Quest Status</InputLabel>
                 <Select defaultValue="" label="Quest Status" inputRef={questStatusRef} name="status">
                   <MenuItem value="Active"><Chip variant="outlined" label="Active" color="success" size="small"/></MenuItem>
-                  <MenuItem value="Expired"><Chip variant="outlined" label="Expired" color="default" size="small"/></MenuItem>
+                  <MenuItem value="Expired"><Chip variant="outlined" label="Expired" color="secondary" size="small"/></MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -247,15 +248,15 @@ export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Ele
               </Grid>
               <Grid md={6} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
               <Grid md={3} xs={6}>
-                <Typography variant="subtitle2">Thumbnail Name</Typography>
+                <Typography variant="overline" color="text.secondary">Thumbnail Name</Typography>
                 <Typography variant="body2">{selectedImage?.name || images[0].name}</Typography>
               </Grid>
               <Grid md={3} xs={6}>
-                <Typography variant="subtitle2">Thumbnail Filename</Typography>
+                <Typography variant="overline" color="text.secondary">Thumbnail Filename</Typography>
                 <Typography variant="body2">{selectedImage?.filename || images[0].filename}</Typography>
               </Grid>
               <Grid xs={12}>
-                <Typography variant="subtitle2">Thumbnail Preview</Typography>
+                <Typography variant="overline" color="text.secondary">Thumbnail Preview</Typography>
                 <CardMedia
                   component="img"
                   alt={selectedImage?.name || images[0].name}
@@ -285,31 +286,31 @@ export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Ele
               </Grid>
               <Grid md={6} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
               <Grid md={3} xs={6}>
-                <Typography variant="subtitle2">Course Name</Typography>
+                <Typography variant="overline" color="text.secondary">Course Name</Typography>
                 <Typography variant="body2">{selectedCourse?.name || courses[0]?.name }</Typography>
               </Grid>
               <Grid md={3} xs={6}>
-                <Typography variant="subtitle2">Course Code</Typography>
+                <Typography variant="overline" color="text.secondary">Course Code</Typography>
                 <Typography variant="body2">{selectedCourse?.code || courses[0]?.code}</Typography>
               </Grid>
               <Grid md={3} xs={6}>
-                <Typography variant="subtitle2">Course Year / Term</Typography>
+                <Typography variant="overline" color="text.secondary">Course Year / Term</Typography>
                 <Typography variant="body2">
                   AY {selectedCourse?.term.academic_year.start_year || courses[0]?.term.academic_year.start_year}-{selectedCourse?.term.academic_year.end_year || courses[0].term.academic_year.end_year} / {selectedCourse?.term.name || courses[0].term.name}
                 </Typography>
               </Grid>
               <Grid md={3} xs={6}>
-                <Typography variant="subtitle2">Course Duration</Typography>
+                <Typography variant="overline" color="text.secondary">Course Duration</Typography>
                 <Typography variant="body2">
                   From {selectedCourse?.term.start_date || courses[0]?.term.start_date} to {selectedCourse?.term.end_date || courses[0].term.end_date}
                 </Typography>
               </Grid>
               <Grid xs={12}>
-                <Typography variant="subtitle2">Course Description</Typography>
+                <Typography variant="overline" color="text.secondary">Course Description</Typography>
                 <Typography variant="body2">{selectedCourse?.description || courses[0]?.description}</Typography>
               </Grid>
               <Grid xs={12}>
-                <Typography variant="subtitle2">Course Thumbnail</Typography>
+                <Typography variant="overline" color="text.secondary">Course Thumbnail</Typography>
                 <CardMedia
                   component="img"
                   alt={selectedCourse?.image.name || courses[0]?.image.name}

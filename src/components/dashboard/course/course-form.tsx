@@ -158,6 +158,13 @@ export function CourseForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.
       logger.error('Failed to fetch data', error);
     });
   }, []);
+
+  React.useEffect(() => {
+    if (terms && terms.length > 0) {
+      setSelectedTerm(terms[0]);
+    }
+  }, [terms]);
+
   return (
     <form onSubmit={handleSubmit}>
       <Card>
@@ -181,9 +188,9 @@ export function CourseForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.
             <Grid md={3} xs={6}>
               <FormControl fullWidth required>
                 <InputLabel>Course Type</InputLabel>
-                <Select defaultValue="Eduquest" label="Quest Type" inputRef={courseTypeRef} name="type">
-                  <MenuItem value="Eduquest"><Chip variant="outlined" label="Eduquest" color="primary" size={"small"}/></MenuItem>
-                  <MenuItem value="Private"><Chip variant="outlined" label="Private" color="default" size={"small"}/></MenuItem>
+                <Select defaultValue="Public" label="Quest Type" inputRef={courseTypeRef} name="type">
+                  <MenuItem value="Public"><Chip variant="outlined" label="Public" color="primary" size="small"/></MenuItem>
+                  <MenuItem value="Private"><Chip variant="outlined" label="Private" color="secondary" size="small"/></MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -192,7 +199,7 @@ export function CourseForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.
                 <InputLabel>Course Status</InputLabel>
                 <Select defaultValue="Active" label="Quest Status" inputRef={courseStatusRef} name="type">
                   <MenuItem value="Active"><Chip variant="outlined" label="Active" color="success" size={"small"}/></MenuItem>
-                  <MenuItem value="Inactive"><Chip variant="outlined" label="Inactive" color="default" size={"small"}/></MenuItem>
+                  <MenuItem value="Inactive"><Chip variant="outlined" label="Inactive" color="secondary" size={"small"}/></MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -223,15 +230,15 @@ export function CourseForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.
               </Grid>
               <Grid md={6} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
               <Grid md={3} xs={6}>
-                <Typography variant="subtitle2">Thumbnail Name</Typography>
+                <Typography variant="overline" color="text.secondary">Thumbnail Name</Typography>
                 <Typography variant="body2">{selectedImage?.name || images[0].name}</Typography>
               </Grid>
               <Grid md={3} xs={6}>
-                <Typography variant="subtitle2">Thumbnail Filename</Typography>
+                <Typography variant="overline" color="text.secondary">Thumbnail Filename</Typography>
                 <Typography variant="body2">{selectedImage?.filename || images[0].filename}</Typography>
               </Grid>
               <Grid xs={12}>
-                <Typography variant="subtitle2">Thumbnail Preview</Typography>
+                <Typography variant="overline" color="text.secondary">Thumbnail Preview</Typography>
                 <CardMedia
                   component="img"
                   alt={selectedImage?.name || images[0].name}
@@ -261,28 +268,28 @@ export function CourseForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.
               </Grid>
               <Grid md={6} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
               <Grid md={4} xs={12}>
-                <Typography variant="subtitle2">Term Name</Typography>
-                <Typography variant="body2">{selectedTerm?.name || terms[0]?.name }</Typography>
+                <Typography variant="overline" color="text.secondary">Term Name</Typography>
+                <Typography variant="body2">{selectedTerm?.name || terms?.[0]?.name}</Typography>
               </Grid>
               <Grid md={4} xs={12}>
-                <Typography variant="subtitle2">Term Code</Typography>
-                <Typography variant="body2">{selectedTerm?.start_date || terms[0]?.start_date}</Typography>
+                <Typography variant="overline" color="text.secondary">Term Start Date</Typography>
+                <Typography variant="body2">{selectedTerm?.start_date ?? null}</Typography>
               </Grid>
               <Grid md={4} xs={12}>
-                <Typography variant="subtitle2">Term End Date</Typography>
-                <Typography variant="body2">{selectedTerm?.end_date || terms[0]?.end_date}</Typography>
+                <Typography variant="overline" color="text.secondary">Term End Date</Typography>
+                <Typography variant="body2">{selectedTerm?.end_date ?? null}</Typography>
               </Grid>
               <Grid md={4} xs={12}>
-                <Typography variant="subtitle2">Academic Year ID</Typography>
-                <Typography variant="body2">{selectedTerm?.academic_year.id || terms[0]?.academic_year.id}</Typography>
+                <Typography variant="overline" color="text.secondary">Academic Year ID</Typography>
+                <Typography variant="body2">{selectedTerm?.academic_year.id || terms?.[0]?.academic_year.id}</Typography>
               </Grid>
               <Grid md={4} xs={12}>
-                <Typography variant="subtitle2">Start Year</Typography>
-                <Typography variant="body2">{selectedTerm?.academic_year.start_year || terms[0]?.academic_year.start_year}</Typography>
+                <Typography variant="overline" color="text.secondary">Start Year</Typography>
+                <Typography variant="body2">{selectedTerm?.academic_year.start_year ?? null}</Typography>
               </Grid>
               <Grid md={4} xs={12}>
-                <Typography variant="subtitle2">End Year</Typography>
-                <Typography variant="body2">{selectedTerm?.academic_year.end_year || terms[0]?.academic_year.end_year}</Typography>
+                <Typography variant="overline" color="text.secondary">End Year</Typography>
+                <Typography variant="body2">{selectedTerm?.academic_year.end_year ?? null}</Typography>
               </Grid>
             </Grid> : null}
 

@@ -17,7 +17,7 @@ export default function Page(): React.JSX.Element {
 
   const getBadges = async (): Promise<void> => {
     try {
-      const response: AxiosResponse = await apiService.get<Badge[]>('/api/Badge/');
+      const response: AxiosResponse<Badge[]> = await apiService.get<Badge[]>('/api/Badge/');
       const data: Badge[] = response.data;
       setBadges(data);
       logger.debug('Badges', data);

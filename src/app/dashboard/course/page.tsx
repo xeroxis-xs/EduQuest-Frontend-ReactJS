@@ -4,7 +4,6 @@ import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
-import { Upload as UploadIcon } from '@phosphor-icons/react/dist/ssr/Upload';
 import { XCircle as XCircleIcon } from '@phosphor-icons/react/dist/ssr/XCircle';
 import type { Course } from '@/types/course';
 import apiService from "@/api/api-service";
@@ -27,12 +26,13 @@ export default function Page(): React.JSX.Element {
     setShowForm(!showForm);
   };
 
-  const getCourse = async (): Promise<void> => {
+  const getCourses = async (): Promise<void> => {
     try {
       const response: AxiosResponse<Course[]> = await apiService.get<Course[]>('/api/Course/');
       const data: Course[] = response.data;
-      setCourses(data);
-      logger.debug('data', data);
+      const filteredData = data.filter((course) => course.type !== 'Private');
+      setCourses(filteredData);
+      logger.debug('Filtered Courses', filteredData);
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         if (error.response?.status === 401) {
@@ -48,7 +48,7 @@ export default function Page(): React.JSX.Element {
 
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
-      await getCourse();
+      await getCourses();
     };
 
     fetchData().catch((error: unknown) => {
@@ -64,20 +64,17 @@ export default function Page(): React.JSX.Element {
           <Typography variant="h4">Courses</Typography>
 
         </Stack>
-        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-          <Button startIcon={<UploadIcon fontSize="var(--icon-fontSize-md)"  />} variant="contained">
-            Import
-          </Button>
+        <Stack direction="row" sx={{ alignItems: 'center' }}>
           <Button startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
             {showForm ? 'Close' : 'Create'}
           </Button>
         </Stack>
       </Stack>
-      {showForm && <CourseForm onFormSubmitSuccess={getCourse} />}
+      {showForm && <CourseForm onFormSubmitSuccess={getCourses} />}
       {loading ? (
         <SkeletonCourseCard />
       ) : (
-        <CourseCard rows={courses} onEnrolledSuccess={getCourse} />
+        <CourseCard rows={courses} onEnrolledSuccess={getCourses} />
       )}
     </Stack>
   );

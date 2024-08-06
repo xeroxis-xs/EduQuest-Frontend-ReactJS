@@ -5,22 +5,8 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import { CheckCircle as CheckCircleIcon } from "@phosphor-icons/react/dist/ssr/CheckCircle";
-import Pagination from '@mui/material/Pagination';
-import type { Course } from '@/types/course';
 import CardActionArea from "@mui/material/CardActionArea";
-import CardHeader from "@mui/material/CardHeader";
-import Chip from "@mui/material/Chip";
-import CardActions from "@mui/material/CardActions";
-import Button from "@mui/material/Button";
-import {CardMedia, Divider} from "@mui/material";
-import { SignIn as SignInIcon } from "@phosphor-icons/react/dist/ssr/SignIn";
-import { Users as UsersIcon } from "@phosphor-icons/react/dist/ssr/Users";
-import { Check as CheckIcon } from "@phosphor-icons/react/dist/ssr/Check";
-import apiService from "@/api/api-service";
-import {logger} from "@/lib/default-logger";
-import {AxiosError} from "axios";
-import {authClient} from "@/lib/auth/client";
-import {useUser} from "@/hooks/use-user";
+import {CardMedia} from "@mui/material";
 import type {Badge} from "@/types/badge";
 import Stack from "@mui/material/Stack";
 
@@ -39,7 +25,7 @@ export function BadgeCard({ badges = [] }: BadgeCardProps): React.JSX.Element {
       {badges.map((badge) => (
         <Grid key={badge.id} lg={3} md={4} xs={12} >
           <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-            <CardActionArea href={`/dashboard/badge/${badge.id.toString()}` } sx={{ height: '100%', borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}>
+            <CardActionArea href='#' sx={{ height: '100%', borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}>
               {/*<CardHeader title={badge.name}/>*/}
               <CardMedia
                 component="img"
@@ -51,11 +37,11 @@ export function BadgeCard({ badges = [] }: BadgeCardProps): React.JSX.Element {
                 <Typography variant="subtitle1">
                   {badge.name}
                 </Typography>
-                <Typography variant="body2" mt={2}>
+                <Typography variant="body2" mt={2} mb={2}>
                   {badge.description}
                 </Typography>
 
-                <Typography variant="subtitle2" mt={2}>Condition:</Typography>
+                <Typography variant="overline" color="text.secondary">Condition</Typography>
                 <Stack component="ul" spacing={1} style={{listStyleType: 'none', paddingLeft: 0}}>
                   {badge.condition.split(',').map((condition, index) => (
                     <li key={index} style={{display: 'flex', alignItems: 'center', }}>
