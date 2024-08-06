@@ -64,6 +64,12 @@ jobs:
           tags: eduquestfrontend.azurecr.io/${{ env.REPO }}:${{ github.sha }}
           file: ./Dockerfile
           context: .
+          build-args: |
+            NEXT_PUBLIC_BACKEND_URL=${{ secrets.NEXT_PUBLIC_BACKEND_URL }}
+            NEXT_PUBLIC_AZURE_CLIENT_ID=${{ secrets.NEXT_PUBLIC_AZURE_CLIENT_ID }}
+            NEXT_PUBLIC_AZURE_REDIRECT_URI=${{ secrets.NEXT_PUBLIC_AZURE_REDIRECT_URI }}
+            NEXT_PUBLIC_MICROSERVICE_URL=${{ secrets.NEXT_PUBLIC_MICROSERVICE_URL }}
+            NEXT_PUBLIC_SITE_URL=${{ secrets.NEXT_PUBLIC_SITE_URL }}
 
   deploy:
     permissions:
