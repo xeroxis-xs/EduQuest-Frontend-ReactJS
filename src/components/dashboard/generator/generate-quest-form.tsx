@@ -32,9 +32,10 @@ import type { Document } from "@/types/document";
 import type { GeneratedQuestion } from "@/types/generated-question";
 import type { GeneratedQuestions } from "@/types/generated-questions";
 import type { EduquestUser } from "@/types/eduquest-user";
-import LinearProgress, { type LinearProgressProps } from '@mui/material/LinearProgress';
+import LinearProgress, { type LinearProgressProps, linearProgressClasses } from '@mui/material/LinearProgress';
 import Box from '@mui/material/Box';
-
+import Avatar from '@mui/material/Avatar';
+import { styled } from '@mui/material/styles';
 
 
 interface CourseFormProps {
@@ -52,16 +53,33 @@ interface NewQuestType {
   image: Image | undefined;
 }
 
-function LinearProgressWithLabel(props: LinearProgressProps & { value: number }) {
+const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
+  height: 10,
+  borderRadius: 5,
+  [`&.${linearProgressClasses.colorPrimary}`]: {
+    backgroundColor: theme.palette.grey[theme.palette.mode === 'light' ? 200 : 800],
+  },
+  [`& .${linearProgressClasses.bar}`]: {
+    borderRadius: 5,
+    backgroundColor: theme.palette.mode === 'light' ? 'primary' : 'primary',
+  },
+}));
+
+
+function LinearProgressWithLabel(props: LinearProgressProps & { value: number, status: string }) {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center' }}>
       <Box sx={{ width: '100%', mr: 1 }}>
-        <LinearProgress variant="determinate" {...props} />
-      </Box>
-      <Box sx={{ minWidth: 35 }}>
-        <Typography variant="body2" color="text.secondary">{`${Math.round(
-          props.value
-        ).toString()}%`}</Typography>
+        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
+          <Typography variant="body2" color="text.secondary">
+            {props.status}
+          </Typography>
+          <Typography variant="body2" color="text.secondary">
+            {`${Math.round(props.value).toString()}%`}
+          </Typography>
+        </Box>
+
+        <BorderLinearProgress variant="determinate" {...props} />
       </Box>
     </Box>
   );
@@ -83,6 +101,7 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
   const [selectedDocument, setSelectedDocument] = React.useState<Document | null>(null);
   const [submitStatus, setSubmitStatus] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [progress, setProgress] = React.useState(0);
+  const [progressStatus, setProgressStatus] = React.useState<string>(''); // New state for progress status message
   const [showProgress, setShowProgress] = React.useState(false); // State to control progress bar visibility
 
   const getImages = async (): Promise<void> => {
@@ -165,6 +184,7 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
     event.preventDefault();
     setSubmitStatus(null); // Reset submit status
     setProgress(10); // Initial progress
+    setProgressStatus('Creating a new Quest'); // Initial progress status
     setShowProgress(true); // Show progress bar
 
     const newQuest: NewQuestType = {
@@ -182,7 +202,8 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
     const createdQuestId = await createQuest(newQuest);
 
     if (createdQuestId) {
-      setProgress(30); // Progress after quest creation
+      setProgress(40); // Progress after quest creation
+      setProgressStatus('Generating Questions from Document'); // Progress status after quest creation
       logger.debug('Calling generateQuestions');
       const generatedQuestions = await generateQuestions(
         filename?.split('/').pop() || '',
@@ -193,17 +214,22 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
       if (generatedQuestions === null) {
         logger.debug('Generated questions is null');
         setSubmitStatus({ type: 'error', message: 'Generate Failed. Please try again.' });
+        setProgressStatus('Generation failed'); // Progress status on failure
       } else if (Array.isArray(generatedQuestions)) {
         setProgress(70); // Progress after questions generation
+        setProgressStatus('Importing Questions generated'); // Progress status after questions generation
         logger.debug('Generated questions is an array');
         await bulkCreateQuestions(generatedQuestions, createdQuestId);
         setProgress(100); // Final progress
+        setProgressStatus('Completed'); // Final progress status
       } else {
         logger.debug('Generated questions is not an array:', generatedQuestions);
         setSubmitStatus({ type: 'error', message: 'Generate Failed. Please try again.' });
+        setProgressStatus('Generation failed'); // Progress status on failure
       }
     } else {
       setSubmitStatus({ type: 'error', message: 'Quest creation failed. Please try again.' });
+      setProgressStatus('Quest creation failed'); // Progress status on failure
     }
 
     setShowProgress(false); // Hide progress bar after submission
@@ -292,7 +318,17 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
   return (
     <form onSubmit={handleSubmit}>
       <Card>
-        <CardHeader subheader="Generate Quest from the uploaded document through GPT" title="Generate Quest" />
+        <CardHeader
+          subheader="Generate Quest from the uploaded document through GPT model: GPT 3.5 Turbo 16K"
+          title="Generate Quest"
+          avatar={
+            <Avatar
+              variant="square"
+              src="/assets/ChatGPT.svg"
+              sx={{ width: 42, height: 42 }}
+            />
+          }
+        />
         <Divider />
         <CardContent>
           <Grid container spacing={3}>
@@ -409,9 +445,9 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
               </Grid>
             </Grid> : null}
 
-          {showProgress && ( // Conditionally render progress bar
-            <Box sx={{ width: '100%', mt: 5}}>
-              <LinearProgressWithLabel value={progress} />
+          {showProgress && (
+            <Box sx={{ width: '100%', mt: 5 }}>
+              <LinearProgressWithLabel value={progress} status={progressStatus} />
             </Box>
           )}
         </CardContent>
