@@ -15,7 +15,7 @@ import { User as UserIcon } from '@phosphor-icons/react/dist/ssr/User';
 import { paths } from '@/paths';
 import { authClient } from '@/lib/auth/client';
 import { logger } from '@/lib/default-logger';
-import { useUser } from '@/hooks/use-user';
+import { useUser } from "@/hooks/use-user";
 
 export interface UserPopoverProps {
   anchorEl: Element | null;
@@ -25,7 +25,7 @@ export interface UserPopoverProps {
 
 export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): React.JSX.Element {
   const { checkSession } = useUser();
-  const { user } = useUser();
+  const { eduquestUser } = useUser();
   const router = useRouter();
 
   const handleSignOut = React.useCallback(async (): Promise<void> => {
@@ -58,10 +58,14 @@ export function UserPopover({ anchorEl, onClose, open }: UserPopoverProps): Reac
     >
       <Box sx={{ p: '16px 20px ' }}>
         <Typography variant="subtitle1">
-          {user?.name?.replace(/#/g, '') ?? ''}
+          {eduquestUser?.nickname ?? ''}
+          {/*{eduquestUser?.username?.replace(/#/g, '') ?? ''}*/}
         </Typography>
+        {/*<Typography color="text.secondary" variant="body2">*/}
+        {/*  {eduquestUser?.nickname ?? ''}*/}
+        {/*</Typography>*/}
         <Typography color="text.secondary" variant="body2">
-          {user?.username ?? ''}
+          {eduquestUser?.email ?? ''}
         </Typography>
       </Box>
       <Divider />

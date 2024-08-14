@@ -2,20 +2,14 @@
 
 import * as React from 'react';
 import Avatar from '@mui/material/Avatar';
-import Badge from '@mui/material/Badge';
 import Box from '@mui/material/Box';
 import IconButton from '@mui/material/IconButton';
 import Stack from '@mui/material/Stack';
-import Tooltip from '@mui/material/Tooltip';
-import {Bell as BellIcon} from '@phosphor-icons/react/dist/ssr/Bell';
 import {List as ListIcon} from '@phosphor-icons/react/dist/ssr/List';
-// import {MagnifyingGlass as MagnifyingGlassIcon} from '@phosphor-icons/react/dist/ssr/MagnifyingGlass';
 import {UserAvatar, type UserAvatarProps} from '@/components/auth/user-avatar';
-
 import {usePopover} from '@/hooks/use-popover';
 import {useUser} from '@/hooks/use-user';
 import {getUserPhotoAvatar} from "@/app/msal/msal-graph";
-// import {extractInitials} from '@/app/msal/user-helper';
 import {logger} from '@/lib/default-logger';
 
 import {MobileNav} from './mobile-nav';
@@ -36,16 +30,6 @@ export function MainNav(): React.JSX.Element {
 
   React.useEffect(() => {
     if (user) {
-      // const response = await getUserPhotoAvatar();
-      // if (response instanceof Blob) {
-      //   const url = URL.createObjectURL(response);
-      //   setUserPhoto(url);
-      // } else if (typeof response === "string") {
-      //   setUserPhoto(response);
-      //   setShowUserInitials(false);
-      // } else {
-      //   logger.error("Unsupported photo data type.");
-      // }
       type AvatarResponse = Blob | string;
 
       void getUserPhotoAvatar().then((response: AvatarResponse) => {
@@ -53,11 +37,9 @@ export function MainNav(): React.JSX.Element {
         if (response instanceof Blob) {
           const url = URL.createObjectURL(response);
           setUserPhoto(url);
-        } else if (typeof response === "string") {
-          setUserPhoto(response);
-          setShowUserInitials(false);
         } else {
-          logger.error("Unsupported photo data type.");
+            setUserPhoto(response);
+            setShowUserInitials(false);
         }
       });
       setShowUserInitials(false);
@@ -107,25 +89,10 @@ export function MainNav(): React.JSX.Element {
             >
               <ListIcon />
             </IconButton>
-            {/*<Tooltip title="Search">*/}
-            {/*  <IconButton>*/}
-            {/*    <MagnifyingGlassIcon />*/}
-            {/*  </IconButton>*/}
-            {/*</Tooltip>*/}
+
           </Stack>
           <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
-            {/*<Tooltip title="Contacts">*/}
-            {/*  <IconButton>*/}
-            {/*    <UsersIcon />*/}
-            {/*  </IconButton>*/}
-            {/*</Tooltip>*/}
-            <Tooltip title="Notifications">
-              <Badge badgeContent={4} color="success" variant="dot">
-                <IconButton>
-                  <BellIcon />
-                </IconButton>
-              </Badge>
-            </Tooltip>
+
             {
               showUserInitials ?
                 <Box
