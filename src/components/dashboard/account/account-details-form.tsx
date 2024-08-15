@@ -136,18 +136,29 @@ export function AccountDetailsForm(): React.JSX.Element {
               </Grid>
               <Grid sm={6} xs={12}>
                 <Typography variant="overline" color="text.secondary">Last login</Typography>
-                <Typography variant="body2">{eduquestUser.last_login} </Typography>
-              </Grid>
-              <Grid sm={6} xs={12}>
-                <Typography variant="overline" color="text.secondary">Updated at</Typography>
-                <Typography variant="body2">{new Date(eduquestUser.updated_at).toLocaleDateString("en-SG", {
+                <Typography variant="body2">
+                  {new Date(eduquestUser.last_login).toLocaleDateString("en-SG", {
                   day: "2-digit",
                   month: "short",
                   year: "numeric",
                   hour: '2-digit',
                   minute: '2-digit',
                   second: '2-digit'
-                })}</Typography>
+                })}
+                </Typography>
+              </Grid>
+              <Grid sm={6} xs={12}>
+                <Typography variant="overline" color="text.secondary">Updated at</Typography>
+                <Typography variant="body2">
+                  {new Date(eduquestUser.updated_at).toLocaleDateString("en-SG", {
+                  day: "2-digit",
+                  month: "short",
+                  year: "numeric",
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  second: '2-digit'
+                })}
+                </Typography>
               </Grid>
               <Grid sm={6} xs={12}>
                 <Typography variant="overline" color="text.secondary">Is superuser</Typography>
