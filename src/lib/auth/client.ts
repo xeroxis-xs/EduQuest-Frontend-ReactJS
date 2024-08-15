@@ -35,22 +35,19 @@ class AuthClient {
     logger.debug('access-token obtained from localStorage');
 
     if (token === null) {
-      logger.debug('No access token found, perform signInWithMsal');
-      await this.signInWithMsal();
+      logger.debug('No access token found, redirect to Login');
+      // await this.signInWithMsal();
+      return {
+        data: {
+          user: null,
+          eduquestUser: null
+        }
+      };
     }
 
-    if (token !== null) {
-      const msalUser = msalInstance.getActiveAccount();
-      const eduquestUser = await this.getEduquestUser(msalUser?.username ?? '');
-      return { data: { user: msalUser, eduquestUser } };
-    }
-    return {
-      data: {
-        user: null,
-        eduquestUser: null
-      },
-      error: 'No access token found or failed to get msalUser/eduquestUser'
-    };
+    const msalUser = msalInstance.getActiveAccount();
+    const eduquestUser = await this.getEduquestUser(msalUser?.username ?? '');
+    return { data: { user: msalUser, eduquestUser } };
   }
 
   async getEduquestUser(username: string): Promise<EduquestUser | null> {
