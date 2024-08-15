@@ -22,7 +22,7 @@ import Grid from "@mui/material/Unstable_Grid2";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
 import OutlinedInput from "@mui/material/OutlinedInput";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
+import Select, { type SelectChangeEvent } from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import CardActions from "@mui/material/CardActions";
 import RouterLink from "next/link";
@@ -39,12 +39,11 @@ import {Check as CheckIcon} from "@phosphor-icons/react/dist/ssr/Check";
 import {SignIn as SignInIcon} from "@phosphor-icons/react/dist/ssr/SignIn";
 import Box from "@mui/material/Box";
 import {Users as UsersIcon} from "@phosphor-icons/react/dist/ssr/Users";
-import IconButton, { IconButtonProps } from '@mui/material/IconButton';
+import IconButton, { type IconButtonProps } from '@mui/material/IconButton';
 import { CaretDown as CaretDownIcon } from "@phosphor-icons/react/dist/ssr/CaretDown";
 import { styled } from '@mui/material/styles';
 import Collapse from '@mui/material/Collapse';
-import {Image} from "@/types/image";
-import {UserCourse} from "@/types/user-course";
+import {type Image} from "@/types/image";
 import { SkeletonQuestCard } from "@/components/dashboard/skeleton/skeleton-quest-card";
 import { SkeletonCourseDetailCard } from "@/components/dashboard/skeleton/skeleton-course-detail-card";
 
@@ -77,7 +76,6 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
   const courseTermIdRef = React.useRef<HTMLInputElement>(null);
   const courseImageIdRef = React.useRef<HTMLInputElement>(null);
   const [course, setCourse] = React.useState<Course>();
-  const [userCourse, setUserCourse] = React.useState<UserCourse>();
   const [terms, setTerms] = React.useState<Term[]>();
   const [quests, setQuests] = React.useState<Quest[]>();
   const [images, setImages] = React.useState<Image[]>();
@@ -103,7 +101,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
       const response: AxiosResponse<Course> = await apiService.get<Course>(`/api/Course/${params.courseId}`);
       const data: Course = response.data;
       setCourse(data);
-      setUserCourse(data.enrolled_users.find(user => user.user === eduquestUser?.id));
+      // setUserCourse(data.enrolled_users.find(user => user.user === eduquestUser?.id.toString()));
       logger.debug('course', data);
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
@@ -238,8 +236,12 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
   const handleEnroll = async () => {
     try {
       const data = {
-        user: eduquestUser?.id,
-        course: params.courseId
+        user: {
+          id: eduquestUser?.id
+        },
+        course: {
+          id: params.courseId
+        }
       }
       const response = await apiService.post(`/api/UserCourse/`, data);
       if (response.status === 201) {
@@ -371,7 +373,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
                 {course.enrolled_users.length.toString()}
               </Typography>
             </Box>
-            {eduquestUser && userCourse && course.enrolled_users.includes(userCourse) ? (
+            {eduquestUser && course.enrolled_users.includes(eduquestUser?.id.toString()) ? (
               <Button endIcon={<CheckIcon/>} disabled>Enrolled</Button>
             ) : (
               <Button endIcon={<SignInIcon/>} onClick={() => handleEnroll()} variant="contained">Enroll</Button>
@@ -385,8 +387,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
       )}
 
       <form onSubmit={handleSubmit}>
-        {showForm && course && (
-          <Card>
+        {showForm && course ? <Card>
             <CardHeader title="Course"/>
             <Divider/>
 
@@ -399,8 +400,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
                     <OutlinedInput defaultValue={course.id} label="Course ID" name="id" disabled/>
                   </FormControl>
                 </Grid>
-                <Grid md={6} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}>
-                </Grid>
+                <Grid md={6} xs={12} sx={{ display: { xs: 'none', md: 'block' } }} />
                 <Grid md={3} xs={12}>
                   <FormControl fullWidth required>
                     <InputLabel>Course Code</InputLabel>
@@ -448,9 +448,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
               </Grid>
 
               <Typography sx={{my: 3}} variant="h6">Term</Typography>
-              {terms && (
-
-                <Grid container spacing={3}>
+              {terms ? <Grid container spacing={3}>
 
                   <Grid md={6} xs={12}>
                     <FormControl fullWidth required>
@@ -488,8 +486,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
                     <Typography variant="overline" color="text.secondary">Academic Year</Typography>
                     <Typography variant="body2">AY {selectedTerm?.academic_year.start_year || course.term.academic_year.start_year}-{selectedTerm?.academic_year.end_year || terms[0].academic_year.end_year}</Typography>
                   </Grid>
-                </Grid>
-              )}
+                </Grid> : null}
 
               <Divider sx={{my: 4}}/>
 
@@ -501,7 +498,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
                     <FormControl fullWidth required>
                       <InputLabel>Thumbnail ID</InputLabel>
                       <Select defaultValue={course.image.id} onChange={handleImageChange} inputRef={courseImageIdRef}
-                              label="Image ID" variant="outlined" type="number">
+                              label="Thumbnail ID" variant="outlined" type="number">
                         {images.map((option) => (
                           <MenuItem key={option.id} value={option.id}>
                             {option.id} - {option.name}
@@ -536,14 +533,11 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
                 <Button startIcon={<TrashIcon/>} color="error" onClick={handleDeleteCourse}>Delete Course</Button>
                 <Button startIcon={<FloppyDiskIcon/>} type="submit" variant="contained">Update Course</Button>
             </CardActions>
-          </Card>
-        )}
+          </Card> : null}
 
-        {submitStatus && (
-          <Alert severity={submitStatus.type} sx={{marginTop: 2}}>
+        {submitStatus ? <Alert severity={submitStatus.type} sx={{marginTop: 2}}>
             {submitStatus.message}
-          </Alert>
-        )}
+          </Alert> : null}
 
       </form>
       <Typography variant="h5">Quests</Typography>

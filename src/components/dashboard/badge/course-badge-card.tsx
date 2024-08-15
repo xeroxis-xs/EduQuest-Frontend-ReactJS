@@ -29,14 +29,28 @@ export function CourseBadgeCard({ courseBadges = [] }: CourseBadgeCardProps): Re
                 image={`/assets/${courseBadge.badge.image.filename}`}
                 sx={{ height: 160, objectFit: 'contain', p: 4, backgroundColor: '#fafafa' }}
               />
-              <CardContent sx={{ flex: 1 }}>
-                <Typography variant="subtitle1">
-                  {courseBadge.badge.name}
+              <CardContent>
+
+                <Typography variant="h6" mb={3} align="center">
+                    {courseBadge.badge.name}
+                  </Typography>
+                <Typography variant="overline" color="text.secondary">
+                  Term
                 </Typography>
-                <Typography variant="body2">
-                  Earned from: {courseBadge.course_completed.course}
+                <Typography variant="body2" mb={2}>
+                  AY {courseBadge.course_completed.course.term.academic_year.start_year}-{courseBadge.course_completed.course.term.academic_year.end_year} {courseBadge.course_completed.course.term.name}
                 </Typography>
+
+                  <Typography variant="overline" color="text.secondary">
+                    Source
+                  </Typography>
+                  <Typography variant="body2">
+                    {courseBadge.course_completed.course.code} {courseBadge.course_completed.course.name}
+                  </Typography>
+
               </CardContent>
+
+
             </CardActionArea>
 
           </Card>

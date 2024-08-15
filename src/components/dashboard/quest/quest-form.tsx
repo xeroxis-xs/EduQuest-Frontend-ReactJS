@@ -227,10 +227,8 @@ export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Ele
             <Grid container spacing={3} >
               <Grid md={6} xs={12}>
                 <FormControl fullWidth required>
-                  <InputLabel id="thumbnail-label">Thumbnail ID</InputLabel>
+                  <InputLabel>Thumbnail ID</InputLabel>
                   <Select
-                    labelId="thumbnail-label"
-                    id="thumbnail"
                     defaultValue={images[0]?.id}
                     onChange={handleImageChange}
                     inputRef={questImageIdRef}

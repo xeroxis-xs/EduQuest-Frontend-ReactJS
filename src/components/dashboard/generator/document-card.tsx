@@ -193,7 +193,7 @@ export function DocumentCard({ documents = [], handleDeleteSuccess, handleSubmit
             <form onSubmit={handleSubmit}>
               <CardContent>
                 <Stack spacing={2} sx={{height: '100%'}}>
-                  <Box display="flex" justifyContent={'center'} alignItems={'center'} mb={4}>
+                  <Box display="flex" justifyContent="center" alignItems="center" mb={4}>
                     <FormControl required>
                       <Button
                         component="label"
@@ -208,25 +208,25 @@ export function DocumentCard({ documents = [], handleDeleteSuccess, handleSubmit
                       </Button>
                     </FormControl>
                   </Box>
-                  <Box display="flex" alignItems={'center'}>
+                  <Box display="flex" alignItems="center">
                     <CheckCircleIcon size={22} style={{marginRight: '8px'}} color="#66bb6a"/>
                     <Typography variant="body2">
                       Maximum uploads per user: 5
                     </Typography>
                   </Box>
-                  <Box display="flex" alignItems={'center'}>
+                  <Box display="flex" alignItems="center">
                     <CheckCircleIcon size={22} style={{marginRight: '8px'}} color="#66bb6a"/>
                     <Typography variant="body2">
                       Supported file type: PDF, DOCX, PPTX
                     </Typography>
                   </Box>
-                  <Box display="flex" alignItems={'center'} mb={4}>
+                  <Box display="flex" alignItems="center" mb={4}>
                     <CheckCircleIcon size={22} style={{marginRight: '8px'}} color="#66bb6a"/>
                     <Typography variant="body2">
                       Maximum file size: 5MB
                     </Typography>
                   </Box>
-                  <Box display="flex" justifyContent={'center'} alignItems={'center'} >
+                  <Box display="flex" justifyContent="center" alignItems="center" >
                     <FormControl required>
                       <Button
                         variant="contained"
@@ -236,11 +236,9 @@ export function DocumentCard({ documents = [], handleDeleteSuccess, handleSubmit
                       >Upload</Button>
                     </FormControl>
                   </Box>
-                  {uploadStatus && (
-                    <Alert severity={uploadStatus.type} sx={{marginTop: 2}}>
+                  {uploadStatus ? <Alert severity={uploadStatus.type} sx={{marginTop: 2}}>
                       {uploadStatus.message}
-                    </Alert>
-                  )}
+                    </Alert> : null}
                 </Stack>
               </CardContent>
             </form>

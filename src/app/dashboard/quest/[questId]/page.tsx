@@ -36,12 +36,12 @@ import Chip from "@mui/material/Chip";
 import {useUser} from "@/hooks/use-user";
 import {UserQuestAttemptTable} from "@/components/dashboard/quest/attempt/quest-attempt-table";
 import { CardMedia } from "@mui/material";
-import IconButton, { IconButtonProps } from '@mui/material/IconButton';
+import IconButton, { type IconButtonProps } from '@mui/material/IconButton';
 import { CaretDown as CaretDownIcon } from "@phosphor-icons/react/dist/ssr/CaretDown";
 import { CalendarX as CalendarXIcon } from "@phosphor-icons/react/dist/ssr/CalendarX";
 import { styled } from '@mui/material/styles';
 import Collapse from '@mui/material/Collapse';
-import {Image} from "@/types/image";
+import {type Image} from "@/types/image";
 import { SkeletonQuestDetailCard } from "@/components/dashboard/skeleton/skeleton-quest-detail-card";
 import { SkeletonQuestAttemptTable } from "@/components/dashboard/skeleton/skeleton-quest-attempt-table";
 
@@ -260,7 +260,9 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
         last_attempted_on: new Date().toISOString(),
         all_questions_submitted: false,
         user: eduquestUser?.id,
-        quest: params.questId as unknown as number,
+        quest: {
+          id: params.questId as unknown as number
+        },
       });
       logger.debug('New Attempt created:', response.data);
       router.push(`/dashboard/quest/${params.questId}/quest-attempt/${response.data.id.toString()}`);
@@ -308,8 +310,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
 
   return (
     <Stack spacing={3}>
-      {quest &&
-      <Stack direction="row" sx={{justifyContent: 'space-between'}}>
+      {quest ? <Stack direction="row" sx={{justifyContent: 'space-between'}}>
         <Button startIcon={<CaretLeftIcon fontSize="var(--icon-fontSize-md)"/>} component={RouterLink} href={`/dashboard/course/${quest?.from_course.id.toString()}`}>View Quests for {quest.from_course.code} {quest.from_course.name}</Button>
         <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }} color="error">
           <Button startIcon={<CalendarXIcon fontSize="var(--icon-fontSize-md)"/>} onClick={handleExpires} color="error" >Expires Quest</Button>
@@ -317,7 +318,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
             {showForm ? 'Close' : 'Edit Quest'}
           </Button>
         </Stack>
-      </Stack>
+      </Stack> : null
       }
 
       {!showForm && (
@@ -445,8 +446,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
           </CardContent>
           <CardActions sx={{ justifyContent: 'center' }}>
 
-            {course && eduquestUser && userQuestAttempts && (
-              quest.status !== 'Active' ? (
+            {course && eduquestUser && userQuestAttempts ? quest.status !== 'Active' ? (
                 <Button disabled variant='contained'>
                   Quest has Expired
                 </Button>
@@ -454,7 +454,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
                 <Button disabled variant='contained'>
                   No more attempts available
                 </Button>
-              ) : course.enrolled_users.find(user => user.user === eduquestUser?.id) ? (
+              ) : course.enrolled_users.includes(eduquestUser?.id.toString()) ? (
                 <Button endIcon={<GameControllerIcon fontSize="var(--icon-fontSize-md)"/>}
                         variant='contained'
                         onClick={handleNewAttempt}
@@ -469,8 +469,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
                 >
                   Enroll Course before attempting
                 </Button>
-              )
-            )}
+              ) : null}
 
 
           </CardActions>
@@ -600,7 +599,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
                     <FormControl fullWidth required>
                       <InputLabel>Thumbnail ID</InputLabel>
                       <Select defaultValue={quest.image.id} onChange={handleImageChange} inputRef={questImageIdRef}
-                              label="Image ID" variant="outlined" type="number">
+                              label="Thumbnail ID" variant="outlined" type="number">
                         {images.map((option) => (
                           <MenuItem key={option.id} value={option.id}>
                             {option.id} - {option.name}

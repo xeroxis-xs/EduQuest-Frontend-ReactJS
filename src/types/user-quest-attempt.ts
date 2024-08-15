@@ -9,5 +9,5 @@ export interface UserQuestAttempt {
   time_taken: number
   total_score_achieved: number
   user: EduquestUser['id']
-  quest: Quest['id']
+  quest: Quest
 }

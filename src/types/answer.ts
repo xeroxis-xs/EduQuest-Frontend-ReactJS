@@ -5,5 +5,5 @@ export interface Answer {
   question: Question['id'];
   text: string;
   is_correct: boolean;
-  reason: string;
+  reason: string | null;
 }

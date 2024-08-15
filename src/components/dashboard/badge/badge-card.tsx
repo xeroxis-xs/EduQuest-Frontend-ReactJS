@@ -34,10 +34,10 @@ export function BadgeCard({ badges = [] }: BadgeCardProps): React.JSX.Element {
                 sx={{ height: 160, objectFit: 'contain', p: 4, backgroundColor: '#fafafa' }}
               />
               <CardContent sx={{ flex: 1 }}>
-                <Typography variant="subtitle1">
+                <Typography variant="h6" mb={3} align="center">
                   {badge.name}
                 </Typography>
-                <Typography variant="body2" mt={2} mb={2}>
+                <Typography variant="body2" mb={2}>
                   {badge.description}
                 </Typography>
 
@@ -45,7 +45,7 @@ export function BadgeCard({ badges = [] }: BadgeCardProps): React.JSX.Element {
                 <Stack component="ul" spacing={1} style={{listStyleType: 'none', paddingLeft: 0}}>
                   {badge.condition.split(',').map((condition, index) => (
                     <li key={index} style={{display: 'flex', alignItems: 'center', }}>
-                      <CheckCircleIcon size={22} style={{marginRight: '8px'}} color="#66bb6a"/>
+                      <CheckCircleIcon size={22} style={{ flexShrink: 0, marginRight: '8px' }} color="#66bb6a"/>
                       <Typography variant="body2">{condition.trim()}</Typography>
                     </li>
                   ))}

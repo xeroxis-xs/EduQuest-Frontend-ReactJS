@@ -5,5 +5,5 @@ export interface UserCourseBadge {
   id: number;
   badge: Badge;
   course_completed: UserCourse;
-  awarded_on: string; // ISO 8601 datetime string
+  awarded_date: string; // ISO 8601 datetime string
 }

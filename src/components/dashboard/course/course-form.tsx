@@ -219,7 +219,7 @@ export function CourseForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.
                 <FormControl fullWidth required>
                   <InputLabel>Thumbnail ID</InputLabel>
                   <Select defaultValue={images[0]?.id} onChange={handleImageChange} inputRef={courseImageIdRef}
-                          label="Image ID" variant="outlined" type="number">
+                          label="Thumbnail ID" variant="outlined" type="number">
                     {images.map((option) => (
                       <MenuItem key={option.id} value={option.id}>
                         {option.id} - {option.name}

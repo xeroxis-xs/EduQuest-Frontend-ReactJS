@@ -2,34 +2,41 @@ import * as React from 'react';
 import { useTheme } from '@mui/material/styles';
 import type { ApexOptions } from 'apexcharts';
 import { Chart } from '@/components/core/chart';
+import { TopCollector } from "@/types/analytics/top-collector";
 
-export interface UserBadge {
-  nickname: string;
-  badges: {
-    name: string;
-    image: string;
-  }[];
+
+export interface TopCollectorsProps {
+  topCollectors?: TopCollector[];
 }
 
-export interface LeaderboardChartProps {
-  userBadges: UserBadge[];
-}
-
-export function LeaderboardChart({ userBadges }: LeaderboardChartProps): React.JSX.Element {
-  // Sort userBadges by the number of badges in descending order
-  const sortedUserBadges = [...userBadges].sort((a, b) => b.badges.length - a.badges.length);
+export function TopCollectorChart({ topCollectors = [] }: TopCollectorsProps): React.JSX.Element {
+  // Sort topCollectors by the number of badges in descending order
+  const sortedtopCollectors = [...topCollectors].sort((a, b) => b.badge_count - a.badge_count);
 
   // Extract nicknames and badge counts
-  const nicknames = sortedUserBadges.map(user => user.nickname);
-  const badgeCounts = sortedUserBadges.map(user => user.badges.length);
-  const badgeDetails = sortedUserBadges.map(user => {
+  const nicknames = sortedtopCollectors.map(user => user.nickname);
+  const badgeCounts = sortedtopCollectors.map(user => user.badge_count);
+  const badgeDetails = sortedtopCollectors.map(user => {
     const badgeMap: Record<string, { count: number, image: string }> = {};
-    user.badges.forEach(badge => {
+
+    // Process quest badges
+    user.quest_badges.forEach(questBadge => {
+      const badge = questBadge.badge;
       if (!badgeMap[badge.name]) {
-        badgeMap[badge.name] = { count: 0, image: badge.image };
+        badgeMap[badge.name] = { count: 0, image: `assets/${badge.image.filename}` };
       }
       badgeMap[badge.name].count += 1;
     });
+
+    // Process course badges
+    user.course_badges.forEach(courseBadge => {
+      const badge = courseBadge.badge;
+      if (!badgeMap[badge.name]) {
+        badgeMap[badge.name] = { count: 0, image: `assets/${badge.image.filename}` };
+      }
+      badgeMap[badge.name].count += 1;
+    });
+
     return badgeMap;
   });
 

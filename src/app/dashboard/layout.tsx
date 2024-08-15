@@ -6,10 +6,14 @@ import GlobalStyles from '@mui/material/GlobalStyles';
 import { AuthGuard } from '@/components/auth/auth-guard';
 import { MainNav } from '@/components/dashboard/layout/main-nav';
 import { SideNav } from '@/components/dashboard/layout/side-nav';
+import { metadata as dashboardMetadata } from '@/app/dashboard/metadata';
+import type { Metadata } from 'next';
 
 interface LayoutProps {
   children: React.ReactNode;
 }
+
+export const metadata: Metadata = dashboardMetadata;
 
 export default function Layout({ children }: LayoutProps): React.JSX.Element {
   return (

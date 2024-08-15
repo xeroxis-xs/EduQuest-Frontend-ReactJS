@@ -46,8 +46,12 @@ export function CourseCard({ rows = [], onEnrolledSuccess }: CourseCardProps): R
   const handleEnroll = async (courseId:number) => {
     try {
       const data = {
-        user: eduquestUser?.id,
-        course: courseId
+        user: {
+          id: eduquestUser?.id
+        },
+        course: {
+          id: courseId
+        }
       }
       const response = await apiService.post(`/api/UserCourse/`, data);
       if (response.status === 201) {
@@ -110,7 +114,7 @@ export function CourseCard({ rows = [], onEnrolledSuccess }: CourseCardProps): R
                     {course.enrolled_users.length.toString()}
                   </Typography>
                 </Box>
-                {eduquestUser && course.enrolled_users.find(user => user.user === eduquestUser?.id) ? (
+                {eduquestUser && course.enrolled_users.includes(eduquestUser?.id.toString()) ? (
                   <Button endIcon={<CheckIcon/>} disabled>Enrolled</Button>
                 ) : (
                   <Button endIcon={<SignInIcon/>} onClick={() => handleEnroll(course.id)}>Enroll</Button>

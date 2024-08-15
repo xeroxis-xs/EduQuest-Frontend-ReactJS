@@ -37,9 +37,7 @@ export function MyEarnedBadges({ badges = [], sx }: MyEarnedBadgesProps): React.
       <CardHeader
         title="My Badges"
         avatar={
-          <Avatar sx={{ backgroundColor: 'white', height: '24px', width: '24px'}}>
-            <MedalIcon fontSize="var(--icon-fontSize-md)" color="var(--mui-palette-primary-main)" />
-          </Avatar>
+          <MedalIcon fontSize="var(--icon-fontSize-md)" color="var(--mui-palette-primary-main)" />
         }
         sx={{ pr: '10px'}}
       />

@@ -6,10 +6,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import Pagination from '@mui/material/Pagination';
-// import type { Question } from '@/types/question';
 import CardHeader from "@mui/material/CardHeader";
-// import Chip from "@mui/material/Chip";
-// import {Answer} from "@/types/answer";
 import FormGroup from '@mui/material/FormGroup';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
@@ -17,12 +14,9 @@ import CardActions from "@mui/material/CardActions";
 import Button from "@mui/material/Button";
 import { FloppyDisk as FloppyDiskIcon } from "@phosphor-icons/react/dist/ssr/FloppyDisk";
 import { PaperPlaneTilt as PaperPlaneTiltIcon } from "@phosphor-icons/react/dist/ssr/PaperPlaneTilt";
+import { Eye as EyeIcon } from "@phosphor-icons/react/dist/ssr/Eye";
+import { EyeClosed as EyeClosedIcon } from "@phosphor-icons/react/dist/ssr/EyeClosed";
 import {Divider} from "@mui/material";
-// import type {Quest} from "@/types/quest";
-// import apiService from "@/api/api-service";
-// import {logger} from "@/lib/default-logger";
-// import {authClient} from "@/lib/auth/client";
-// import {Trash as TrashIcon} from "@phosphor-icons/react/dist/ssr/Trash";
 import { type UserQuestQuestionAttempt } from "@/types/user-quest-question-attempt";
 import {logger} from "@/lib/default-logger";
 import apiService from "@/api/api-service";
@@ -37,22 +31,6 @@ interface QuestionAttemptCardProps {
   onSaveResult: (status: { type: 'success' | 'error'; message: string }) => void;
 }
 
-// function removeQuestionField(data: UserQuestQuestionAttempt[]) {
-//   return data.map(attempt => ({
-//     ...attempt,
-//     selected_answers: attempt.selected_answers.map(sa => ({
-//       ...sa,
-//       answer: { ...sa.answer, question: undefined } // Remove the question field
-//     })),
-//     question: {
-//       ...attempt.question,
-//       answers: attempt.question.answers.map(ans => ({
-//         ...ans,
-//         question: undefined // Remove the question field
-//       }))
-//     }
-//   }));
-// }
 
 export function setSubmitted(data: UserQuestQuestionAttempt[], submitted: boolean) : UserQuestQuestionAttempt[] {
   return data.map(attempt => ({
@@ -69,65 +47,24 @@ export function setLastAttemptedOn(data: UserQuestQuestionAttempt[]) : UserQuest
 }
 
 
-// /* eslint-disable camelcase -- Disabling camelcase rule because the API response uses snake_case, and we need to match those property names exactly. */
-// function calculateScore(data: UserQuestQuestionAttempt): number {
-//
-//   const { selected_answers, question } = data;
-//   const total_answers = question.answers;
-//
-//   const num_correct = total_answers.filter(answer => answer.is_correct).length;
-//   const num_incorrect = total_answers.length - num_correct;
-//
-//   const num_correct_selected = selected_answers.filter(answer => answer.is_selected && answer.answer.is_correct).length;
-//   const num_incorrect_selected = selected_answers.filter(answer => answer.is_selected && !answer.answer.is_correct).length;
-//
-//   if (num_correct_selected === 0 && num_incorrect_selected > 0) {
-//     return 0;
-//   }
-//
-//   // Calculate the score
-//   const correct_score = num_correct > 0 ? num_correct_selected / num_correct : 0;
-//   const penalty = num_incorrect > 0 ? num_incorrect_selected / num_incorrect : 0;
-//
-//   // Use the question's max_score to determine the final score achieved
-//   const score_achieved = correct_score * (1 - penalty) * question.max_score;
-//
-//   return score_achieved;
-// }
-// /* eslint-enable camelcase -- Enabling rule back*/
-//
-// export function calculateScoresForData(data: UserQuestQuestionAttempt[]): UserQuestQuestionAttempt[] {
-//   return data.map(userQuestQuestionAttempt => {
-//     const score = calculateScore(userQuestQuestionAttempt);
-//     return {
-//       ...userQuestQuestionAttempt,
-//       score_achieved: score
-//     };
-//   });
-// }
-
 export function QuestionAttemptCard({ data = [], onDataChange, onSubmitResult, onSaveResult }: QuestionAttemptCardProps): React.JSX.Element {
   const [page, setPage] = React.useState(1);
+  const [showExplanation, setShowExplanation] = React.useState<Record<number, boolean>>({});
   const rowsPerPage = 1;
-  // Calculate the number of pages
   const pageCount = Math.ceil(data.length / rowsPerPage);
-  // Calculate the items to be displayed on the current page
   const currentAttemptedQuestionsAndAnswers = data.slice((page - 1) * rowsPerPage, page * rowsPerPage);
-  // Handle page change
+
   const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number) => {
     setPage(newPage);
   };
 
   const handleCheckboxChange = (answerId: number, isChecked: boolean) => {
-    // Assuming you have access to the attempt ID or can derive it from the current context
     const attemptId = currentAttemptedQuestionsAndAnswers[0].id;
-    // Call the function passed as prop with the necessary parameters
     onDataChange(attemptId, answerId, isChecked);
   };
 
   const handleSave = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    // Update last_attempted_on to the current date
     const updatedData = setLastAttemptedOn(data);
     logger.debug("Save button clicked, updated data: ", updatedData);
 
@@ -150,13 +87,10 @@ export function QuestionAttemptCard({ data = [], onDataChange, onSubmitResult, o
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // Update last_attempted_on to the current date
     const updatedData = setLastAttemptedOn(data);
     const submittedData = setSubmitted(updatedData, true);
-    // const modifiedData = removeQuestionField(submittedData);
     logger.debug("Submit button clicked, updated data ", submittedData);
 
-    // Update UserQuestQuestionAttempt to set 'submitted' to true
     try {
       const response = await apiService.patch(`/api/UserQuestQuestionAttempt/bulk-update/`, submittedData);
       if (response.status === 200) {
@@ -175,67 +109,86 @@ export function QuestionAttemptCard({ data = [], onDataChange, onSubmitResult, o
     }
   };
 
+  const toggleExplanation = (id: number) => {
+    setShowExplanation(prevState => ({
+      ...prevState,
+      [id]: !prevState[id]
+    }));
+  };
+
   return (
     <form onSubmit={handleSubmit}>
       <FormGroup>
-      <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
-        <Pagination count={pageCount} page={page} onChange={handleChangePage} color="primary" />
-      </Box>
-      <Grid container spacing={4}>
+        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
+          <Pagination count={pageCount} page={page} onChange={handleChangePage} color="primary" />
+        </Box>
+        <Grid container spacing={4}>
 
-      {currentAttemptedQuestionsAndAnswers.map((attemptedQuestionsAndAnswers) => (
-        <Grid key={attemptedQuestionsAndAnswers.id} xs={12} >
-          <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-            <CardHeader title={`Question ${attemptedQuestionsAndAnswers.question.number.toString()}` } subheader={`${attemptedQuestionsAndAnswers.question.max_score.toString()} point(s)` }/>
-            <Divider/>
-              <CardContent>
-                <Grid container spacing={3}>
-                  <Grid xs={12}>
-                    <Typography variant="subtitle1">
-                      {attemptedQuestionsAndAnswers.question.text}
-                    </Typography>
-                  </Grid>
-                  {attemptedQuestionsAndAnswers.question.answers.map((answer) => {
-                    // Assuming each answer has a unique ID and selected_answers contains objects with an answer property that includes the ID
-                    const isSelected = attemptedQuestionsAndAnswers.selected_answers.find(sa => sa.answer.id === answer.id)?.is_selected || false;
-
-                    return (
-                      <Grid key={answer.id} md={6} xs={12} >
-                        <FormControlLabel
-                          control={
-                            <Checkbox
-                              checked={isSelected}
-                              onChange={(e) => { handleCheckboxChange(answer.id, e.target.checked); }}
-                            />
-                          }
-                          label={answer.text}
-                        />
-                      </Grid>
-                    );
-                  })}
-
-                  { attemptedQuestionsAndAnswers.submitted ?
-                    <Grid xs={12}>
-                    <Typography variant="body1" >
-                      Score: {parseFloat(attemptedQuestionsAndAnswers.score_achieved.toFixed(2))} / {attemptedQuestionsAndAnswers.question.max_score}
-                    </Typography>
-                    </Grid>: null
+          {currentAttemptedQuestionsAndAnswers.map((attemptedQuestionsAndAnswers) => (
+            <Grid key={attemptedQuestionsAndAnswers.id} xs={12} >
+              <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+                <CardHeader
+                  title={`Question ${attemptedQuestionsAndAnswers.question.number.toString()}`}
+                  subheader={`${attemptedQuestionsAndAnswers.question.max_score.toString()} point(s)`}
+                  action={
+                    attemptedQuestionsAndAnswers.submitted &&
+                    attemptedQuestionsAndAnswers.question.answers.some(answer => answer.reason) ? <Button
+                        startIcon={showExplanation[attemptedQuestionsAndAnswers.id] ? <EyeClosedIcon /> : <EyeIcon />}
+                        onClick={() => { toggleExplanation(attemptedQuestionsAndAnswers.id); }}
+                      >
+                        {showExplanation[attemptedQuestionsAndAnswers.id] ? 'Hide Explanation' : 'Show Explanation'}
+                      </Button> : null
                   }
+                />
+                <Divider/>
+                <CardContent>
+                  <Grid container spacing={3}>
+                    <Grid xs={12}>
+                      <Typography variant="subtitle1">
+                        {attemptedQuestionsAndAnswers.question.text}
+                      </Typography>
+                    </Grid>
+                    {attemptedQuestionsAndAnswers.question.answers.map((answer) => {
+                      const isSelected = attemptedQuestionsAndAnswers.selected_answers.find(sa => sa.answer.id === answer.id)?.is_selected || false;
 
-                </Grid>
+                      return (
+                        <Grid key={answer.id} md={6} xs={12} >
+                          <FormControlLabel
+                            control={
+                              <Checkbox
+                                checked={isSelected}
+                                onChange={(e) => { handleCheckboxChange(answer.id, e.target.checked); }}
+                              />
+                            }
+                            label={answer.text}
+                          />
+                          {showExplanation[attemptedQuestionsAndAnswers.id] && answer.reason ? <Typography variant="body2">{answer.reason}</Typography> : null}
+                        </Grid>
+                      );
+                    })}
 
-              </CardContent>
-            <CardActions sx={{justifyContent: 'flex-end'}}>
-              <Button startIcon={<FloppyDiskIcon/> } variant="outlined" disabled={attemptedQuestionsAndAnswers.submitted} onClick={handleSave} >Save All</Button>
-              <Button endIcon={<PaperPlaneTiltIcon/>} type="submit" disabled={attemptedQuestionsAndAnswers.submitted} variant="contained">Submit All</Button>
-            </CardActions>
-          </Card>
+                    { attemptedQuestionsAndAnswers.submitted ?
+                      <Grid xs={12}>
+                        <Typography variant="body1" >
+                          Score: {parseFloat(attemptedQuestionsAndAnswers.score_achieved.toFixed(2))} / {attemptedQuestionsAndAnswers.question.max_score}
+                        </Typography>
+                      </Grid>: null
+                    }
+
+                  </Grid>
+
+                </CardContent>
+                <CardActions sx={{justifyContent: 'flex-end'}}>
+                  <Button startIcon={<FloppyDiskIcon/> } variant="outlined" disabled={attemptedQuestionsAndAnswers.submitted} onClick={handleSave} >Save All</Button>
+                  <Button endIcon={<PaperPlaneTiltIcon/>} type="submit" disabled={attemptedQuestionsAndAnswers.submitted} variant="contained">Submit All</Button>
+                </CardActions>
+              </Card>
+            </Grid>
+          ))}
+
+
         </Grid>
-      ))}
-
-
-    </Grid>
-    </FormGroup>
+      </FormGroup>
     </form>
   );
 }

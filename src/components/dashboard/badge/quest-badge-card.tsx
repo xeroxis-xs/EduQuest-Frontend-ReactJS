@@ -23,7 +23,7 @@ export function QuestBadgeCard({ questBadges = [] }: QuestBadgeCardProps): React
         <Grid key={questBadge.id} lg={3} md={4} xs={12} >
           <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <CardActionArea href='#' sx={{ height: '100%', borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}>
-              {/*<CardHeader title={badge.name}/>*/}
+
               <CardMedia
                 component="img"
                 alt={questBadge.badge.image.name}
@@ -31,11 +31,21 @@ export function QuestBadgeCard({ questBadges = [] }: QuestBadgeCardProps): React
                 sx={{ height: 160, objectFit: 'contain', p: 4, backgroundColor: '#fafafa' }}
               />
               <CardContent sx={{ flex: 1 }}>
-                <Typography variant="subtitle1">
+                <Typography variant="h6" mb={3} align="center">
                   {questBadge.badge.name}
                 </Typography>
+                <Typography variant="overline" color="text.secondary">
+                  Term
+                </Typography>
+                <Typography variant="body2" mb={2}>
+                  AY {questBadge.quest_attempted.quest.from_course.term.academic_year.start_year}-{questBadge.quest_attempted.quest.from_course.term.academic_year.end_year} {questBadge.quest_attempted.quest.from_course.term.name}
+                </Typography>
+
+                <Typography variant="overline" color="text.secondary">
+                  Source
+                </Typography>
                 <Typography variant="body2">
-                  Earned from: {questBadge.quest_attempted.quest}
+                  {questBadge.quest_attempted.quest.name} in {questBadge.quest_attempted.quest.from_course.code} {questBadge.quest_attempted.quest.from_course.name}
                 </Typography>
               </CardContent>
             </CardActionArea>

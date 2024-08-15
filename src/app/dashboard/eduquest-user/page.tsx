@@ -70,7 +70,7 @@ export default function Page(): React.JSX.Element {
           </Button>
         </div>
       </Stack>
-      {showForm && <EduquestUserForm />} {/* Conditional rendering */}
+      {showForm ? <EduquestUserForm /> : null} {/* Conditional rendering */}
       <EduquestUserFilters />
       <EduquestUserTable rows={eduquestUsers} />
     </Stack>

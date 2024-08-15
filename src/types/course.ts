@@ -1,6 +1,5 @@
 import type {Term} from "@/types/term";
 import type {Image} from "@/types/image";
-import type {UserCourse} from "@/types/user-course";
 
 export interface Course {
   id: number;
@@ -10,6 +9,6 @@ export interface Course {
   type: string;
   description: string;
   status: string;
-  enrolled_users: UserCourse[];
+  enrolled_users: string[]; // list of user id in string
   image: Image;
 }

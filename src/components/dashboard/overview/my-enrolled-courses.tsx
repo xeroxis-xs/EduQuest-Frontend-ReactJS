@@ -12,7 +12,6 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { CourseChart } from "@/components/dashboard/overview/chart/course-chart";
-import Avatar from "@mui/material/Avatar";
 import {Book as BookIcon} from "@phosphor-icons/react/dist/ssr/Book";
 import { TablePagination } from '@mui/material';
 import Tooltip from "@mui/material/Tooltip";
@@ -59,9 +58,7 @@ export function MyEnrolledCourses({ courses = [], sx }: MyEnrolledCoursesProps):
         <CardHeader
           title="My Courses"
           avatar={
-            <Avatar sx={{ backgroundColor: 'white', height: '24px', width: '24px'}}>
               <BookIcon fontSize="var(--icon-fontSize-md)" color="var(--mui-palette-primary-main)" />
-            </Avatar>
           }
           sx={{ pr: '10px'}}
         />

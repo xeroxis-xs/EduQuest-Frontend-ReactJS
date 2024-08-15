@@ -5,37 +5,29 @@ import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import Divider from '@mui/material/Divider';
 import type { SxProps } from '@mui/material/styles';
-import Avatar from "@mui/material/Avatar";
 import { Ranking as RankingIcon } from '@phosphor-icons/react/dist/ssr/Ranking';
 import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
 import Tooltip from "@mui/material/Tooltip";
 import Stack from "@mui/material/Stack";
-import {LeaderboardChart} from "@/components/dashboard/overview/chart/leaderboard-chart";
+import {TopCollectorChart} from "@/components/dashboard/overview/chart/top-collector-chart";
 import CardContent from "@mui/material/CardContent";
+import { TopCollector } from "@/types/analytics/top-collector";
+import Typography from "@mui/material/Typography";
 
-export interface UserBadge {
-  nickname: string;
-  badges: {
-    name: string;
-    image: string;
-  }[];
-}
 
 export interface TopCollectorsProps {
-  userBadges?: UserBadge[];
+  topCollectors?: TopCollector[];
   sx?: SxProps;
 }
 
-export function TopCollectors({ userBadges = [], sx }: TopCollectorsProps): React.JSX.Element {
+export function TopCollectors({ topCollectors = [], sx }: TopCollectorsProps): React.JSX.Element {
   return (
     <Card sx={{ ...sx, display: 'flex', flexDirection: 'column', height: '100%' }}>
       <Stack direction="row" sx={{ alignItems: 'center' }} spacing={0}>
       <CardHeader
         title="Top Collectors"
         avatar={
-          <Avatar sx={{ backgroundColor: 'white', height: '24px', width: '24px'}}>
-            <RankingIcon fontSize="var(--icon-fontSize-md)" color="var(--mui-palette-primary-main)" />
-          </Avatar>
+          <RankingIcon fontSize="var(--icon-fontSize-md)" color="var(--mui-palette-primary-main)" />
         }
         sx={{ pr: '10px'}}
       />
@@ -45,7 +37,12 @@ export function TopCollectors({ userBadges = [], sx }: TopCollectorsProps): Reac
       </Stack>
       <Divider />
       <CardContent sx={{ height: '100%', p: '6px'}}>
-        <LeaderboardChart userBadges={userBadges}/>
+        { topCollectors?.length > 0 ? (
+          <TopCollectorChart topCollectors={topCollectors}/>
+        ) : (
+          <Typography variant="subtitle2" align="center" mt={4}>No data available</Typography>
+        )}
+
       </CardContent>
 
 

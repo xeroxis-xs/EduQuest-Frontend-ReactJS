@@ -5,5 +5,5 @@ export interface UserQuestBadge {
   id: number;
   badge: Badge;
   quest_attempted: UserQuestAttempt;
-  awarded_on: string; // ISO 8601 datetime string
+  awarded_date: string; // ISO 8601 datetime string
 }
