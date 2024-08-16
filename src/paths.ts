@@ -6,10 +6,10 @@ export const paths = {
   dashboard: {
     overview: '/dashboard',
     account: '/dashboard/account',
-    customers: '/dashboard/customers',
-    user: '/dashboard/eduquest-user',
-    integrations: '/dashboard/integrations',
-    settings: '/dashboard/settings',
+    // customers: '/dashboard/customers',
+    // user: '/dashboard/eduquest-user',
+    // integrations: '/dashboard/integrations',
+    // settings: '/dashboard/settings',
     course: '/dashboard/course',
     quest: '/dashboard/quest',
     generator: {
@@ -21,6 +21,7 @@ export const paths = {
       catalogue: '/dashboard/badge/badge-catalogue',
       my: '/dashboard/badge/my-badge',
     },
+    feedback: '/dashboard/feedback'
   },
   errors: {
     notFound: '/errors/not-found',

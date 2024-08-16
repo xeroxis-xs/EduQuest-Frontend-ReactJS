@@ -10,6 +10,7 @@ import { Sword as SwordIcon } from '@phosphor-icons/react/dist/ssr/Sword';
 import { MagicWand as MagicWandIcon } from "@phosphor-icons/react/dist/ssr/MagicWand";
 import { Medal as MedalIcon } from '@phosphor-icons/react/dist/ssr/Medal';
 import { Upload as UploadIcon } from '@phosphor-icons/react/dist/ssr/Upload';
+import { ChatCircleDots as ChatCircleDotsIcon } from '@phosphor-icons/react/dist/ssr/ChatCircleDots';
 
 export const navIcons = {
   'chart-pie': ChartPieIcon,
@@ -23,4 +24,5 @@ export const navIcons = {
   'badge': MedalIcon,
   'magic-wand': MagicWandIcon,
   'upload': UploadIcon,
+  'chat-circle-dots': ChatCircleDotsIcon,
 } as Record<string, Icon>;

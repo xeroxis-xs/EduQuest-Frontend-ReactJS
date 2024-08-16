@@ -58,6 +58,13 @@ export const navItems = [
     icon: 'upload',
     matcher: { type: 'startsWith', href: paths.dashboard.import },
   },
+  {
+    key: 'feedback',
+    title: 'Feedback',
+    href: paths.dashboard.feedback,
+    icon: 'chat-circle-dots',
+    matcher: { type: 'startsWith', href: paths.dashboard.feedback },
+  },
   // { key: 'customers', title: 'Customers', href: paths.dashboard.customers, icon: 'users' },
   // { key: 'integrations', title: 'Integrations', href: paths.dashboard.integrations, icon: 'plugs-connected' },
   // { key: 'settings', title: 'Settings', href: paths.dashboard.settings, icon: 'gear-six' },
