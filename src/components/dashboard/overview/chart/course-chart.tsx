@@ -2,30 +2,23 @@ import * as React from 'react';
 import {alpha, useTheme} from '@mui/material/styles';
 import type { ApexOptions } from 'apexcharts';
 import { Chart } from '@/components/core/chart';
+import {UserCourseProgression} from "@/types/analytics/user-course-progression";
 
-export interface Course {
-  id: string;
-  code: string;
-  name: string;
-  term: string;
-  quests: number;
-  completed: number;
-}
 
 export interface CourseChartProps {
-  course: Course;
+  aUserCourseProgression: UserCourseProgression;
 }
 
-export function CourseChart({ course }: CourseChartProps): React.JSX.Element {
+export function CourseChart({ aUserCourseProgression }: CourseChartProps): React.JSX.Element {
 
-  const chartOptions = useChartOptions(course.name);
+  const chartOptions = useChartOptions(aUserCourseProgression.course_name);
 
   return (
     <Chart
       options={chartOptions}
       series={[
-        { name: 'Completed', data: [course.completed] },
-        { name: 'Not Completed', data: [course.quests - course.completed] }
+        { name: 'Completed', data: [aUserCourseProgression.completed_quests] },
+        { name: 'Not Completed', data: [aUserCourseProgression.total_quests - aUserCourseProgression.completed_quests] }
       ]}
       type="bar"
       width="100%"

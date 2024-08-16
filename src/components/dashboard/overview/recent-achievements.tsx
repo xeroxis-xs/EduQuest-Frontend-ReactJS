@@ -82,21 +82,25 @@ export function RecentAchievements({ recentBadges = [], sx }: RecentAchievements
           recentBadges.map((recentBadge) => (
             <React.Fragment key={recentBadge.id}>
               {isExtendedUserCourseBadge(recentBadge) && (
-                <Grid container spacing={1}>
-                  <Grid xs={3}>
-                    <Typography sx={{ mb: 2 }} variant="overline" color="text.secondary">
+                <Grid container spacing={1} mb={1}>
+                  <Grid xs={2}>
+                    <Typography variant="overline" color="text.secondary" display="block">
                       {new Date(recentBadge.awarded_date).toLocaleDateString("en-SG", {
                         day: "2-digit",
                         month: "short",
-                        year: "numeric",
+                        year: "numeric"
+                      })}
+                    </Typography>
+                    <Typography variant="overline" color="text.secondary">
+                      {new Date(recentBadge.awarded_date).toLocaleTimeString("en-SG", {
                         hour: '2-digit',
                         minute: '2-digit',
                         second: '2-digit'
-                      })} :
+                      })}
                     </Typography>
                   </Grid>
-                  <Grid xs={9}>
-                    <Typography sx={{ mb: 2 }} variant="body2">
+                  <Grid xs={10}>
+                    <Typography variant="body2">
                       <Box component="span" sx={{ display: 'inline-block', verticalAlign: 'middle', mr: '4px' }}>
                         <UserIcon width={20} height={20} />
                       </Box>
@@ -119,21 +123,25 @@ export function RecentAchievements({ recentBadges = [], sx }: RecentAchievements
                 </Grid>
               )}
               {isExtendedUserQuestBadge(recentBadge) && (
-                <Grid container spacing={1}>
-                  <Grid xs={3}>
-                    <Typography sx={{ mb: 2 }} variant="overline" color="text.secondary">
+                <Grid container spacing={1} mb={1}>
+                  <Grid xs={2}>
+                    <Typography variant="overline" color="text.secondary" display="block">
                       {new Date(recentBadge.awarded_date).toLocaleDateString("en-SG", {
                         day: "2-digit",
                         month: "short",
-                        year: "numeric",
+                        year: "numeric"
+                      })}
+                    </Typography>
+                    <Typography variant="overline" color="text.secondary">
+                      {new Date(recentBadge.awarded_date).toLocaleTimeString("en-SG", {
                         hour: '2-digit',
                         minute: '2-digit',
                         second: '2-digit'
-                      })} :
+                      })}
                     </Typography>
                   </Grid>
-                  <Grid xs={9}>
-                    <Typography sx={{ mb: 2 }} variant="body2">
+                  <Grid xs={10}>
+                    <Typography variant="body2">
                       <Box component="span" sx={{ display: 'inline-block', verticalAlign: 'middle', mr: '4px' }}>
                         <UserIcon width={20} height={20} />
                       </Box>

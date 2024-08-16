@@ -17,7 +17,7 @@ import { TablePagination } from '@mui/material';
 import Tooltip from "@mui/material/Tooltip";
 import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
 import Stack from "@mui/material/Stack";
-
+import {UserCourseProgression} from "@/types/analytics/user-course-progression";
 
 
 export interface Course {
@@ -30,11 +30,11 @@ export interface Course {
 }
 
 export interface MyEnrolledCoursesProps {
-  courses?: Course[];
+  userCourseProgression?: UserCourseProgression[];
   sx?: SxProps;
 }
 
-export function MyEnrolledCourses({ courses = [], sx }: MyEnrolledCoursesProps): React.JSX.Element {
+export function MyEnrolledCourses({ userCourseProgression = [], sx }: MyEnrolledCoursesProps): React.JSX.Element {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
@@ -77,12 +77,12 @@ export function MyEnrolledCourses({ courses = [], sx }: MyEnrolledCoursesProps):
             </TableRow>
           </TableHead>
           <TableBody>
-            {courses.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((course) => (
-              <TableRow hover key={course.id} sx={{height: '66px'}}>
-                <TableCell sx={{ borderBottom: "none" }}>{course.term}</TableCell>
-                <TableCell sx={{ borderBottom: "none" }}>{course.code} {course.name}</TableCell>
+            {userCourseProgression.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((aUserCourseProgression) => (
+              <TableRow hover key={aUserCourseProgression.course_id} sx={{height: '66px'}}>
+                <TableCell sx={{ borderBottom: "none", pr:0 }}>{aUserCourseProgression.course_term}</TableCell>
+                <TableCell sx={{ borderBottom: "none", pr:0 }}>{aUserCourseProgression.course_name}</TableCell>
                 <TableCell sx={{ width: '40%', borderBottom: "none" }}>
-                  <CourseChart course={course}/>
+                  <CourseChart aUserCourseProgression={aUserCourseProgression}/>
                 </TableCell>
               </TableRow>
             ))}
@@ -93,7 +93,7 @@ export function MyEnrolledCourses({ courses = [], sx }: MyEnrolledCoursesProps):
       <TablePagination
         rowsPerPageOptions={[5, 10, 25]}
         component="div"
-        count={courses.length}
+        count={userCourseProgression.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}

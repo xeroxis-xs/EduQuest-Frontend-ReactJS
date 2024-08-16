@@ -2,26 +2,22 @@ import * as React from 'react';
 import {useTheme} from '@mui/material/styles';
 import type { ApexOptions } from 'apexcharts';
 import { Chart } from '@/components/core/chart';
+import {UserBadgeProgression} from "@/types/analytics/user-badge-progression";
 
-export interface Badge {
-  name: string;
-  image: string;
-  count: number;
-}
 
 export interface CourseChartProps {
-  badge: Badge;
+  aUserBadgeProgression: UserBadgeProgression;
   maxCount: number[];
 }
 
-export function BadgeChart({ badge, maxCount }: CourseChartProps): React.JSX.Element {
+export function BadgeChart({ aUserBadgeProgression, maxCount }: CourseChartProps): React.JSX.Element {
 
-  const chartOptions = useChartOptions(badge.name, maxCount);
+  const chartOptions = useChartOptions(aUserBadgeProgression.badge_name, maxCount);
 
   return (
     <Chart
       options={chartOptions}
-      series={[{name: 'Collected', data: [badge.count] }]}
+      series={[{name: 'Collected', data: [aUserBadgeProgression.count] }]}
       type="bar"
       width="100%"
       height={20}

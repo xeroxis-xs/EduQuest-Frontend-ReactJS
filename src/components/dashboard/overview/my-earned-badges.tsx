@@ -5,31 +5,26 @@ import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import Divider from '@mui/material/Divider';
 import type { SxProps } from '@mui/material/styles';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
 import Avatar from "@mui/material/Avatar";
 import { Medal as MedalIcon } from '@phosphor-icons/react/dist/ssr/Medal';
 import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
 import Tooltip from "@mui/material/Tooltip";
 import Stack from "@mui/material/Stack";
 import {BadgeChart} from "@/components/dashboard/overview/chart/badge-chart";
+import {UserBadgeProgression} from "@/types/analytics/user-badge-progression";
+import Grid from '@mui/material/Unstable_Grid2';
+import Typography from "@mui/material/Typography";
+import CardContent from "@mui/material/CardContent";
 
-export interface Badge {
-  name: string;
-  image: string;
-  count: number;
-}
+
 
 export interface MyEarnedBadgesProps {
-  badges?: Badge[];
+  userBadgeProgression?: UserBadgeProgression[];
   sx?: SxProps;
 }
 
-export function MyEarnedBadges({ badges = [], sx }: MyEarnedBadgesProps): React.JSX.Element {
-  const badgeCounts = badges.map(badge => badge.count);
+export function MyEarnedBadges({ userBadgeProgression = [], sx }: MyEarnedBadgesProps): React.JSX.Element {
+  const badgeCounts = userBadgeProgression.map(i => i.count);
 
   return (
     <Card sx={{ ...sx, display: 'flex', flexDirection: 'column', height: '100%' }}>
@@ -46,27 +41,27 @@ export function MyEarnedBadges({ badges = [], sx }: MyEarnedBadgesProps): React.
       </Tooltip>
       </Stack>
       <Divider />
-      <Table sx={{mb: 2}}>
-        <TableHead>
-          <TableRow>
-            <TableCell>Name</TableCell>
-            <TableCell>Progress</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {badges.map((badge) => (
-            <TableRow key={badge.name}>
-              <TableCell sx={{ borderBottom: "none", display: 'flex', alignItems: 'center', pr:0 }}>
-                <Avatar src={badge.image} sx={{ marginRight: 2 }} />
-                {badge.name}
-              </TableCell>
-              <TableCell sx={{ width: '45%', borderBottom: "none", pl: '8px' }}>
-                <BadgeChart badge={badge} maxCount={badgeCounts} />
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table>
+      <CardContent sx={{ height: "100%"}}>
+        <Stack
+          direction="column"
+          justifyContent="space-between"
+          alignItems="center"
+          height="100%"
+        >
+        {userBadgeProgression.map((aUserBadgeProgression) => (
+          <Grid container spacing={2} key={aUserBadgeProgression.badge_id} width="100%" >
+
+            <Grid xs={6} md={5} sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+              <Avatar src={`assets/${aUserBadgeProgression.badge_filename}`} sx={{ mr: 1 }} />
+              <Typography variant="body2">{aUserBadgeProgression.badge_name}</Typography>
+            </Grid>
+            <Grid xs={6} md={7} sx={{ display: 'flex', alignItems: 'center', mb: 2, pl:4 }}>
+              <BadgeChart aUserBadgeProgression={aUserBadgeProgression} maxCount={badgeCounts} />
+            </Grid>
+          </Grid>
+        ))}
+        </Stack>
+      </CardContent>
     </Card>
   );
 }

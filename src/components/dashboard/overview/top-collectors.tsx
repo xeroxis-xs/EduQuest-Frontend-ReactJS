@@ -36,7 +36,7 @@ export function TopCollectors({ topCollectors = [], sx }: TopCollectorsProps): R
       </Tooltip>
       </Stack>
       <Divider />
-      <CardContent sx={{ height: '100%', p: '6px'}}>
+      <CardContent sx={{ height: '100%', p: '6px', minHeight: '400px'}}>
         { topCollectors?.length > 0 ? (
           <TopCollectorChart topCollectors={topCollectors}/>
         ) : (
