@@ -44,8 +44,9 @@ export function MyEarnedBadges({ userBadgeProgression = [], sx }: MyEarnedBadges
       <CardContent sx={{ height: "100%"}}>
         <Stack
           direction="column"
-          justifyContent="space-between"
+          justifyContent="center"
           alignItems="center"
+          spacing={2}
           height="100%"
         >
         {userBadgeProgression.map((aUserBadgeProgression) => (

@@ -43,7 +43,7 @@ export function SkeletonMyEnrolledCourses(): React.JSX.Element {
           </TableHead>
           <TableBody>
             {Array.from({ length: 5 }).map((_, index) => (
-              <TableRow hover key={index} sx={{height: '66px'}}>
+              <TableRow hover key={index} >
                 <TableCell sx={{ borderBottom: "none", pr:0 }}><Typography variant="subtitle1"><Skeleton/></Typography></TableCell>
                 <TableCell sx={{ borderBottom: "none", pr:0 }}><Typography variant="subtitle1"><Skeleton/></Typography></TableCell>
                 <TableCell sx={{ width: '40%', borderBottom: "none" }}>

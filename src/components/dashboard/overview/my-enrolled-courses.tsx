@@ -78,7 +78,7 @@ export function MyEnrolledCourses({ userCourseProgression = [], sx }: MyEnrolled
           </TableHead>
           <TableBody>
             {userCourseProgression.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((aUserCourseProgression) => (
-              <TableRow hover key={aUserCourseProgression.course_id} sx={{height: '66px'}}>
+              <TableRow hover key={aUserCourseProgression.course_id} >
                 <TableCell sx={{ borderBottom: "none", pr:0 }}>{aUserCourseProgression.course_term}</TableCell>
                 <TableCell sx={{ borderBottom: "none", pr:0 }}>{aUserCourseProgression.course_name}</TableCell>
                 <TableCell sx={{ width: '40%', borderBottom: "none" }}>
