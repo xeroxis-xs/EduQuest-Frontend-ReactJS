@@ -51,7 +51,7 @@ export function TotalCourse({ diff, trend, sx, value }: TotalCourseProps): React
                   <Stack sx={{ alignItems: 'center' }} direction="row" spacing={0.5}>
                     <TrendIcon color={trendColor} fontSize="var(--icon-fontSize-md)" />
                     <Typography color={trendColor} variant="body2">
-                      {Math.round(diff as number).toFixed(1)}%
+                      {Math.round(diff!).toFixed(1)}%
                     </Typography>
                   </Stack>
                   <Typography color="text.secondary" variant="caption">

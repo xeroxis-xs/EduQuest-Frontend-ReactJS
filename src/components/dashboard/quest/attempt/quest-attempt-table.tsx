@@ -16,6 +16,7 @@ import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
 import LinearProgress from "@mui/material/LinearProgress";
 import Typography from "@mui/material/Typography";
+import { formatTime } from "@/components/dashboard/overview/shortest-user"
 
 interface UserQuestAttemptTableProps {
   questId?: string;
@@ -28,24 +29,6 @@ export function UserQuestAttemptTable({ questId = '0', rows = [], totalMaxScore 
 
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-
-  const formatTime = (milliseconds:number) => {
-    const oneSecond = 1000;
-    const oneMinute = 60 * oneSecond;
-    const oneHour = 60 * oneMinute;
-    const oneDay = 24 * oneHour;
-
-    const days = Math.floor(milliseconds / oneDay);
-    const daysRemainder = milliseconds % oneDay;
-    const hours = Math.floor(daysRemainder / oneHour);
-    const hoursRemainder = daysRemainder % oneHour;
-    const minutes = Math.floor(hoursRemainder / oneMinute);
-    const minutesRemainder = hoursRemainder % oneMinute;
-    const seconds = Math.floor(minutesRemainder / oneSecond);
-    const millisecondsLeft = Math.round(minutesRemainder % oneSecond);
-
-    return `${days.toString()}d ${hours.toString()}h ${minutes.toString()}m ${seconds.toString()}s ${millisecondsLeft.toString()}ms`;
-  };
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,

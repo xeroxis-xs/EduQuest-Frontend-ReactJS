@@ -4,7 +4,7 @@ import * as React from 'react';
 import Grid from '@mui/material/Unstable_Grid2';
 import { TotalCourse } from '@/components/dashboard/overview/total-course';
 import { TotalQuest } from "@/components/dashboard/overview/total-quest";
-import { Goat } from "@/components/dashboard/overview/goat";
+import { ShortestUser } from "@/components/dashboard/overview/shortest-user";
 import { TotalUser } from "@/components/dashboard/overview/total-user";
 import { MyEnrolledCourses } from "@/components/dashboard/overview/my-enrolled-courses";
 import { MyEarnedBadges } from "@/components/dashboard/overview/my-earned-badges";
@@ -29,7 +29,7 @@ import {SkeletonMyEnrolledCourses} from "@/components/dashboard/skeleton/analyti
 import {SkeletonTotalUser} from "@/components/dashboard/skeleton/analytics/skeleton-total-user";
 import {SkeletonTotalCourse} from "@/components/dashboard/skeleton/analytics/skeleton-total-course";
 import {SkeletonTotalQuest} from "@/components/dashboard/skeleton/analytics/skeleton-total-quest";
-import {SkeletonGoat} from "@/components/dashboard/skeleton/analytics/skeleton-goat";
+import {SkeletonShortestUser} from "@/components/dashboard/skeleton/analytics/skeleton-shortest-user";
 
 
 export interface AnalyticsPartOne {
@@ -98,20 +98,22 @@ export default function Page(): React.JSX.Element {
   }
 
   const getAnalyticsPartTwo = async (): Promise<void> => {
-    try {
-      const response: AxiosResponse<AnalyticsPartTwo> = await apiService.get<AnalyticsPartTwo>(`/api/Analytics/part-two/${eduquestUser?.id.toString()}`);
-      const data: AnalyticsPartTwo = response.data;
-      logger.debug('Analytics Part Two', data);
-      setAnalyticsPartTwo(data);
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
+    if (eduquestUser) {
+      try {
+        const response: AxiosResponse<AnalyticsPartTwo> = await apiService.get<AnalyticsPartTwo>(`/api/Analytics/part-two/${eduquestUser.id.toString()}`);
+        const data: AnalyticsPartTwo = response.data;
+        logger.debug('Analytics Part Two', data);
+        setAnalyticsPartTwo(data);
+      } catch (error: unknown) {
+        if (error instanceof AxiosError) {
+          if (error.response?.status === 401) {
+            await authClient.signInWithMsal();
+          }
         }
+        logger.error('Error: ', error);
+      } finally {
+        setAnalyticsPartTwoLoading(false);
       }
-      logger.error('Error: ', error);
-    } finally {
-      setAnalyticsPartTwoLoading(false);
     }
   }
 
@@ -189,9 +191,9 @@ export default function Page(): React.JSX.Element {
         }
       </Grid>
       <Grid lg={3} sm={6} xs={12}>
-        { analyticsPartOneLoading? <SkeletonGoat /> :
+        { analyticsPartOneLoading? <SkeletonShortestUser /> :
           (analyticsPartOne.shortest_time_user ?
-            <Goat shortestTimeUser={analyticsPartOne.shortest_time_user} sx={{ height: '100%' }} /> : null
+            <ShortestUser shortestTimeUser={analyticsPartOne.shortest_time_user} sx={{ height: '100%' }} /> : null
           )
         }
       </Grid>

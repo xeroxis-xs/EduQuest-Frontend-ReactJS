@@ -16,22 +16,22 @@ export interface BudgetProps {
   shortestTimeUser: ShortestTimeUser | null;
 }
 
-function formatTime(milliseconds: number): string {
+export function formatTime(milliseconds: number): string {
   const hours = Math.floor(milliseconds / 3600000);
   const minutes = Math.floor((milliseconds % 3600000) / 60000);
   const seconds = Math.floor((milliseconds % 60000) / 1000);
-  const ms = milliseconds % 1000;
+  const ms = Math.round(milliseconds % 1000);
 
   const parts = [];
-  if (hours > 0) parts.push(`${hours} hr`);
-  if (minutes > 0) parts.push(`${minutes} min`);
-  if (seconds > 0) parts.push(`${seconds} sec`);
-  if (ms > 0) parts.push(`${ms} ms`);
+  if (hours > 0) parts.push(`${hours.toString()} hr`);
+  if (minutes > 0) parts.push(`${minutes.toString()} min`);
+  if (seconds > 0) parts.push(`${seconds.toString()} sec`);
+  if (ms > 0) parts.push(`${ms.toString()} ms`);
 
   return parts.join(' ');
 }
 
-export function Goat ({ sx, shortestTimeUser }: BudgetProps): React.JSX.Element {
+export function ShortestUser ({ sx, shortestTimeUser }: BudgetProps): React.JSX.Element {
   return (
     <Card sx={sx}>
       <CardContent sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%', py: '24px' }}>

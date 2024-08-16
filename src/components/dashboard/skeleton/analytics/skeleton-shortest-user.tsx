@@ -10,7 +10,7 @@ import Avatar from "@mui/material/Avatar";
 import { Crown as CrownIcon } from '@phosphor-icons/react/dist/ssr/Crown';
 import {User as UserIcon} from "@phosphor-icons/react/dist/ssr/User";
 
-export function SkeletonGoat(): React.JSX.Element {
+export function SkeletonShortestUser(): React.JSX.Element {
   return (
     <Card>
       <CardContent sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%', py: '24px' }}>
