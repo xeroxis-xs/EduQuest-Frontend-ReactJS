@@ -15,7 +15,7 @@ export interface TotalCourseProps {
   diff?: number;
   trend: 'up' | 'down';
   sx?: SxProps;
-  value: string;
+  value: number;
 }
 
 export function TotalCourse({ diff, trend, sx, value }: TotalCourseProps): React.JSX.Element {
@@ -42,19 +42,23 @@ export function TotalCourse({ diff, trend, sx, value }: TotalCourseProps): React
 
               <Typography variant="h4">{value}</Typography>
 
-              {diff ? (
+              {diff === 0 ? (
+                <Typography color="text.secondary" variant="caption">
+                  No changes since last week
+                </Typography>
+              ) : (
                 <Stack sx={{ alignItems: 'center', mt: '10px' }} direction="row" spacing={2}>
                   <Stack sx={{ alignItems: 'center' }} direction="row" spacing={0.5}>
                     <TrendIcon color={trendColor} fontSize="var(--icon-fontSize-md)" />
                     <Typography color={trendColor} variant="body2">
-                      {diff}%
+                      {Math.round(diff as number).toFixed(1)}%
                     </Typography>
                   </Stack>
                   <Typography color="text.secondary" variant="caption">
                     Since last week
                   </Typography>
                 </Stack>
-              ) : null}
+              )}
             </Stack>
 
           </Stack>

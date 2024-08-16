@@ -9,17 +9,29 @@ import Typography from '@mui/material/Typography';
 import { Crown as CrownIcon } from '@phosphor-icons/react/dist/ssr/Crown';
 import { Info as InfoIcon } from '@phosphor-icons/react/dist/ssr/Info';
 import { User as UserIcon } from '@phosphor-icons/react/dist/ssr/User';
+import type {ShortestTimeUser} from "@/types/analytics/shortest-time-user";
 
 export interface BudgetProps {
   sx?: SxProps;
-  value: {
-    nickname: string;
-    quest: string;
-    time: string;
-  };
+  shortestTimeUser: ShortestTimeUser | null;
 }
 
-export function Goat ({ sx, value }: BudgetProps): React.JSX.Element {
+function formatTime(milliseconds: number): string {
+  const hours = Math.floor(milliseconds / 3600000);
+  const minutes = Math.floor((milliseconds % 3600000) / 60000);
+  const seconds = Math.floor((milliseconds % 60000) / 1000);
+  const ms = milliseconds % 1000;
+
+  const parts = [];
+  if (hours > 0) parts.push(`${hours} hr`);
+  if (minutes > 0) parts.push(`${minutes} min`);
+  if (seconds > 0) parts.push(`${seconds} sec`);
+  if (ms > 0) parts.push(`${ms} ms`);
+
+  return parts.join(' ');
+}
+
+export function Goat ({ sx, shortestTimeUser }: BudgetProps): React.JSX.Element {
   return (
     <Card sx={sx}>
       <CardContent sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%', py: '24px' }}>
@@ -37,12 +49,18 @@ export function Goat ({ sx, value }: BudgetProps): React.JSX.Element {
                   <InfoIcon fontSize="var(--icon-fontSize-sm)" style={{ marginLeft: '8px', cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
                 </Tooltip>
               </Stack>
-              <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
-                <UserIcon fontSize="var(--icon-fontSize-md)"/>
-                <Typography variant="h6">{value.nickname}</Typography>
-              </Stack>
-              <Typography variant="body2">Quest: {value.quest}</Typography>
-              <Typography variant="body2">Time Taken: {value.time}</Typography>
+              {shortestTimeUser ? (
+                <>
+                  <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
+                    <UserIcon fontSize="var(--icon-fontSize-md)"/>
+                    <Typography variant="h6">{shortestTimeUser.nickname}</Typography>
+                  </Stack>
+                  <Typography variant="body2">Quest: {shortestTimeUser.quest_name}</Typography>
+                  <Typography variant="body2">Time Taken: {formatTime(shortestTimeUser.time_taken)}</Typography>
+                </>
+              ) : (
+                <Typography variant="body2">No User</Typography>
+              )}
             </Stack>
           </Stack>
         </Stack>

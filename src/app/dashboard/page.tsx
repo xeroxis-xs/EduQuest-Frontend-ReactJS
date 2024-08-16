@@ -14,6 +14,10 @@ import { type ExtendedUserCourseBadge, type ExtendedUserQuestBadge } from "@/typ
 import { type TopCollector } from "@/types/analytics/top-collector";
 import { type UserCourseProgression } from "@/types/analytics/user-course-progression";
 import { type UserBadgeProgression } from "@/types/analytics/user-badge-progression";
+import { type UserStats } from "@/types/analytics/user-stats";
+import { type CourseEnrollmentStats } from "@/types/analytics/course-enrollment-stats";
+import { type QuestAttemptStats } from "@/types/analytics/quest-attempt-stats";
+import { type ShortestTimeUser } from "@/types/analytics/shortest-time-user";
 import { AxiosError, type AxiosResponse } from "axios";
 import apiService from "@/api/api-service";
 import { logger } from "@/lib/default-logger";
@@ -22,7 +26,18 @@ import { SkeletonTopCollector } from "@/components/dashboard/skeleton/analytics/
 import { SkeletonRecentAchievements } from "@/components/dashboard/skeleton/analytics/skeleton-recent-achievements";
 import {useUser} from "@/hooks/use-user";
 import {SkeletonMyEnrolledCourses} from "@/components/dashboard/skeleton/analytics/skeleton-my-enrolled-courses";
+import {SkeletonTotalUser} from "@/components/dashboard/skeleton/analytics/skeleton-total-user";
+import {SkeletonTotalCourse} from "@/components/dashboard/skeleton/analytics/skeleton-total-course";
+import {SkeletonTotalQuest} from "@/components/dashboard/skeleton/analytics/skeleton-total-quest";
+import {SkeletonGoat} from "@/components/dashboard/skeleton/analytics/skeleton-goat";
 
+
+export interface AnalyticsPartOne {
+  user_stats: UserStats;
+  course_enrollment_stats: CourseEnrollmentStats;
+  quest_attempt_stats: QuestAttemptStats;
+  shortest_time_user: ShortestTimeUser | null;
+}
 
 export interface AnalyticsPartTwo {
   user_course_progression: UserCourseProgression[];
@@ -36,8 +51,25 @@ export interface AnalyticsPartThree {
 
 export default function Page(): React.JSX.Element {
   const { eduquestUser } = useUser();
+  const [analyticsPartOneLoading, setAnalyticsPartOneLoading] = React.useState(true);
   const [analyticsPartTwoLoading, setAnalyticsPartTwoLoading] = React.useState(true);
   const [analyticsPartThreeLoading, setAnalyticsPartThreeLoading] = React.useState(true);
+  const [analyticsPartOne, setAnalyticsPartOne] = React.useState<AnalyticsPartOne>({
+    user_stats: {
+      total_users: 0,
+      new_users_percentage: 0
+    },
+    course_enrollment_stats: {
+      total_enrollments: 0,
+      new_enrollments_percentage: 0
+    },
+    quest_attempt_stats: {
+      total_quest_attempts: 0,
+      new_quest_attempts_percentage: 0
+    },
+    shortest_time_user: null,
+  });
+
   const [analyticsPartTwo, setAnalyticsPartTwo] = React.useState<AnalyticsPartTwo>({
     user_course_progression: [],
     user_badge_progression: [],
@@ -46,6 +78,24 @@ export default function Page(): React.JSX.Element {
     top_users_with_most_badges: [],
     recent_badge_awards: [],
   });
+
+  const getAnalyticsPartOne = async (): Promise<void> => {
+    try {
+      const response: AxiosResponse<AnalyticsPartOne> = await apiService.get<AnalyticsPartOne>('/api/Analytics/part-one');
+      const data: AnalyticsPartOne = response.data;
+      logger.debug('Analytics Part One', data);
+      setAnalyticsPartOne(data);
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 401) {
+          await authClient.signInWithMsal();
+        }
+      }
+      logger.error('Error: ', error);
+    } finally {
+      setAnalyticsPartOneLoading(false);
+    }
+  }
 
   const getAnalyticsPartTwo = async (): Promise<void> => {
     try {
@@ -85,6 +135,7 @@ export default function Page(): React.JSX.Element {
 
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
+      await getAnalyticsPartOne();
       await getAnalyticsPartThree();
       await getAnalyticsPartTwo();
     };
@@ -105,16 +156,44 @@ export default function Page(): React.JSX.Element {
   return (
     <Grid container spacing={5}>
       <Grid lg={3} sm={6} xs={12}>
-        <TotalUser sx={{ height: '100%' }} value="10" trend="up" diff={12} />
+        { analyticsPartOneLoading? <SkeletonTotalUser /> :
+          (analyticsPartOne.user_stats ?
+              <TotalUser
+                sx={{ height: '100%' }}
+                value={analyticsPartOne.user_stats.total_users}
+                trend="up"
+                diff={analyticsPartOne.user_stats.new_users_percentage} /> : null
+          )
+        }
       </Grid>
       <Grid lg={3} sm={6} xs={12}>
-        <TotalCourse sx={{ height: '100%' }} value="12" trend="up" diff={16} />
+        { analyticsPartOneLoading? <SkeletonTotalCourse /> :
+          (analyticsPartOne.course_enrollment_stats ?
+            <TotalCourse
+              sx={{ height: '100%' }}
+              value={analyticsPartOne.course_enrollment_stats.total_enrollments}
+              trend="up"
+              diff={analyticsPartOne.course_enrollment_stats.new_enrollments_percentage} /> : null
+          )
+        }
       </Grid>
       <Grid lg={3} sm={6} xs={12}>
-        <TotalQuest sx={{ height: '100%' }} value="56" trend="up" diff={1} />
+        { analyticsPartOneLoading? <SkeletonTotalQuest /> :
+          (analyticsPartOne.quest_attempt_stats ?
+            <TotalQuest
+              sx={{ height: '100%' }}
+              value={analyticsPartOne.quest_attempt_stats.total_quest_attempts}
+              trend="up"
+              diff={analyticsPartOne.quest_attempt_stats.new_quest_attempts_percentage} /> : null
+          )
+        }
       </Grid>
       <Grid lg={3} sm={6} xs={12}>
-        <Goat sx={{ height: '100%' }} value={{ nickname: 'TEOH XI SHENG', quest: 'Quest 1 from CSC1', time: '50ms' }} />
+        { analyticsPartOneLoading? <SkeletonGoat /> :
+          (analyticsPartOne.shortest_time_user ?
+            <Goat shortestTimeUser={analyticsPartOne.shortest_time_user} sx={{ height: '100%' }} /> : null
+          )
+        }
       </Grid>
       <Grid lg={8} md={12} xs={12}>
         { analyticsPartTwoLoading? <SkeletonMyEnrolledCourses /> :
