@@ -347,8 +347,8 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
                 <Typography variant="overline" color="text.secondary" display="block">Type</Typography>
                 <Chip variant="outlined" label={quest.type} color={
                   quest.type === 'Eduquest MCQ' ? 'primary' :
-                    quest.type === 'Wooclap' ? 'info' :
-                      quest.type === 'Kahoot!' ? 'info' :
+                    quest.type === 'Wooclap' ? 'neon' :
+                      quest.type === 'Kahoot!' ? 'violet' :
                         quest.type === 'Private' ? 'secondary' : 'default'
                 } size="small"/>
               </Grid>
@@ -498,10 +498,10 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
                   <FormControl fullWidth required>
                     <InputLabel>Quest Type</InputLabel>
                     <Select defaultValue={quest.type} label="Quest Type" inputRef={questTypeRef} name="type">
-                      <MenuItem value="Eduquest MCQ"><Chip variant="outlined" label="Eduquest MCQ" color="primary"/></MenuItem>
+                      <MenuItem value="Eduquest MCQ"><Chip variant="outlined" label="Eduquest MCQ" color="primary" size="small"/></MenuItem>
                       <MenuItem value="Private"><Chip variant="outlined" label="Private" color="secondary" size="small"/></MenuItem>
-                      <MenuItem value="Kahoot!"><Chip variant="outlined" label="Kahoot!" color="info" size="small"/></MenuItem>
-                      <MenuItem value="Wooclap"><Chip variant="outlined" label="Wooclap" color="info" size="small"/></MenuItem>
+                      <MenuItem value="Kahoot!"><Chip variant="outlined" label="Kahoot!" color="violet" size="small"/></MenuItem>
+                      <MenuItem value="Wooclap"><Chip variant="outlined" label="Wooclap" color="neon" size="small"/></MenuItem>
                     </Select>
 
                   </FormControl>

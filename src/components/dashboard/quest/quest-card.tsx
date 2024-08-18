@@ -75,8 +75,8 @@ export function QuestCard({ rows = [], onQuestDeleteSuccess }: QuestCardProps): 
 
                 <Chip variant="outlined" label={quest.type} sx={{ mb: 1.5, mr: 1 }} color={
                   quest.type === 'Eduquest MCQ' ? 'primary' :
-                    quest.type === 'Wooclap' ? 'info' :
-                      quest.type === 'Kahoot!' ? 'info' :
+                    quest.type === 'Wooclap' ? 'neon' :
+                      quest.type === 'Kahoot!' ? 'violet' :
                         quest.type === 'Private' ? 'secondary' : 'default'
                 } size="small"/>
 

@@ -1,6 +1,6 @@
 import type { ColorSystemOptions } from '@mui/material/styles';
 
-import { california, kepple, neonBlue, nevada, redOrange, shakespeare, stormGrey } from './colors';
+import { california, kepple, neonBlue, nevada, redOrange, shakespeare, stormGrey, lightBlue, purple } from './colors';
 import type { ColorScheme } from './types';
 
 export const colorSchemes = {
@@ -68,6 +68,20 @@ export const colorSchemes = {
         dark: california[500],
         contrastText: 'var(--mui-palette-common-black)',
       },
+      neon: {
+        ...lightBlue,
+        light: lightBlue[300],
+        main: lightBlue[400],
+        dark: lightBlue[500],
+        contrastText: 'var(--mui-palette-common-black)',
+      },
+      violet: {
+        ...purple,
+        light: purple[300],
+        main: purple[400],
+        dark: purple[500],
+        contrastText: 'var(--mui-palette-common-black)',
+      }
     },
   },
   light: {
@@ -134,6 +148,20 @@ export const colorSchemes = {
         dark: california[600],
         contrastText: 'var(--mui-palette-common-white)',
       },
+      neon: {
+        ...lightBlue,
+        light: lightBlue[300],
+        main: lightBlue[400],
+        dark: lightBlue[500],
+        contrastText: 'var(--mui-palette-common-black)',
+      },
+      violet: {
+        ...purple,
+        light: purple[300],
+        main: purple[400],
+        dark: purple[500],
+        contrastText: 'var(--mui-palette-common-black)',
+      }
     },
   },
 } satisfies Partial<Record<ColorScheme, ColorSystemOptions>>;

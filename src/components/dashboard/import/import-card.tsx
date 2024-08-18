@@ -230,8 +230,8 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
               <Select defaultValue="Wooclap" label="Quest Type" inputRef={questTypeRef} name="type">
                 <MenuItem value="Eduquest MCQ"><Chip variant="outlined" label="Eduquest MCQ" color="primary" size="small"/></MenuItem>
                 <MenuItem value="Private"><Chip variant="outlined" label="Private" color="secondary" size="small"/></MenuItem>
-                <MenuItem value="Kahoot!"><Chip variant="outlined" label="Kahoot!" color="info" size="small"/></MenuItem>
-                <MenuItem value="Wooclap"><Chip variant="outlined" label="Wooclap" color="info" size="small"/></MenuItem>
+                <MenuItem value="Kahoot!"><Chip variant="outlined" label="Kahoot!" color="violet" size="small"/></MenuItem>
+                <MenuItem value="Wooclap"><Chip variant="outlined" label="Wooclap" color="neon" size="small"/></MenuItem>
               </Select>
             </FormControl>
           </Grid>

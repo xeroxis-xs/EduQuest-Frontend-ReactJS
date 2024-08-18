@@ -18,20 +18,35 @@ declare module '@mui/material/styles/createPalette' {
     700: string;
     800: string;
     900: string;
+    light?: string;
+    main?: string;
+    dark?: string;
+    contrastText?: string;
   }
 
   interface Palette {
     neutral: PaletteRange;
+    neon?: PaletteRange;
+    violet?: PaletteRange;
   }
 
   interface PaletteOptions {
     neutral?: PaletteRange;
+    neon?: PaletteRange;
+    violet?: PaletteRange;
   }
 
   interface TypeBackground {
     level1: string;
     level2: string;
     level3: string;
+  }
+}
+
+declare module '@mui/material/Chip' {
+  interface ChipPropsColorOverrides {
+    neon: true;
+    violet: true;
   }
 }
 
