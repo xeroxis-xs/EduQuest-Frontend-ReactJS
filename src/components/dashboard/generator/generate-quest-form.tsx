@@ -312,7 +312,7 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
     fetchData().catch((error: unknown) => {
       logger.error('Failed to fetch data', error);
     });
-  });
+  }, []);
 
 
   return (

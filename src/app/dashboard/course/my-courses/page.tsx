@@ -47,7 +47,7 @@ export default function Page(): React.JSX.Element {
     fetchData().catch((error: unknown) => {
       logger.error('Failed to fetch data', error);
     });
-  });
+  }, []);
 
 
   return (

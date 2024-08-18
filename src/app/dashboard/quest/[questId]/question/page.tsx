@@ -68,7 +68,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
     fetchData().catch((error: unknown) => {
       logger.error('Failed to fetch data', error);
     });
-  });
+  }, []);
 
 
   return (

@@ -269,7 +269,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
     fetchData().catch((error: unknown) => {
       logger.error('Failed to fetch data', error);
     });
-  });
+  }, []);
 
 
   return (
