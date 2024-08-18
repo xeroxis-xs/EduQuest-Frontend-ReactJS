@@ -39,11 +39,13 @@ import { CardMedia } from "@mui/material";
 import IconButton, { type IconButtonProps } from '@mui/material/IconButton';
 import { CaretDown as CaretDownIcon } from "@phosphor-icons/react/dist/ssr/CaretDown";
 import { CalendarX as CalendarXIcon } from "@phosphor-icons/react/dist/ssr/CalendarX";
+import { Plus as PlusIcon } from "@phosphor-icons/react/dist/ssr/Plus";
 import { styled } from '@mui/material/styles';
 import Collapse from '@mui/material/Collapse';
 import {type Image} from "@/types/image";
 import { SkeletonQuestDetailCard } from "@/components/dashboard/skeleton/skeleton-quest-detail-card";
 import { SkeletonQuestAttemptTable } from "@/components/dashboard/skeleton/skeleton-quest-attempt-table";
+import {NewQuestionForm} from "@/components/dashboard/quest/question/new-question-form";
 
 
 interface ExpandMoreProps extends IconButtonProps {
@@ -81,7 +83,8 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
   const [selectedCourse, setSelectedCourse] = React.useState<Course | null>(null);
   const [selectedImage, setSelectedImage] = React.useState<Image | null>(null);
   const [submitStatus, setSubmitStatus] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
-  const [showForm, setShowForm] = React.useState(false);
+  const [showEditQuestForm, setShowEditQuestForm] = React.useState(false);
+  const [showNewQuestionForm, setShowNewQuestionForm] = React.useState(false);
   const [expanded, setExpanded] = React.useState(false);
   const [loadingQuest, setLoadingQuest] = React.useState(true);
   const [loadingQuestAttemptTable, setLoadingQuestAttemptTable] = React.useState(true);
@@ -90,8 +93,12 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
     setExpanded(!expanded);
   };
 
-  const toggleForm = (): void => {
-    setShowForm(!showForm);
+  const toggleEditQuestForm = (): void => {
+    setShowEditQuestForm(!showEditQuestForm);
+  };
+
+  const toggleNewQuestionForm = (): void => {
+    setShowNewQuestionForm(!showNewQuestionForm);
   };
 
   const getQuest = async (): Promise<Quest | undefined> => {
@@ -203,7 +210,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
     }
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
+  const handleQuestSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     const updatedQuest = {
       type: questTypeRef.current?.value,
@@ -223,7 +230,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
       logger.debug('Update Success:', response.data);
       setSubmitStatus({ type: 'success', message: 'Update Successful' });
       await getQuest();
-      setShowForm(false)
+      setShowEditQuestForm(false)
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         if (error.response?.status === 401) {
@@ -312,14 +319,14 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
         {eduquestUser?.is_staff ?
           <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }} color="error">
             <Button startIcon={<CalendarXIcon fontSize="var(--icon-fontSize-md)"/>} onClick={handleExpires} color="error" >Expires Quest</Button>
-            <Button startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PenIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
-              {showForm ? 'Close' : 'Edit Quest'}
+            <Button startIcon={showEditQuestForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PenIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleEditQuestForm}>
+              {showEditQuestForm ? 'Close' : 'Edit Quest'}
             </Button>
           </Stack> : null}
       </Stack> : null
       }
 
-      {!showForm && (
+      {!showEditQuestForm && !showNewQuestionForm && (
         loadingQuest ? (
           <SkeletonQuestDetailCard />
         ) : (
@@ -444,30 +451,34 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
           </CardContent>
           <CardActions sx={{ justifyContent: 'center' }}>
 
-            {course && eduquestUser && userQuestAttempts ? quest.status !== 'Active' ? (
-                <Button disabled variant='contained'>
-                  Quest has Expired
-                </Button>
-              ) : userQuestAttempts.length >= quest.max_attempts ? (
-                <Button disabled variant='contained'>
-                  No more attempts available
-                </Button>
-              ) : course.enrolled_users.includes(eduquestUser?.id.toString()) ? (
-                <Button endIcon={<GameControllerIcon fontSize="var(--icon-fontSize-md)"/>}
-                        variant='contained'
-                        onClick={handleNewAttempt}
-                >
-                  Start New Attempt
-                </Button>
-              ) : (
-                <Button startIcon={<CaretLeftIcon fontSize="var(--icon-fontSize-md)" />}
-                        variant='outlined'
-                        component={RouterLink}
-                        href={`/dashboard/course/${quest.from_course.id.toString()}`}
-                >
-                  Enroll Course before attempting
-                </Button>
-              ) : null}
+            {course && eduquestUser && userQuestAttempts ? quest.total_questions === 0 ? (
+              <Button startIcon={<PlusIcon/>} variant='contained' onClick={toggleNewQuestionForm}>
+                Create New Questions
+              </Button>
+            ) : quest.status !== 'Active' ? (
+              <Button disabled variant='contained'>
+                Quest has Expired
+              </Button>
+            ) : userQuestAttempts.length >= quest.max_attempts ? (
+              <Button disabled variant='contained'>
+                No more attempts available
+              </Button>
+            ) : course.enrolled_users.includes(eduquestUser?.id.toString()) ? (
+              <Button endIcon={<GameControllerIcon fontSize="var(--icon-fontSize-md)"/>}
+                      variant='contained'
+                      onClick={handleNewAttempt}
+              >
+                Start New Attempt
+              </Button>
+            ) : (
+              <Button startIcon={<CaretLeftIcon fontSize="var(--icon-fontSize-md)" />}
+                      variant='outlined'
+                      component={RouterLink}
+                      href={`/dashboard/course/${quest.from_course.id.toString()}`}
+              >
+                Enroll Course before attempting
+              </Button>
+            ) : null}
 
 
           </CardActions>
@@ -478,9 +489,17 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
         )
       )}
 
-      {/* FORM */}
-      <form onSubmit={handleSubmit}>
-        {showForm && quest ? <Card>
+      {/* New Question FORM */}
+      { showNewQuestionForm && quest ? (
+        <NewQuestionForm onCreateSuccess={getQuest} quest={quest} onCancelCreate={toggleNewQuestionForm}/>
+        ) : null}
+
+
+
+      {/* Edit Quest FORM */}
+      <form onSubmit={handleQuestSubmit}>
+        {showEditQuestForm && quest ?
+          <Card>
             <CardHeader title={`Quest ${quest.id.toString()}`}/>
             <Divider/>
 
