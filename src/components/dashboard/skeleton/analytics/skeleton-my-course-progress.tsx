@@ -16,7 +16,7 @@ import TableCell from "@mui/material/TableCell";
 import TableBody from "@mui/material/TableBody";
 import {noop} from "@babel/types";
 
-export function SkeletonMyEnrolledCourses(): React.JSX.Element {
+export function SkeletonMyCourseProgress(): React.JSX.Element {
   return (
     <Card sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       <Stack direction="row" sx={{ alignItems: 'center' }} spacing={0}>

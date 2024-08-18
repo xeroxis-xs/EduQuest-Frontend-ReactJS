@@ -162,7 +162,7 @@ export function QuestionAttemptCard({ data = [], onDataChange, onSubmitResult, o
                             }
                             label={answer.text}
                           />
-                          {showExplanation[attemptedQuestionsAndAnswers.id] && answer.reason ? <Typography variant="body2">{answer.reason}</Typography> : null}
+                          {showExplanation[attemptedQuestionsAndAnswers.id] && answer.reason ? <Typography variant="body2" mt={1}>{answer.reason}</Typography> : null}
                         </Grid>
                       );
                     })}

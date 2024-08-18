@@ -335,13 +335,13 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
             <Grid md={4} xs={12}>
               <FormControl fullWidth required>
                 <InputLabel>Quest Name</InputLabel>
-                <OutlinedInput defaultValue="" label="Name" name="name" inputRef={questNameRef} />
+                <OutlinedInput defaultValue="My Private Quest" label="Quest Name" inputRef={questNameRef} />
               </FormControl>
             </Grid>
             <Grid md={4} xs={12}>
               <FormControl fullWidth required>
                 <InputLabel>Quest Type</InputLabel>
-                <Select defaultValue="Private" label="Quest Type" inputRef={questTypeRef} name="type" disabled>
+                <Select defaultValue="Private" label="Quest Type" inputRef={questTypeRef} disabled>
                   <MenuItem value="Private"><Chip variant="outlined" label="Private" color="secondary" size="small"/></MenuItem>
                 </Select>
               </FormControl>
@@ -349,7 +349,7 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
             <Grid md={4} xs={12}>
               <FormControl fullWidth required>
                 <InputLabel>Quest Status</InputLabel>
-                <Select defaultValue="Active" label="Quest Status" inputRef={questStatusRef} name="status" disabled>
+                <Select defaultValue="Active" label="Quest Status" inputRef={questStatusRef} disabled>
                   <MenuItem value="Active"><Chip variant="outlined" label="Active" color="success" size="small"/></MenuItem>
                 </Select>
               </FormControl>
@@ -357,7 +357,7 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
             <Grid xs={12}>
               <FormControl fullWidth required>
                 <TextField
-                  defaultValue=""
+                  defaultValue="Private quest for my own learning."
                   label="Quest Description"
                   inputRef={questDescriptionRef}
                   name="description"

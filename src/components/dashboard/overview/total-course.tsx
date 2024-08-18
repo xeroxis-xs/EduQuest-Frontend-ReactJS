@@ -10,12 +10,13 @@ import { Book as BookIcon } from '@phosphor-icons/react/dist/ssr/Book';
 import { Info as InfoIcon } from '@phosphor-icons/react/dist/ssr/Info';
 import { TrendDown as TrendDownIcon } from '@phosphor-icons/react/dist/ssr/TrendDown';
 import { TrendUp as TrendUpIcon } from '@phosphor-icons/react/dist/ssr/TrendUp';
+import Box from "@mui/material/Box";
 
 export interface TotalCourseProps {
-  diff?: number;
+  diff?: number | null;
   trend: 'up' | 'down';
   sx?: SxProps;
-  value: number;
+  value: number | null;
 }
 
 export function TotalCourse({ diff, trend, sx, value }: TotalCourseProps): React.JSX.Element {
@@ -40,24 +41,32 @@ export function TotalCourse({ diff, trend, sx, value }: TotalCourseProps): React
                 </Tooltip>
               </Stack>
 
-              <Typography variant="h4">{value}</Typography>
-
-              {diff === 0 ? (
-                <Typography color="text.secondary" variant="caption">
-                  No changes since last week
+              {diff === null ? (
+                <Typography variant="subtitle2">
+                  No data available
                 </Typography>
+              ) : diff === 0 ? (
+                <Box>
+                  <Typography variant="h4">{value}</Typography>
+                  <Typography color="text.secondary" variant="caption">
+                    No changes since last week
+                  </Typography>
+                </Box>
               ) : (
-                <Stack sx={{ alignItems: 'center', mt: '10px' }} direction="row" spacing={2}>
-                  <Stack sx={{ alignItems: 'center' }} direction="row" spacing={0.5}>
-                    <TrendIcon color={trendColor} fontSize="var(--icon-fontSize-md)" />
-                    <Typography color={trendColor} variant="body2">
-                      {Math.round(diff!).toFixed(1)}%
+                <Box>
+                  <Typography variant="h4">{value}</Typography>
+                  <Stack sx={{ alignItems: 'center', mt: '10px' }} direction="row" spacing={2}>
+                    <Stack sx={{ alignItems: 'center' }} direction="row" spacing={0.5}>
+                      <TrendIcon color={trendColor} fontSize="var(--icon-fontSize-md)" />
+                      <Typography color={trendColor} variant="body2">
+                        {Math.round(diff!).toFixed(1)}%
+                      </Typography>
+                    </Stack>
+                    <Typography color="text.secondary" variant="caption">
+                      Since last week
                     </Typography>
                   </Stack>
-                  <Typography color="text.secondary" variant="caption">
-                    Since last week
-                  </Typography>
-                </Stack>
+                </Box>
               )}
             </Stack>
 

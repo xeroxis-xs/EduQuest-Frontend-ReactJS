@@ -34,7 +34,7 @@ export interface MyEnrolledCoursesProps {
   sx?: SxProps;
 }
 
-export function MyEnrolledCourses({ userCourseProgression = [], sx }: MyEnrolledCoursesProps): React.JSX.Element {
+export function MyCourseProgress({ userCourseProgression = [], sx }: MyEnrolledCoursesProps): React.JSX.Element {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 

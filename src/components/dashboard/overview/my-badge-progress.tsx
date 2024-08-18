@@ -23,7 +23,7 @@ export interface MyEarnedBadgesProps {
   sx?: SxProps;
 }
 
-export function MyEarnedBadges({ userBadgeProgression = [], sx }: MyEarnedBadgesProps): React.JSX.Element {
+export function MyBadgeProgress({ userBadgeProgression = [], sx }: MyEarnedBadgesProps): React.JSX.Element {
   const badgeCounts = userBadgeProgression.map(i => i.count);
 
   return (

@@ -6,8 +6,8 @@ import { TotalCourse } from '@/components/dashboard/overview/total-course';
 import { TotalQuest } from "@/components/dashboard/overview/total-quest";
 import { ShortestUser } from "@/components/dashboard/overview/shortest-user";
 import { TotalUser } from "@/components/dashboard/overview/total-user";
-import { MyEnrolledCourses } from "@/components/dashboard/overview/my-enrolled-courses";
-import { MyEarnedBadges } from "@/components/dashboard/overview/my-earned-badges";
+import { MyCourseProgress } from "@/components/dashboard/overview/my-course-progress";
+import { MyBadgeProgress } from "@/components/dashboard/overview/my-badge-progress";
 import { RecentAchievements } from "@/components/dashboard/overview/recent-achievements";
 import { TopCollectors } from "@/components/dashboard/overview/top-collectors";
 import { type ExtendedUserCourseBadge, type ExtendedUserQuestBadge } from "@/types/analytics/recent-badge";
@@ -25,11 +25,12 @@ import { authClient } from "@/lib/auth/client";
 import { SkeletonTopCollector } from "@/components/dashboard/skeleton/analytics/skeleton-top-collector";
 import { SkeletonRecentAchievements } from "@/components/dashboard/skeleton/analytics/skeleton-recent-achievements";
 import {useUser} from "@/hooks/use-user";
-import {SkeletonMyEnrolledCourses} from "@/components/dashboard/skeleton/analytics/skeleton-my-enrolled-courses";
+import {SkeletonMyCourseProgress} from "@/components/dashboard/skeleton/analytics/skeleton-my-course-progress";
 import {SkeletonTotalUser} from "@/components/dashboard/skeleton/analytics/skeleton-total-user";
 import {SkeletonTotalCourse} from "@/components/dashboard/skeleton/analytics/skeleton-total-course";
 import {SkeletonTotalQuest} from "@/components/dashboard/skeleton/analytics/skeleton-total-quest";
 import {SkeletonShortestUser} from "@/components/dashboard/skeleton/analytics/skeleton-shortest-user";
+import {SkeletonMyBadgeProgress} from "@/components/dashboard/skeleton/analytics/skeleton-my-badge-progress";
 
 
 export interface AnalyticsPartOne {
@@ -164,7 +165,12 @@ export default function Page(): React.JSX.Element {
                 sx={{ height: '100%' }}
                 value={analyticsPartOne.user_stats.total_users}
                 trend="up"
-                diff={analyticsPartOne.user_stats.new_users_percentage} /> : null
+                diff={analyticsPartOne.user_stats.new_users_percentage} /> :
+              <TotalUser
+                sx={{ height: '100%' }}
+                value={ null }
+                trend="up"
+                diff={ null } />
           )
         }
       </Grid>
@@ -175,7 +181,12 @@ export default function Page(): React.JSX.Element {
               sx={{ height: '100%' }}
               value={analyticsPartOne.course_enrollment_stats.total_enrollments}
               trend="up"
-              diff={analyticsPartOne.course_enrollment_stats.new_enrollments_percentage} /> : null
+              diff={analyticsPartOne.course_enrollment_stats.new_enrollments_percentage} /> :
+            <TotalCourse
+              sx={{ height: '100%' }}
+              value={ null }
+              trend="up"
+              diff={ null } />
           )
         }
       </Grid>
@@ -186,7 +197,12 @@ export default function Page(): React.JSX.Element {
               sx={{ height: '100%' }}
               value={analyticsPartOne.quest_attempt_stats.total_quest_attempts}
               trend="up"
-              diff={analyticsPartOne.quest_attempt_stats.new_quest_attempts_percentage} /> : null
+              diff={analyticsPartOne.quest_attempt_stats.new_quest_attempts_percentage} /> :
+            <TotalQuest
+              sx={{ height: '100%' }}
+              value={ null }
+              trend="up"
+              diff={ null } />
           )
         }
       </Grid>
@@ -198,17 +214,17 @@ export default function Page(): React.JSX.Element {
         }
       </Grid>
       <Grid lg={8} md={12} xs={12}>
-        { analyticsPartTwoLoading? <SkeletonMyEnrolledCourses /> :
+        { analyticsPartTwoLoading? <SkeletonMyCourseProgress /> :
           (analyticsPartTwo.user_course_progression ?
-              <MyEnrolledCourses userCourseProgression={analyticsPartTwo.user_course_progression} sx={{ height: '100%' }} /> : null
+            <MyCourseProgress userCourseProgression={analyticsPartTwo.user_course_progression} sx={{ height: '100%' }} /> : null
           )
         }
 
       </Grid>
       <Grid lg={4} md={12} xs={12}>
-        { analyticsPartTwoLoading? <SkeletonMyEnrolledCourses /> :
+        { analyticsPartTwoLoading? <SkeletonMyBadgeProgress /> :
           (analyticsPartTwo.user_badge_progression ?
-        <MyEarnedBadges userBadgeProgression={analyticsPartTwo.user_badge_progression} sx={{ height: "100%" }}/> : null
+            <MyBadgeProgress userBadgeProgression={analyticsPartTwo.user_badge_progression} sx={{ height: "100%" }}/> : null
       )}
         </Grid>
       <Grid lg={5} md={12} xs={12}>
