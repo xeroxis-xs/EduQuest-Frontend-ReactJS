@@ -11,7 +11,7 @@ import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
 import Tooltip from "@mui/material/Tooltip";
 import Stack from "@mui/material/Stack";
 import {BadgeChart} from "@/components/dashboard/overview/chart/badge-chart";
-import {UserBadgeProgression} from "@/types/analytics/user-badge-progression";
+import type { UserBadgeProgression } from "@/types/analytics/user-badge-progression";
 import Grid from '@mui/material/Unstable_Grid2';
 import Typography from "@mui/material/Typography";
 import CardContent from "@mui/material/CardContent";

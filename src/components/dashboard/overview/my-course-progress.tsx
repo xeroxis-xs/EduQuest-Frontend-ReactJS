@@ -17,17 +17,7 @@ import { TablePagination } from '@mui/material';
 import Tooltip from "@mui/material/Tooltip";
 import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
 import Stack from "@mui/material/Stack";
-import {UserCourseProgression} from "@/types/analytics/user-course-progression";
-
-
-export interface Course {
-  id: string;
-  code: string;
-  name: string;
-  term: string;
-  quests: number;
-  completed: number;
-}
+import type { UserCourseProgression } from "@/types/analytics/user-course-progression";
 
 export interface MyEnrolledCoursesProps {
   userCourseProgression?: UserCourseProgression[];

@@ -8,9 +8,7 @@ import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
 import Divider from "@mui/material/Divider";
 import {Book as BookIcon} from "@phosphor-icons/react/dist/ssr/Book";
 import Grid from "@mui/material/Unstable_Grid2";
-import Avatar from "@mui/material/Avatar";
 import Typography from "@mui/material/Typography";
-import {BadgeChart} from "@/components/dashboard/overview/chart/badge-chart";
 import CardContent from "@mui/material/CardContent";
 
 export function SkeletonMyBadgeProgress(): React.JSX.Element {
