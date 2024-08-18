@@ -37,10 +37,10 @@ export function QuestionCard({ questionsAndAnswers = []
   // Calculate the items to be displayed on the current page
   const currentQuestionsAndAnswers = questionsAndAnswers.slice((page - 1) * rowsPerPage, page * rowsPerPage);
   // Handle page change
-  const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number) => {
+  const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number): void => {
     setPage(newPage);
   };
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     // const newQuest = {
     //   type: questTypeRef.current?.value,

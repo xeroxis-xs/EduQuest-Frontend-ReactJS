@@ -95,14 +95,12 @@ export default function Page(): React.JSX.Element {
               ))}
             </Select>
           </FormControl>
-          {eduquestUser?.is_staff && (
-            <Button startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
+          {eduquestUser?.is_staff ? <Button startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
               {showForm ? 'Close' : 'Create'}
-            </Button>
-          )}
+            </Button> : null}
         </Stack>
       </Stack>
-      {showForm && <QuestForm onFormSubmitSuccess={getQuests}/>} {/* Conditional rendering */}
+      {showForm ? <QuestForm onFormSubmitSuccess={getQuests}/> : null} {/* Conditional rendering */}
       {loading ? (
         <SkeletonQuestCard />
       ) : (

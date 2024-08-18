@@ -66,7 +66,7 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
 }));
 
 
-function LinearProgressWithLabel(props: LinearProgressProps & { value: number, status: string }) {
+function LinearProgressWithLabel(props: LinearProgressProps & { value: number, status: string }): React.JSX.Element {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center' }}>
       <Box sx={{ width: '100%', mr: 1 }}>
@@ -148,7 +148,7 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
     }
   };
 
-  const handleDocumentChange = (event: SelectChangeEvent<number>) => {
+  const handleDocumentChange = (event: SelectChangeEvent<number>): void => {
     const documentId = Number(event.target.value);
     const document = documents?.find(d => d.id === documentId);
     if (document) {
@@ -180,7 +180,7 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
     }
   }
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     setSubmitStatus(null); // Reset submit status
     setProgress(10); // Initial progress
@@ -312,7 +312,7 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
     fetchData().catch((error: unknown) => {
       logger.error('Failed to fetch data', error);
     });
-  }, []);
+  });
 
 
   return (
@@ -445,11 +445,10 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
               </Grid>
             </Grid> : null}
 
-          {showProgress && (
+          {showProgress ?
             <Box sx={{ width: '100%', mt: 5 }}>
               <LinearProgressWithLabel value={progress} status={progressStatus} />
-            </Box>
-          )}
+            </Box> : null}
         </CardContent>
 
         <CardActions sx={{ justifyContent: 'flex-end' }}>
@@ -457,11 +456,10 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
         </CardActions>
 
       </Card>
-      {submitStatus && (
+      {submitStatus ?
         <Alert severity={submitStatus.type} sx={{ marginTop: 2 }}>
           {submitStatus.message}
-        </Alert>
-      )}
+        </Alert> : null}
     </form>
   );
 }

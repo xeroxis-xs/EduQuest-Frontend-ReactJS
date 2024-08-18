@@ -68,18 +68,18 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
     fetchData().catch((error: unknown) => {
       logger.error('Failed to fetch data', error);
     });
-  }, []);
+  });
 
 
   return (
     <Stack spacing={3}>
-      {quest &&
+      {quest ?
         <Stack direction="row" spacing={3} sx={{justifyContent: 'space-between'}}>
           <Button startIcon={<CaretLeftIcon fontSize="var(--icon-fontSize-md)"/>} href={`/dashboard/quest/${quest?.id.toString()}`}>Return to Quest {quest?.name} </Button>
         <Button startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PenIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
           {showForm ? 'Close' : 'Edit Question'}
         </Button>
-      </Stack>
+      </Stack> : null
       }
 
       <QuestionCard questionsAndAnswers={questionsAndAnswers}/>

@@ -21,12 +21,12 @@ export default function Page(): React.JSX.Element {
   const [userQuestQuestionAttempts, setUserQuestQuestionAttempts] = React.useState<UserQuestQuestionAttempt[]>([]);
   const [userQuestAttempts, setUserQuestAttempts] = React.useState<UserQuestAttempt[]>([]);
 
-  const handleQuestions = (q: Question[]) => {
+  const handleQuestions = (q: Question[]): void => {
     setQuestions(q);
     logger.debug('Questions:', questions);
   }
 
-  const getQuestQuestionAttempts = async (questId:number) => {
+  const getQuestQuestionAttempts = async (questId:number): Promise<void> => {
     try {
       const response = await apiService.get<UserQuestQuestionAttempt[]>(`/api/UserQuestQuestionAttempt/by-quest/${questId.toString()}`);
       const data: UserQuestQuestionAttempt[] = response.data;
@@ -42,7 +42,7 @@ export default function Page(): React.JSX.Element {
     }
   };
 
-  const getQuestAttempts = async (questId:number) => {
+  const getQuestAttempts = async (questId:number): Promise<void> => {
     try {
       const response = await apiService.get<UserQuestAttempt[]>(`/api/UserQuestAttempt/by-quest/${questId.toString()}`);
       const data: UserQuestAttempt[] = response.data;

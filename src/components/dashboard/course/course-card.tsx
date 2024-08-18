@@ -39,11 +39,11 @@ export function CourseCard({ rows = [], onEnrolledSuccess }: CourseCardProps): R
   const currentCourses = rows.slice((page - 1) * rowsPerPage, page * rowsPerPage);
 
   // Handle page change
-  const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number) => {
+  const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number): void => {
     setPage(newPage);
   };
 
-  const handleEnroll = async (courseId:number) => {
+  const handleEnroll = async (courseId:number): Promise<void> => {
     try {
       const data = {
         user: {

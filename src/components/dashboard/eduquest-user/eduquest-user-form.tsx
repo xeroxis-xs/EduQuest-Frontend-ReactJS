@@ -31,8 +31,8 @@ export function EduquestUserForm({ onCreateSuccess }: EduquestUserFormProps): Re
     event.preventDefault();
 
     const newUser: Partial<EduquestUser> = {
-      email: email,
-      username: username,
+      email,
+      username,
       first_name: firstName,
       last_name: lastName,
     };

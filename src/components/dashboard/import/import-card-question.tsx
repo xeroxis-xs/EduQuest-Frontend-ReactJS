@@ -25,7 +25,7 @@ interface ImportCardQuestionProps {
 export function ImportCardQuestion({ questions, onQuestionUpdateSuccess }: ImportCardQuestionProps): React.JSX.Element {
   const [updatedQuestions, setUpdatedQuestions] = React.useState(questions);
 
-  const handleAnswerChange = (questionId: number, answerId: number, isCorrect: boolean) => {
+  const handleAnswerChange = (questionId: number, answerId: number, isCorrect: boolean): void => {
     logger.debug('handleAnswerChange', questionId, answerId, isCorrect);
     const newQuestions = updatedQuestions.map((question) => {
       if (question.id === questionId) {
@@ -45,7 +45,7 @@ export function ImportCardQuestion({ questions, onQuestionUpdateSuccess }: Impor
     setUpdatedQuestions(newQuestions);
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     logger.debug('Submitting updated questions', updatedQuestions);
 

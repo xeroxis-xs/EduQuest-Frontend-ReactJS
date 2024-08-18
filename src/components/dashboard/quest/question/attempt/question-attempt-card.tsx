@@ -54,16 +54,16 @@ export function QuestionAttemptCard({ data = [], onDataChange, onSubmitResult, o
   const pageCount = Math.ceil(data.length / rowsPerPage);
   const currentAttemptedQuestionsAndAnswers = data.slice((page - 1) * rowsPerPage, page * rowsPerPage);
 
-  const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number) => {
+  const handleChangePage = (_event: React.ChangeEvent<unknown>, newPage: number): void => {
     setPage(newPage);
   };
 
-  const handleCheckboxChange = (answerId: number, isChecked: boolean) => {
+  const handleCheckboxChange = (answerId: number, isChecked: boolean): void => {
     const attemptId = currentAttemptedQuestionsAndAnswers[0].id;
     onDataChange(attemptId, answerId, isChecked);
   };
 
-  const handleSave = async (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleSave = async (event: React.MouseEvent<HTMLButtonElement>): Promise<void> => {
     event.preventDefault();
     const updatedData = setLastAttemptedOn(data);
     logger.debug("Save button clicked, updated data: ", updatedData);
@@ -85,7 +85,7 @@ export function QuestionAttemptCard({ data = [], onDataChange, onSubmitResult, o
     }
   }
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     const updatedData = setLastAttemptedOn(data);
     const submittedData = setSubmitted(updatedData, true);
@@ -109,7 +109,7 @@ export function QuestionAttemptCard({ data = [], onDataChange, onSubmitResult, o
     }
   };
 
-  const toggleExplanation = (id: number) => {
+  const toggleExplanation = (id: number): void => {
     setShowExplanation(prevState => ({
       ...prevState,
       [id]: !prevState[id]

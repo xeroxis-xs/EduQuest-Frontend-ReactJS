@@ -7,7 +7,7 @@ import {AxiosError, type AxiosResponse} from "axios";
 import { logger } from '@/lib/default-logger'
 import { authClient } from "@/lib/auth/client";
 import {useUser} from "@/hooks/use-user";
-import {Document} from "@/types/document";
+import type { Document } from "@/types/document";
 import { SkeletonBadgeCard } from '@/components/dashboard/skeleton/skeleton-badge-card';
 import { DocumentCard } from "@/components/dashboard/generator/document-card";
 
@@ -40,11 +40,11 @@ export default function Page(): React.JSX.Element {
     }
   }
 
-  const handleDeleteSuccess = async () => {
+  const handleDeleteSuccess = async (): Promise<void> => {
     await getMyDocuments();
   }
 
-  const handleSubmitSuccess = async () => {
+  const handleSubmitSuccess = async (): Promise<void> => {
     await getMyDocuments();
   }
 
@@ -57,7 +57,7 @@ export default function Page(): React.JSX.Element {
     fetchData().catch((error: unknown) => {
       logger.error('Failed to fetch data', error);
     });
-  }, []);
+  });
 
 
   return (

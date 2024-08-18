@@ -1,5 +1,5 @@
 import type { Course } from "@/types/course";
-import {EduquestUser} from "@/types/eduquest-user";
+import type {EduquestUser} from "@/types/eduquest-user";
 
 export interface UserCourse {
   id: number;

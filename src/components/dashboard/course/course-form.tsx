@@ -85,7 +85,7 @@ export function CourseForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.
     }
   }
 
-  const handleImageChange = (event: SelectChangeEvent<number>) => {
+  const handleImageChange = (event: SelectChangeEvent<number>): void => {
     const imageId = Number(event.target.value); // Convert the value to a number
     const image = images?.find(i => i.id === imageId);
     if (image) {
@@ -97,7 +97,7 @@ export function CourseForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.
     }
   };
 
-  const handleTermChange = (event: SelectChangeEvent<number>) => {
+  const handleTermChange = (event: SelectChangeEvent<number>): void => {
     const termId = Number(event.target.value); // Convert the value to a number
     const term = terms?.find(t => t.id === termId);
     if (term) {
@@ -115,7 +115,7 @@ export function CourseForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.
     }
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     const newCourse = {
       code: courseCodeRef.current?.value,
@@ -198,8 +198,8 @@ export function CourseForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.
               <FormControl fullWidth required>
                 <InputLabel>Course Status</InputLabel>
                 <Select defaultValue="Active" label="Quest Status" inputRef={courseStatusRef} name="type">
-                  <MenuItem value="Active"><Chip variant="outlined" label="Active" color="success" size={"small"}/></MenuItem>
-                  <MenuItem value="Inactive"><Chip variant="outlined" label="Inactive" color="secondary" size={"small"}/></MenuItem>
+                  <MenuItem value="Active"><Chip variant="outlined" label="Active" color="success" size="small"/></MenuItem>
+                  <MenuItem value="Inactive"><Chip variant="outlined" label="Inactive" color="secondary" size="small"/></MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -300,11 +300,10 @@ export function CourseForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.
         </CardActions>
 
       </Card>
-      {submitStatus && (
+      {submitStatus ?
         <Alert severity={submitStatus.type} sx={{ marginTop: 2 }}>
           {submitStatus.message}
-        </Alert>
-      )}
+        </Alert> : null}
 
     </form>
   );

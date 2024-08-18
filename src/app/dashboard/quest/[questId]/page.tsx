@@ -86,7 +86,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
   const [loadingQuest, setLoadingQuest] = React.useState(true);
   const [loadingQuestAttemptTable, setLoadingQuestAttemptTable] = React.useState(true);
 
-  const handleExpandClick = () => {
+  const handleExpandClick = (): void => {
     setExpanded(!expanded);
   };
 
@@ -172,7 +172,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
     }
   }
 
-  const handleCourseChange = (event: SelectChangeEvent<number>) => {
+  const handleCourseChange = (event: SelectChangeEvent<number>): void => {
     // Since the value is now explicitly a number, ensure that the state and logic that depend on this value are correctly typed and implemented.
     const courseId = Number(event.target.value); // Convert the value to a number
     const newCourse = courses?.find(c => c.id === courseId);
@@ -191,7 +191,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
     }
   };
 
-  const handleImageChange = (event: SelectChangeEvent<number>) => {
+  const handleImageChange = (event: SelectChangeEvent<number>): void => {
     const imageId = Number(event.target.value); // Convert the value to a number
     const image = images?.find(i => i.id === imageId);
     if (image) {
@@ -203,7 +203,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
     }
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     const updatedQuest = {
       type: questTypeRef.current?.value,
@@ -236,7 +236,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
 
   };
 
-  const handleDeleteQuest = async () => {
+  const handleDeleteQuest = async (): Promise<void> => {
     try {
       await apiService.delete(`/api/Quest/${params.questId}`);
       router.push(paths.dashboard.quest.all);
@@ -251,7 +251,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
     }
   };
 
-  const handleNewAttempt = async () => {
+  const handleNewAttempt = async (): Promise<void> => {
     try {
       const response: AxiosResponse<UserQuestAttempt> = await apiService.post(`/api/UserQuestAttempt/`, {
         last_attempted_on: new Date().toISOString(),
@@ -274,7 +274,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
     }
   }
 
-  const handleExpires = async () => {
+  const handleExpires = async (): Promise<void> => {
     try {
       const data = { status: 'Expired' }
       const response : AxiosResponse<Quest> = await apiService.patch(`/api/Quest/${params.questId}/`, data);
@@ -302,21 +302,20 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
     fetchData().catch((error: unknown) => {
       logger.error('Failed to fetch data', error);
     });
-  }, []);
+  });
 
 
   return (
     <Stack spacing={3}>
       {quest ? <Stack direction="row" sx={{justifyContent: 'space-between'}}>
         <Button startIcon={<CaretLeftIcon fontSize="var(--icon-fontSize-md)"/>} component={RouterLink} href={`/dashboard/course/${quest?.from_course.id.toString()}`}>View Quests for {quest.from_course.code} {quest.from_course.name}</Button>
-        {eduquestUser?.is_staff && (
-            <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }} color="error">
+        {eduquestUser?.is_staff ?
+          <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }} color="error">
             <Button startIcon={<CalendarXIcon fontSize="var(--icon-fontSize-md)"/>} onClick={handleExpires} color="error" >Expires Quest</Button>
             <Button startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PenIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
               {showForm ? 'Close' : 'Edit Quest'}
             </Button>
-          </Stack>
-        )}
+          </Stack> : null}
       </Stack> : null
       }
 

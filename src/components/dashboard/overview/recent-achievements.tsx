@@ -27,7 +27,7 @@ export interface RecentAchievementsProps {
 }
 
 export function RecentAchievements({ recentBadges = [], sx }: RecentAchievementsProps): React.JSX.Element {
-  const getBadgeImage = (badgeName: string) => {
+  const getBadgeImage = (badgeName: string): React.JSX.Element | null => {
     switch (badgeName) {
       case 'First Attempt':
         return <FirstAttemptBadge width={30} height={30} />;
@@ -54,11 +54,11 @@ export function RecentAchievements({ recentBadges = [], sx }: RecentAchievements
 
   const router = useRouter();
 
-  const handleRouteToQuest = (questId: string) => {
+  const handleRouteToQuest = (questId: string): void => {
     router.push(`/dashboard/quest/${questId}`);
   };
 
-  const handleRouteToCourse = (courseId: string) => {
+  const handleRouteToCourse = (courseId: string): void => {
     router.push(`/dashboard/course/${courseId}`);
   };
 

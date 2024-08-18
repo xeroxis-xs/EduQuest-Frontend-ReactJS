@@ -105,11 +105,11 @@ export function UserQuestAttemptTable({ questId = '0', rows = [], totalMaxScore 
                   </TableCell>
                   <TableCell sx={{ width: '15%'}}>
                     {row.all_questions_submitted ? `${parseFloat(row.total_score_achieved.toFixed(2)).toString()} / ${totalMaxScore?.toString()}` : "Not Available"}
-                    {row.all_questions_submitted &&
-                    <LinearProgress
+                    {row.all_questions_submitted ?
+                      <LinearProgress
                       variant="determinate"
                       value={(row.total_score_achieved / totalMaxScore) * 100}
-                    />}
+                    /> : null}
                   </TableCell>
                   <TableCell>
                     <Button

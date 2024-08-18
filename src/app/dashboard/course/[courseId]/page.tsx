@@ -87,7 +87,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
   const [loadingQuests, setLoadingQuests] = React.useState(true);
   const [loadingCourse, setLoadingCourse] = React.useState(true);
 
-  const handleExpandClick = () => {
+  const handleExpandClick = (): void => {
     setExpanded(!expanded);
   };
 
@@ -166,7 +166,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
     }
   };
 
-  const handleTermChange = (event: SelectChangeEvent<number>) => {
+  const handleTermChange = (event: SelectChangeEvent<number>): void => {
     // Since the value is now explicitly a number, ensure that the state and logic that depend on this value are correctly typed and implemented.
     const termId = Number(event.target.value); // Convert the value to a number
     const term = terms?.find(t => t.id === termId);
@@ -185,7 +185,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
     }
   };
 
-  const handleImageChange = (event: SelectChangeEvent<number>) => {
+  const handleImageChange = (event: SelectChangeEvent<number>): void => {
     const imageId = Number(event.target.value); // Convert the value to a number
     const image = images?.find(i => i.id === imageId);
     if (image) {
@@ -197,7 +197,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
     }
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     const updatedCourse = {
       code: courseCodeRef.current?.value,
@@ -222,7 +222,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
 
   };
 
-  const handleDeleteCourse = async () => {
+  const handleDeleteCourse = async (): Promise<void> => {
     try {
       await apiService.delete(`/api/Course/${params.courseId}`);
 
@@ -233,7 +233,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
     }
   };
 
-  const handleEnroll = async () => {
+  const handleEnroll = async (): Promise<void> => {
     try {
       const data = {
         user: {
@@ -269,18 +269,17 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
     fetchData().catch((error: unknown) => {
       logger.error('Failed to fetch data', error);
     });
-  }, []);
+  });
 
 
   return (
     <Stack spacing={3}>
       <Stack direction="row" spacing={1} sx={{justifyContent: 'space-between'}}>
         <Button startIcon={<CaretLeftIcon fontSize="var(--icon-fontSize-md)"/>} component={RouterLink} href={paths.dashboard.course.all}>View all Courses</Button>
-        {eduquestUser?.is_staff && (
+        {eduquestUser?.is_staff ?
           <Button startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PenIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
             {showForm ? 'Close' : 'Edit Course'}
-          </Button>
-        )}
+          </Button> : null}
       </Stack>
 
       {!showForm && (

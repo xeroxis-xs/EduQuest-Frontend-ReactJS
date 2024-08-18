@@ -96,14 +96,14 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
   }
 
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const file = event.target.files ? event.target.files[0] : null;
     setSelectedFile(file);
     logger.debug('Selected File:', file);
   };
 
 
-  const handleImageChange = (event: SelectChangeEvent<number>) => {
+  const handleImageChange = (event: SelectChangeEvent<number>): void => {
     const imageId = Number(event.target.value); // Convert the value to a number
     const image = images?.find(i => i.id === imageId);
     if (image) {
@@ -115,7 +115,7 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
     }
   };
 
-  const handleCourseChange = (event: SelectChangeEvent<number>) => {
+  const handleCourseChange = (event: SelectChangeEvent<number>): void => {
     const courseId = Number(event.target.value); // Convert the value to a number
     const course = courses?.find(c => c.id === courseId);
     if (course) {
@@ -147,7 +147,7 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
     }
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
 
     // Create FormData
@@ -371,11 +371,10 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
       </CardContent>
     </Card>
 
-    {submitStatus && (
+    {submitStatus ?
       <Alert severity={submitStatus.type} sx={{ mt: 4 }}>
         {typeof submitStatus.message === 'string' ? submitStatus.message : 'An error occurred'}
-      </Alert>
-    )}
+      </Alert> : null}
 
     <Box sx={{display: "flex", justifyContent: "center", mt: 6}}>
       <Button endIcon={<CaretRightIcon/>} type="submit" variant="contained">Next: Edit Question</Button>

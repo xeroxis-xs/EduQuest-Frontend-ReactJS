@@ -11,7 +11,7 @@ import Tooltip from "@mui/material/Tooltip";
 import Stack from "@mui/material/Stack";
 import {TopCollectorChart} from "@/components/dashboard/overview/chart/top-collector-chart";
 import CardContent from "@mui/material/CardContent";
-import { TopCollector } from "@/types/analytics/top-collector";
+import type { TopCollector } from "@/types/analytics/top-collector";
 import Typography from "@mui/material/Typography";
 
 

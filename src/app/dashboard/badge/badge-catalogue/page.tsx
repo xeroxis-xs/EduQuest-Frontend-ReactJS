@@ -6,7 +6,7 @@ import apiService from "@/api/api-service";
 import {AxiosError, type AxiosResponse} from "axios";
 import { logger } from '@/lib/default-logger'
 import { authClient } from "@/lib/auth/client";
-import {Badge} from "@/types/badge";
+import type {Badge} from "@/types/badge";
 import {BadgeCard} from "@/components/dashboard/badge/badge-card";
 import { SkeletonBadgeCard } from "@/components/dashboard/skeleton/skeleton-badge-card";
 

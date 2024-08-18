@@ -6,7 +6,7 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import CardActionArea from "@mui/material/CardActionArea";
 import {CardMedia} from "@mui/material";
-import {UserQuestBadge} from "@/types/user-quest-badge";
+import type { UserQuestBadge } from "@/types/user-quest-badge";
 
 interface QuestBadgeCardProps {
   questBadges?: UserQuestBadge[];

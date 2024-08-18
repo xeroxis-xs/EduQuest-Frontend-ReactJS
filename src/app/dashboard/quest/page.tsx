@@ -67,7 +67,7 @@ export default function Page(): React.JSX.Element {
           </Button>
         </Stack>
       </Stack>
-      {showForm && <QuestForm onFormSubmitSuccess={getQuests}/>} {/* Conditional rendering */}
+      {showForm ? <QuestForm onFormSubmitSuccess={getQuests}/> : null} {/* Conditional rendering */}
       {loading ? (
         <SkeletonQuestCard />
       ) : (

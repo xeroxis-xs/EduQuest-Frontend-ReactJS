@@ -89,7 +89,7 @@ export function MobileNav({ open, onClose }: MobileNavProps): React.JSX.Element 
       </Stack>
       {/*<Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />*/}
       <Box component="nav" sx={{ flex: '1 1 auto', p: '12px' }}>
-        {renderNavItems({ pathname, items: navItems })}
+        {renderNavItems({ pathname, items: filteredNavItems })}
       </Box>
       <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />
       {/*<Stack spacing={2} sx={{ p: '12px' }}>*/}
@@ -154,7 +154,7 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title, ite
   const Icon = icon ? navIcons[icon] : null;
   const router = useRouter();
 
-  const handleClick = () => {
+  const handleClick = (): void => {
     if (items) {
       setOpen(!open);
     } else if (href) {
@@ -232,24 +232,20 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title, ite
             {title}
           </Typography>
         </Box>
-        {items && (
-          <Box sx={{ alignItems: 'center', display: 'flex', justifyContent: 'center', flex: '0 0 auto' }}>
+        {items ? <Box sx={{ alignItems: 'center', display: 'flex', justifyContent: 'center', flex: '0 0 auto' }}>
             {open ? (
               <CaretUpIcon color="var(--NavItem-color)" fontSize="var(--icon-fontSize-sm)" />
             ) : (
               <CaretDownIcon color="var(--NavItem-color)" fontSize="var(--icon-fontSize-sm)" />
             )}
-          </Box>
-        )}
+          </Box> : null}
       </Box>
-      {open && items && (
-        <Box sx={{  borderLeftWidth: '1px',
+      {open && items ? <Box sx={{  borderLeftWidth: '1px',
           borderLeftStyle: 'solid',
           borderLeftColor: 'var(--NavItem-icon-color)',
           pl: 2, ml: '26px' }}>
-          {renderNavItems({ items: items, pathname })}
-        </Box>
-      )}
+          {renderNavItems({ items, pathname })}
+        </Box> : null}
     </li>
   );
 }

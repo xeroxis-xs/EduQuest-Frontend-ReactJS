@@ -32,7 +32,7 @@ export function QuestCard({ rows = [], onQuestDeleteSuccess }: QuestCardProps): 
   // Calculate the items to be displayed on the current page
   const currentQuests = rows.slice((page - 1) * rowsPerPage, page * rowsPerPage);
   // Handle page change
-  const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number) => {
+  const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number): void => {
     setPage(newPage);
   };
 

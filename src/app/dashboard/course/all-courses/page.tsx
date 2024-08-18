@@ -62,16 +62,15 @@ export default function Page(): React.JSX.Element {
       <Stack direction="row" spacing={1} sx={{justifyContent: 'space-between'}}>
         <Typography variant="h4">All Courses</Typography>
 
-        {eduquestUser?.is_staff && (
+        {eduquestUser?.is_staff ?
           <Stack direction="row" sx={{ alignItems: 'center' }}>
             <Button startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
               {showForm ? 'Close' : 'Create'}
             </Button>
-          </Stack>
-        )}
+          </Stack> : null}
 
       </Stack>
-      {showForm && <CourseForm onFormSubmitSuccess={getCourses} />}
+      {showForm ? <CourseForm onFormSubmitSuccess={getCourses} /> : null}
       {loading ? (
         <SkeletonCourseCard />
       ) : (

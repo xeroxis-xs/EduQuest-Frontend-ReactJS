@@ -2,7 +2,7 @@ import * as React from 'react';
 import { useTheme } from '@mui/material/styles';
 import type { ApexOptions } from 'apexcharts';
 import { Chart } from '@/components/core/chart';
-import { TopCollector } from "@/types/analytics/top-collector";
+import type { TopCollector } from "@/types/analytics/top-collector";
 
 
 export interface TopCollectorsProps {

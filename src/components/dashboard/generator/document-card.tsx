@@ -46,13 +46,13 @@ export function DocumentCard({ documents = [], handleDeleteSuccess, handleSubmit
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
   const [uploadStatus, setUploadStatus] = React.useState<{ type: 'success' | 'error', message: string } | null>(null);
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const file = event.target.files ? event.target.files[0] : null;
     setSelectedFile(file);
     logger.debug('Selected File:', file);
   };
 
-  const handleDelete = (documentId: number) => async () => {
+  const handleDelete = (documentId: number) => async (): Promise<void> => {
     try {
       logger.debug("test")
       const response = await apiService.delete(`/api/Document/${documentId.toString()}/`);
@@ -70,7 +70,7 @@ export function DocumentCard({ documents = [], handleDeleteSuccess, handleSubmit
     }
   }
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     if (!selectedFile) {
       setUploadStatus({ type: 'error', message: 'No file selected' });

@@ -41,7 +41,7 @@ export function ImportCardUserAttempt(
   const rowsPerPage = 1; // Each page will show one card
   const router = useRouter();
 
-  const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number): void => {
+  const handleChangePage = (_event: React.ChangeEvent<unknown>, newPage: number): void => {
     setPage(newPage);
   };
 
@@ -77,7 +77,7 @@ export function ImportCardUserAttempt(
     }
   }
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     try {
       const updateUserQuestQuestionAttempt = setSubmitted(userQuestQuestionAttempts, true);

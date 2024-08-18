@@ -88,7 +88,7 @@ export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Ele
     }
   };
 
-  const handleImageChange = (event: SelectChangeEvent<number>) => {
+  const handleImageChange = (event: SelectChangeEvent<number>): void => {
     const imageId = Number(event.target.value); // Convert the value to a number
     const image = images?.find(i => i.id === imageId);
     if (image) {
@@ -100,7 +100,7 @@ export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Ele
     }
   };
 
-  const handleCourseChange = (event: SelectChangeEvent<number>) => {
+  const handleCourseChange = (event: SelectChangeEvent<number>): void => {
     const courseId = Number(event.target.value); // Convert the value to a number
     const course = courses?.find(c => c.id === courseId);
     if (course) {
@@ -132,7 +132,7 @@ export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Ele
     }
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     const newQuest = {
       type: questTypeRef.current?.value,
@@ -324,11 +324,9 @@ export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Ele
         </CardActions>
 
       </Card>
-      {submitStatus && (
-        <Alert severity={submitStatus.type} sx={{ marginTop: 2 }}>
+      {submitStatus ? <Alert severity={submitStatus.type} sx={{ marginTop: 2 }}>
           {submitStatus.message}
-        </Alert>
-      )}
+        </Alert> : null}
 
     </form>
   );

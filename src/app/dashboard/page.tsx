@@ -150,7 +150,7 @@ export default function Page(): React.JSX.Element {
     const intervalId = setInterval(fetchData, 60000); // Fetch data every 60 seconds
 
     return () => { clearInterval(intervalId); }; // Clear interval on component unmount
-  }, []);
+  });
 
   // React.useEffect(() => {
   //   logger.debug('Analytics Part Three', analyticsPartThree);

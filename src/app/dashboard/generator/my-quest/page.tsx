@@ -54,7 +54,7 @@ export default function Page(): React.JSX.Element {
     fetchData().catch((error: unknown) => {
       logger.error('Failed to fetch data', error);
     });
-  }, []);
+  });
 
 
   return (
@@ -69,7 +69,7 @@ export default function Page(): React.JSX.Element {
           </Button>
         </Stack>
       </Stack>
-      {showForm && <GenerateQuestForm onFormSubmitSuccess={getPrivateQuests} />}
+      {showForm ? <GenerateQuestForm onFormSubmitSuccess={getPrivateQuests} /> : null}
       {loading ? (
         <SkeletonQuestCard />
       ) : (

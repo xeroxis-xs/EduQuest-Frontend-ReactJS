@@ -59,7 +59,7 @@ export async function handleLoginRedirect() : Promise<void>{
   }
 }
 
-export const handleLogout = (logoutType = "redirect") => {
+export const handleLogout = (logoutType = "redirect"): void => {
   if (logoutType === "popup") {
     msalInstance.logoutPopup().catch((e: unknown) => {
       logger.error("logoutPopup failed: ", e);

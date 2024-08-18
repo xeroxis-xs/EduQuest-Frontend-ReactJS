@@ -42,8 +42,6 @@ export function SkeletonQuestCard(): React.JSX.Element {
                   <Skeleton width="70%" />
                 </Typography>
               </CardContent>
-              <Box>
-              </Box>
             </Card>
           </Grid>
         ))}

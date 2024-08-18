@@ -93,7 +93,7 @@ export default function Page({ params }: { params: { userQuestAttemptId: string,
     }
   }
 
-  const handleDataChange = (attemptId: number, answerId: number, isChecked: boolean) => {
+  const handleDataChange = (attemptId: number, answerId: number, isChecked: boolean): void => {
     if (attemptedQuestionsAndAnswers) {
       const newData = attemptedQuestionsAndAnswers.map((attempt : UserQuestQuestionAttempt) => {
         if (attempt.id === attemptId) {
@@ -129,13 +129,13 @@ export default function Page({ params }: { params: { userQuestAttemptId: string,
 
   return (
     <Stack spacing={3}>
-      {attemptedQuestionsAndAnswers && attemptedQuestionsAndAnswers.length > 0 &&
+      {attemptedQuestionsAndAnswers && attemptedQuestionsAndAnswers.length > 0 ?
         <Stack direction="row" spacing={3} sx={{justifyContent: 'space-between'}}>
           <Button startIcon={<CaretLeftIcon fontSize="var(--icon-fontSize-md)"/>} href={`/dashboard/quest/${params.questId}`}>Return to Quest</Button>
         <Button startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PenIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
           {showForm ? 'Close' : 'Edit Question'}
         </Button>
-      </Stack>
+      </Stack> : null
       }
 
       <QuestionAttemptCard
@@ -145,17 +145,15 @@ export default function Page({ params }: { params: { userQuestAttemptId: string,
         onSaveResult={handleSaveResult}
       />
 
-      {submitStatus && (
+      {submitStatus ?
         <Alert severity={submitStatus.type} sx={{marginTop: 2}}>
           {submitStatus.message}
-        </Alert>
-      )}
+        </Alert> : null}
 
-      {saveStatus && (
+      {saveStatus ?
         <Alert severity={saveStatus.type} sx={{marginTop: 2}}>
           {saveStatus.message}
-        </Alert>
-      )}
+        </Alert> : null}
     </Stack>
 
 

@@ -33,7 +33,7 @@ export default function Page(): React.JSX.Element {
   const [loadingQuestBadges, setLoadingQuestBadges] = React.useState(true);
 
 
-  const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+  const handleChange = (event: React.SyntheticEvent, newValue: string): void => {
     setValue(newValue);
   };
 
@@ -87,7 +87,7 @@ export default function Page(): React.JSX.Element {
     fetchData().catch((error: unknown) => {
       logger.error('Failed to fetch data', error);
     });
-  }, []);
+  });
 
 
   return (

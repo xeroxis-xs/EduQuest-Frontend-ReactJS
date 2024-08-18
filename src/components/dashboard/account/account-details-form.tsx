@@ -11,7 +11,7 @@ import InputLabel from '@mui/material/InputLabel';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Grid from '@mui/material/Unstable_Grid2';
 import { useUser } from '@/hooks/use-user';
-import {UserAvatar, UserAvatarProps} from "@/components/auth/user-avatar";
+import {UserAvatar, type UserAvatarProps} from "@/components/auth/user-avatar";
 import {getUserPhotoAvatar} from "@/app/msal/msal-graph";
 import {logger} from "@/lib/default-logger";
 import Avatar from "@mui/material/Avatar";
@@ -40,7 +40,7 @@ export function AccountDetailsForm(): React.JSX.Element {
     return name.replace(/^#|#$/g, '')
   }
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     const updatedNickname = {
       nickname: nicknameRef.current?.value
@@ -86,7 +86,7 @@ export function AccountDetailsForm(): React.JSX.Element {
       });
       // console.log(user);
     }
-  }, []) //intentionally left the dependency blank.
+  }) //intentionally left the dependency blank.
 
   return (
     <form onSubmit={handleSubmit}>
@@ -96,7 +96,7 @@ export function AccountDetailsForm(): React.JSX.Element {
           title="Profile"
           avatar={
             showUserInitials ?
-              <UserAvatar size={'48px'} {...userAvatarProps}/>
+              <UserAvatar size='48px' {...userAvatarProps}/>
               : userPhoto &&
               <Avatar
                 onError={onImgError}
@@ -116,8 +116,7 @@ export function AccountDetailsForm(): React.JSX.Element {
                   <OutlinedInput defaultValue={eduquestUser.nickname} inputRef={nicknameRef} label="Nickname" name="nickname"/>
                 </FormControl>
               </Grid>
-              <Grid sm={6} xs={12} sx={{display: {xs: 'none', sm: 'block'}}}>
-              </Grid>
+              <Grid sm={6} xs={12} sx={{display: {xs: 'none', sm: 'block'}}}/>
               <Grid sm={6} xs={12}>
                 <Typography variant="overline" color="text.secondary">First Name</Typography>
                 <Typography variant="body2">{eduquestUser.first_name} </Typography>
