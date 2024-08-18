@@ -5,17 +5,37 @@ export const navItems = [
   { key: 'overview', title: 'Overview', href: paths.dashboard.overview, icon: 'chart-pie' },
   {
     key: 'course',
-    title: 'Courses',
-    href: paths.dashboard.course,
+    title: 'Course',
     icon: 'book',
-    matcher: {type: 'startsWith', href: paths.dashboard.course}
+    items: [
+      {
+        key: 'all-courses',
+        title: 'All Courses',
+        href: paths.dashboard.course.all
+      },
+      {
+        key: 'my-courses',
+        title: 'My Courses',
+        href: paths.dashboard.course.my
+      }
+    ]
   },
   {
     key: 'quest',
-    title: 'Quests',
-    href: paths.dashboard.quest,
+    title: 'Quest',
     icon: 'sword',
-    matcher: { type: 'startsWith', href: paths.dashboard.quest },
+    items: [
+      {
+        key: 'all-quests',
+        title: 'All Quests',
+        href: paths.dashboard.quest.all
+      },
+      {
+        key: 'my-quests',
+        title: 'My Quests',
+        href: paths.dashboard.quest.my
+      }
+    ]
   },
   {
     key: 'badge',

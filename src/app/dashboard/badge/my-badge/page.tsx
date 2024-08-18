@@ -120,7 +120,7 @@ export default function Page(): React.JSX.Element {
                 <Button
                   endIcon={<CaretRightIcon/>}
                   component={RouterLink}
-                  href={paths.dashboard.course}
+                  href={paths.dashboard.course.all}
                   sx={{mt:2}}
                   variant="outlined">Browse Courses</Button>
               </Box>

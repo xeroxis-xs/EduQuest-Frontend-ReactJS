@@ -10,8 +10,14 @@ export const paths = {
     // user: '/dashboard/eduquest-user',
     // integrations: '/dashboard/integrations',
     // settings: '/dashboard/settings',
-    course: '/dashboard/course',
-    quest: '/dashboard/quest',
+    course: {
+      all: '/dashboard/course/all-courses',
+      my: '/dashboard/course/my-courses',
+    },
+    quest: {
+      all: '/dashboard/quest/all-quests',
+      my: '/dashboard/quest/my-quests',
+    },
     generator: {
       upload: '/dashboard/generator/my-upload',
       quest: '/dashboard/generator/my-quest',

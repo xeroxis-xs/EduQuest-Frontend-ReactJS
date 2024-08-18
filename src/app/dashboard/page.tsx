@@ -139,8 +139,8 @@ export default function Page(): React.JSX.Element {
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
       await getAnalyticsPartOne();
-      await getAnalyticsPartThree();
       await getAnalyticsPartTwo();
+      await getAnalyticsPartThree();
     };
 
     fetchData().catch((error: unknown) => {

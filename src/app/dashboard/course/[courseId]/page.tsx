@@ -226,7 +226,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
     try {
       await apiService.delete(`/api/Course/${params.courseId}`);
 
-      router.push(paths.dashboard.course);
+      router.push(paths.dashboard.course.all);
     } catch (error) {
       logger.error('Failed to delete the course', error);
       setSubmitStatus({ type: 'error', message: 'Delete Failed. Please try again.' });
@@ -275,7 +275,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
   return (
     <Stack spacing={3}>
       <Stack direction="row" spacing={3} sx={{justifyContent: 'space-between'}}>
-          <Button startIcon={<CaretLeftIcon fontSize="var(--icon-fontSize-md)"/>} component={RouterLink} href={paths.dashboard.course}>View all Courses</Button>
+          <Button startIcon={<CaretLeftIcon fontSize="var(--icon-fontSize-md)"/>} component={RouterLink} href={paths.dashboard.course.all}>View all Courses</Button>
         <Button startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PenIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
           {showForm ? 'Close' : 'Edit Course'}
         </Button>
