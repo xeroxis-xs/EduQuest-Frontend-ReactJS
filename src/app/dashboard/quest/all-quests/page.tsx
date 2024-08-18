@@ -16,6 +16,7 @@ import { SkeletonQuestCard } from "@/components/dashboard/skeleton/skeleton-ques
 import Select, {type SelectChangeEvent} from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
+import {useUser} from "@/hooks/use-user";
 
 export default function Page(): React.JSX.Element {
   const [quests, setQuests] = React.useState<Quest[]>([]);
@@ -23,6 +24,7 @@ export default function Page(): React.JSX.Element {
   const [loading, setLoading] = React.useState(true);
   const [selectedCourseId, setSelectedCourseId] = React.useState<string | null>(null);
   const [courseIds, setCourseIds] = React.useState<string[]>([]);
+  const { eduquestUser } = useUser();
 
 
   const toggleForm = (): void => {
@@ -72,11 +74,9 @@ export default function Page(): React.JSX.Element {
 
   return (
     <Stack spacing={3}>
-      <Stack direction="row" spacing={3}>
-        <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
-          <Typography variant="h4">All Quests</Typography>
+      <Stack direction="row" spacing={1} sx={{justifyContent: 'space-between'}}>
+        <Typography variant="h4">All Quests</Typography>
 
-        </Stack>
         <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
           <FormControl size="small">
             <Select
@@ -95,9 +95,11 @@ export default function Page(): React.JSX.Element {
               ))}
             </Select>
           </FormControl>
-          <Button startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
-            {showForm ? 'Close' : 'Create'}
-          </Button>
+          {eduquestUser?.is_staff && (
+            <Button startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
+              {showForm ? 'Close' : 'Create'}
+            </Button>
+          )}
         </Stack>
       </Stack>
       {showForm && <QuestForm onFormSubmitSuccess={getQuests}/>} {/* Conditional rendering */}

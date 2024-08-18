@@ -7,8 +7,7 @@ import { Download as DownloadIcon } from '@phosphor-icons/react/dist/ssr/Downloa
 import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
 import { Upload as UploadIcon } from '@phosphor-icons/react/dist/ssr/Upload';
 import { XCircle as XCircleIcon } from '@phosphor-icons/react/dist/ssr/XCircle';
-
-import { EduquestUserFilters } from '@/components/dashboard/eduquest-user/eduquest-user-filters';
+// import { EduquestUserFilters } from '@/components/dashboard/eduquest-user/eduquest-user-filters';
 import { EduquestUserTable } from '@/components/dashboard/eduquest-user/eduquest-user-table';
 import type { EduquestUser } from '@/types/eduquest-user';
 import apiService from "@/api/api-service";
@@ -16,6 +15,7 @@ import {AxiosError, type AxiosResponse} from "axios";
 import { logger } from '@/lib/default-logger'
 import {authClient} from "@/lib/auth/client";
 import { EduquestUserForm } from "@/components/dashboard/eduquest-user/eduquest-user-form";
+import { Box } from '@mui/material';
 
 export default function Page(): React.JSX.Element {
   const [eduquestUsers, setEduquestUsers] = React.useState<EduquestUser[]>([]);
@@ -52,27 +52,19 @@ export default function Page(): React.JSX.Element {
 
   return (
     <Stack spacing={3}>
-      <Stack direction="row" spacing={3}>
-        <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
+      <Stack direction="row" spacing={1} justifyContent="space-between">
           <Typography variant="h4">Eduquest Users</Typography>
-          <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
-            <Button color="inherit" startIcon={<UploadIcon fontSize="var(--icon-fontSize-md)" />}>
-              Import
-            </Button>
-            <Button color="inherit" startIcon={<DownloadIcon fontSize="var(--icon-fontSize-md)" />}>
-              Export
-            </Button>
-          </Stack>
-        </Stack>
-        <div>
-          <Button startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
+
+          <Button startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)"/> :
+            <PlusIcon fontSize="var(--icon-fontSize-md)"/>} variant="contained" onClick={toggleForm}>
             {showForm ? 'Close' : 'Add'}
           </Button>
-        </div>
+
+
       </Stack>
-      {showForm ? <EduquestUserForm /> : null} {/* Conditional rendering */}
-      <EduquestUserFilters />
-      <EduquestUserTable rows={eduquestUsers} />
+      {showForm ? <EduquestUserForm onCreateSuccess={getEduquestUser} /> : null}
+      {/*<EduquestUserFilters/>*/}
+      <EduquestUserTable rows={eduquestUsers}/>
     </Stack>
   );
 }

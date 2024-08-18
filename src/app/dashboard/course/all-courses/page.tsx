@@ -13,14 +13,14 @@ import { authClient } from "@/lib/auth/client";
 import { CourseForm } from "@/components/dashboard/course/course-form";
 import { CourseCard } from "@/components/dashboard/course/course-card";
 import { SkeletonCourseCard } from "@/components/dashboard/skeleton/skeleton-course-card";
-
+import {useUser} from "@/hooks/use-user";
 
 
 export default function Page(): React.JSX.Element {
   const [courses, setCourses] = React.useState<Course[]>([]);
   const [showForm, setShowForm] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
-
+  const { eduquestUser } = useUser();
 
   const toggleForm = (): void => {
     setShowForm(!showForm);
@@ -59,16 +59,17 @@ export default function Page(): React.JSX.Element {
 
   return (
     <Stack spacing={3}>
-      <Stack direction="row" spacing={3}>
-        <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
-          <Typography variant="h4">All Courses</Typography>
+      <Stack direction="row" spacing={1} sx={{justifyContent: 'space-between'}}>
+        <Typography variant="h4">All Courses</Typography>
 
-        </Stack>
-        <Stack direction="row" sx={{ alignItems: 'center' }}>
-          <Button startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
-            {showForm ? 'Close' : 'Create'}
-          </Button>
-        </Stack>
+        {eduquestUser?.is_staff && (
+          <Stack direction="row" sx={{ alignItems: 'center' }}>
+            <Button startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
+              {showForm ? 'Close' : 'Create'}
+            </Button>
+          </Stack>
+        )}
+
       </Stack>
       {showForm && <CourseForm onFormSubmitSuccess={getCourses} />}
       {loading ? (

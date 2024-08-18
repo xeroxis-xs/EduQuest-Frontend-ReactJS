@@ -7,7 +7,7 @@ export const paths = {
     overview: '/dashboard',
     account: '/dashboard/account',
     // customers: '/dashboard/customers',
-    // user: '/dashboard/eduquest-user',
+    user: '/dashboard/eduquest-user',
     // integrations: '/dashboard/integrations',
     // settings: '/dashboard/settings',
     course: {

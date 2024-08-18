@@ -9,24 +9,19 @@ import CardHeader from '@mui/material/CardHeader';
 import Divider from '@mui/material/Divider';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
-// import MenuItem from '@mui/material/MenuItem';
 import OutlinedInput from '@mui/material/OutlinedInput';
-// import Select from '@mui/material/Select';
 import Grid from '@mui/material/Unstable_Grid2';
-// import type {AxiosResponse} from "axios";
 import type {EduquestUser} from "@/types/eduquest-user";
 import apiService from "@/api/api-service";
 import {authClient} from "@/lib/auth/client";
 import {logger} from "@/lib/default-logger";
 import {AxiosError} from "axios";
 
-// const roles = [
-//   { value: 'student', label: 'Student' },
-//   { value: 'instructor', label: 'Instructor' },
-//   { value: 'admin', label: 'Admin' },
-// ] as const;
+interface EduquestUserFormProps {
+  onCreateSuccess: () => void;
+}
 
-export function EduquestUserForm(): React.JSX.Element {
+export function EduquestUserForm({ onCreateSuccess }: EduquestUserFormProps): React.JSX.Element {
   const [email, setEmail] = React.useState('');
   const [username, setUsername] = React.useState('');
   const [firstName, setFirstName] = React.useState('');
@@ -36,8 +31,8 @@ export function EduquestUserForm(): React.JSX.Element {
     event.preventDefault();
 
     const newUser: Partial<EduquestUser> = {
-      email,
-      username,
+      email: email,
+      username: username,
       first_name: firstName,
       last_name: lastName,
     };
@@ -45,13 +40,14 @@ export function EduquestUserForm(): React.JSX.Element {
     try {
       await apiService.post('/api/EduquestUser/', newUser);
       logger.debug('User added successfully');
+      onCreateSuccess();
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         if (error.response?.status === 401) {
           await authClient.signInWithMsal();
         }
       }
-      logger.error('Error: ', error);
+      logger.error('Error creating user: ', error);
     }
   };
   return (

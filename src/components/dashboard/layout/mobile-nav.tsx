@@ -16,6 +16,7 @@ import { CaretUp as CaretUpIcon } from '@phosphor-icons/react/dist/ssr/CaretUp';
 import { CaretDown as CaretDownIcon } from '@phosphor-icons/react/dist/ssr/CaretDown';
 import { navItems } from './config';
 import { navIcons } from './nav-icons';
+import {useUser} from "@/hooks/use-user";
 
 export interface MobileNavProps {
   onClose?: () => void;
@@ -25,6 +26,12 @@ export interface MobileNavProps {
 
 export function MobileNav({ open, onClose }: MobileNavProps): React.JSX.Element {
   const pathname = usePathname();
+  const { eduquestUser } = useUser();
+
+  // Filter out the 'import' and 'eduquest-user' item if the user is not a staff member
+  const filteredNavItems = eduquestUser?.is_staff ? navItems : navItems.filter(
+    item => item.key !== 'import' && item.key !== 'eduquest-user'
+  );
 
   return (
     <Drawer

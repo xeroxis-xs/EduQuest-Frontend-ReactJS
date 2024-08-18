@@ -135,9 +135,6 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
     }
   };
 
-  // const filterCourses = async (): Promise<void> => {
-  //
-  // }
 
   const getImages = async (): Promise<void> => {
     try {
@@ -242,7 +239,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
   const handleDeleteQuest = async () => {
     try {
       await apiService.delete(`/api/Quest/${params.questId}`);
-      router.push(paths.dashboard.quest);
+      router.push(paths.dashboard.quest.all);
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         if (error.response?.status === 401) {
@@ -312,12 +309,14 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
     <Stack spacing={3}>
       {quest ? <Stack direction="row" sx={{justifyContent: 'space-between'}}>
         <Button startIcon={<CaretLeftIcon fontSize="var(--icon-fontSize-md)"/>} component={RouterLink} href={`/dashboard/course/${quest?.from_course.id.toString()}`}>View Quests for {quest.from_course.code} {quest.from_course.name}</Button>
-        <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }} color="error">
-          <Button startIcon={<CalendarXIcon fontSize="var(--icon-fontSize-md)"/>} onClick={handleExpires} color="error" >Expires Quest</Button>
-          <Button startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PenIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
-            {showForm ? 'Close' : 'Edit Quest'}
-          </Button>
-        </Stack>
+        {eduquestUser?.is_staff && (
+            <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }} color="error">
+            <Button startIcon={<CalendarXIcon fontSize="var(--icon-fontSize-md)"/>} onClick={handleExpires} color="error" >Expires Quest</Button>
+            <Button startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PenIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
+              {showForm ? 'Close' : 'Edit Quest'}
+            </Button>
+          </Stack>
+        )}
       </Stack> : null
       }
 

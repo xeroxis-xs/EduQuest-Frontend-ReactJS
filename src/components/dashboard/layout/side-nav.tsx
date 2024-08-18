@@ -13,12 +13,18 @@ import type { NavItemConfig } from '@/types/nav';
 import { paths } from '@/paths';
 import { isNavItemActive } from '@/lib/is-nav-item-active';
 import { Logo } from '@/components/core/logo';
-
+import { useUser } from "@/hooks/use-user";
 import { navItems } from './config';
 import { navIcons } from './nav-icons';
 
 export function SideNav(): React.JSX.Element {
   const pathname = usePathname();
+  const { eduquestUser } = useUser();
+
+  // Filter out the 'import' and 'eduquest-user' item if the user is not a staff member
+  const filteredNavItems = eduquestUser?.is_staff ? navItems : navItems.filter(
+    item => item.key !== 'import' && item.key !== 'eduquest-user'
+  );
 
   return (
     <Box
@@ -75,7 +81,7 @@ export function SideNav(): React.JSX.Element {
       </Stack>
       {/*<Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />*/}
       <Box component="nav" sx={{ flex: '1 1 auto', p: '12px' }}>
-        {renderNavItems({ pathname, items: navItems })}
+        {renderNavItems({ pathname, items: filteredNavItems })}
       </Box>
       <Divider sx={{ borderColor: 'var(--mui-palette-neutral-700)' }} />
     </Box>

@@ -274,11 +274,13 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
 
   return (
     <Stack spacing={3}>
-      <Stack direction="row" spacing={3} sx={{justifyContent: 'space-between'}}>
-          <Button startIcon={<CaretLeftIcon fontSize="var(--icon-fontSize-md)"/>} component={RouterLink} href={paths.dashboard.course.all}>View all Courses</Button>
-        <Button startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PenIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
-          {showForm ? 'Close' : 'Edit Course'}
-        </Button>
+      <Stack direction="row" spacing={1} sx={{justifyContent: 'space-between'}}>
+        <Button startIcon={<CaretLeftIcon fontSize="var(--icon-fontSize-md)"/>} component={RouterLink} href={paths.dashboard.course.all}>View all Courses</Button>
+        {eduquestUser?.is_staff && (
+          <Button startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PenIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
+            {showForm ? 'Close' : 'Edit Course'}
+          </Button>
+        )}
       </Stack>
 
       {!showForm && (
