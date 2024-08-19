@@ -100,7 +100,7 @@ export function QuestCard({ rows = [], onQuestDeleteSuccess }: QuestCardProps): 
             {quest.type ==='Private' && (
               <CardActions sx={{ justifyContent: 'flex-end'}}>
                 <Button
-                  endIcon={<TrashIcon />}
+                  startIcon={<TrashIcon />}
                   color="error"
                   onClick={handleDelete(quest.id)}>
                   Delete

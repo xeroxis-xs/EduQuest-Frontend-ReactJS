@@ -7,6 +7,7 @@ import { Pen as PenIcon } from "@phosphor-icons/react/dist/ssr/Pen";
 import { FloppyDisk as FloppyDiskIcon } from "@phosphor-icons/react/dist/ssr/FloppyDisk";
 import { Trash as TrashIcon } from "@phosphor-icons/react/dist/ssr/Trash";
 import { GameController as GameControllerIcon } from "@phosphor-icons/react/dist/ssr/GameController";
+import { FilePlus as FilePlusIcon } from "@phosphor-icons/react/dist/ssr/FilePlus";
 import type { Course } from '@/types/course';
 import type { Quest } from '@/types/quest';
 import type { UserQuestAttempt } from '@/types/user-quest-attempt';
@@ -39,7 +40,6 @@ import { CardMedia } from "@mui/material";
 import IconButton, { type IconButtonProps } from '@mui/material/IconButton';
 import { CaretDown as CaretDownIcon } from "@phosphor-icons/react/dist/ssr/CaretDown";
 import { CalendarX as CalendarXIcon } from "@phosphor-icons/react/dist/ssr/CalendarX";
-import { Plus as PlusIcon } from "@phosphor-icons/react/dist/ssr/Plus";
 import { styled } from '@mui/material/styles';
 import Collapse from '@mui/material/Collapse';
 import {type Image} from "@/types/image";
@@ -246,7 +246,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
   const handleDeleteQuest = async (): Promise<void> => {
     try {
       await apiService.delete(`/api/Quest/${params.questId}`);
-      router.push(paths.dashboard.quest.all);
+      router.push(paths.dashboard.quest.all as string);
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         if (error.response?.status === 401) {
@@ -451,33 +451,37 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
           </CardContent>
           <CardActions sx={{ justifyContent: 'center' }}>
 
-            {course && eduquestUser && userQuestAttempts ? quest.total_questions === 0 ? (
-              <Button startIcon={<PlusIcon/>} variant='contained' onClick={toggleNewQuestionForm}>
-                Create New Questions
-              </Button>
-            ) : quest.status !== 'Active' ? (
-              <Button disabled variant='contained'>
-                Quest has Expired
-              </Button>
-            ) : userQuestAttempts.length >= quest.max_attempts ? (
-              <Button disabled variant='contained'>
-                No more attempts available
-              </Button>
-            ) : course.enrolled_users.includes(eduquestUser?.id.toString()) ? (
-              <Button endIcon={<GameControllerIcon fontSize="var(--icon-fontSize-md)"/>}
-                      variant='contained'
-                      onClick={handleNewAttempt}
-              >
-                Start New Attempt
-              </Button>
-            ) : (
-              <Button startIcon={<CaretLeftIcon fontSize="var(--icon-fontSize-md)" />}
-                      variant='outlined'
-                      component={RouterLink}
-                      href={`/dashboard/course/${quest.from_course.id.toString()}`}
-              >
-                Enroll Course before attempting
-              </Button>
+            {course && eduquestUser && userQuestAttempts ? (
+              quest.total_questions === 0 ? (
+                eduquestUser.is_staff ? (
+                  <Button startIcon={<FilePlusIcon/>} variant='contained' onClick={toggleNewQuestionForm}>
+                    Create New Questions
+                  </Button>
+                ) : null
+              ) : quest.status !== 'Active' ? (
+                <Button disabled variant='contained'>
+                  Quest has Expired
+                </Button>
+              ) : userQuestAttempts.length >= quest.max_attempts ? (
+                <Button disabled variant='contained'>
+                  No more attempts available
+                </Button>
+              ) : course.enrolled_users.includes(eduquestUser?.id.toString()) ? (
+                <Button startIcon={<GameControllerIcon fontSize="var(--icon-fontSize-md)"/>}
+                        variant='contained'
+                        onClick={handleNewAttempt}
+                >
+                  Start New Attempt
+                </Button>
+              ) : (
+                <Button startIcon={<CaretLeftIcon fontSize="var(--icon-fontSize-md)" />}
+                        variant='outlined'
+                        component={RouterLink}
+                        href={`/dashboard/course/${quest.from_course.id.toString()}`}
+                >
+                  Enroll Course before attempting
+                </Button>
+              )
             ) : null}
 
 
@@ -491,8 +495,16 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
 
       {/* New Question FORM */}
       { showNewQuestionForm && quest ? (
-        <NewQuestionForm onCreateSuccess={getQuest} quest={quest} onCancelCreate={toggleNewQuestionForm}/>
-        ) : null}
+        <NewQuestionForm
+          onCreateSuccess={async () => {
+            await getQuest();
+            toggleNewQuestionForm();
+            setSubmitStatus({ type: 'success', message: 'Questions have been successfully created.' })
+          }}
+          questId={params.questId}
+          onCancelCreate={toggleNewQuestionForm}
+        />
+      ) : null}
 
 
 

@@ -11,16 +11,23 @@ import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Divider from '@mui/material/Divider';
 import Alert from '@mui/material/Alert';
-import { PaperPlaneTilt as PaperPlaneTiltIcon } from '@phosphor-icons/react/dist/ssr/PaperPlaneTilt';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import { FilePlus as FilePlusIcon } from "@phosphor-icons/react/dist/ssr/FilePlus";
 import { Trash as TrashIcon } from '@phosphor-icons/react/dist/ssr/Trash';
 import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
 import { XCircle as XCircleIcon } from '@phosphor-icons/react/dist/ssr/XCircle';
+import { CheckCircle as CheckCircleIcon } from '@phosphor-icons/react/dist/ssr/CheckCircle';
 import CardHeader from "@mui/material/CardHeader";
 import { IconButton } from '@mui/material';
 import Stack from "@mui/material/Stack";
-import type {Quest} from "@/types/quest";
-
-
+import {logger} from "@/lib/default-logger";
+import apiService from "@/api/api-service";
+import {AxiosError} from "axios";
+import {authClient} from "@/lib/auth/client";
 
 interface Answer {
   text: string;
@@ -32,32 +39,35 @@ interface Question {
   text: string;
   max_score: number;
   answers: Answer[];
+  from_quest: number;
 }
 
 interface NewQuestionFormProps {
   onCreateSuccess: () => void;
   onCancelCreate: () => void;
-  quest: Quest;
+  questId: string;
 }
 
-export function NewQuestionForm({ quest, onCreateSuccess, onCancelCreate }: NewQuestionFormProps): React.JSX.Element {
+export function NewQuestionForm({ questId, onCreateSuccess, onCancelCreate }: NewQuestionFormProps): React.JSX.Element {
   const [questions, setQuestions] = useState<Question[]>([
     {
       number: 1,
       text: '',
-      max_score: 0,
+      max_score: 1,
       answers: [{ text: '', is_correct: false }],
+      from_quest: questId as unknown as number,
     },
   ]);
   const [formValid, setFormValid] = useState(true);
+  const [openDialog, setOpenDialog] = useState(false);
 
-  const handleQuestionChange = (index: number, field: string, value: any): void => {
+  const handleQuestionChange = (index: number, field: string, value: string | number): void => {
     const newQuestions = [...questions];
     newQuestions[index] = { ...newQuestions[index], [field]: value };
     setQuestions(newQuestions);
   };
 
-  const handleAnswerChange = (qIndex: number, aIndex: number, field: string, value: any): void => {
+  const handleAnswerChange = (qIndex: number, aIndex: number, field: string, value: string | boolean): void => {
     const newQuestions = [...questions];
     newQuestions[qIndex].answers[aIndex] = { ...newQuestions[qIndex].answers[aIndex], [field]: value };
     setQuestions(newQuestions);
@@ -69,8 +79,9 @@ export function NewQuestionForm({ quest, onCreateSuccess, onCancelCreate }: NewQ
       {
         number: questions.length + 1,
         text: '',
-        max_score: 0,
+        max_score: 1,
         answers: [{ text: '', is_correct: false }],
+        from_quest: questId as unknown as number,
       },
     ]);
   };
@@ -92,18 +103,45 @@ export function NewQuestionForm({ quest, onCreateSuccess, onCancelCreate }: NewQ
     setQuestions(newQuestions);
   };
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
-    event.preventDefault();
+  const handleSubmit = async (): Promise<void> => {
+    logger.debug('Questions to be created:', questions);
     if (questions.length === 0 || questions.some(q => q.answers.length === 0)) {
       setFormValid(false);
       return;
     }
     setFormValid(true);
-    onCreateSuccess();
+    try {
+      const response = await apiService.post(`/api/Question/bulk-create/`, questions);
+      if (response.status === 201) {
+        logger.debug('Questions bulk-created:', response.data);
+        onCreateSuccess();
+      }
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 401) {
+          await authClient.signInWithMsal();
+        }
+      }
+      logger.debug('Error creating questions:', error);
+    }
+  };
+
+  const handleFormSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
+    event.preventDefault();
+    setOpenDialog(true);
+  };
+
+  const handleDialogClose = (): void => {
+    setOpenDialog(false);
+  };
+
+  const handleDialogConfirm = async (): Promise<void> => {
+    setOpenDialog(false);
+    await handleSubmit();
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleFormSubmit}>
       {questions.map((question, qIndex) => (
         <Card key={qIndex} sx={{ mb: 2 }}>
           <CardHeader
@@ -132,7 +170,7 @@ export function NewQuestionForm({ quest, onCreateSuccess, onCancelCreate }: NewQ
                   fullWidth
                   label="Score"
                   type="number"
-                  defaultValue={1}
+                  defaultValue={question.max_score}
                   size="small"
                   onChange={(e) => { handleQuestionChange(qIndex, 'number', parseInt(e.target.value)); }}
                   sx={{ mb: 2 }}
@@ -141,38 +179,38 @@ export function NewQuestionForm({ quest, onCreateSuccess, onCancelCreate }: NewQ
               </Grid>
             </Grid>
             <Grid container spacing={3}>
-            {question.answers.map((answer, aIndex) => (
-              <Grid md={6} xs={12} key={aIndex}>
-                <Box sx={{ display: 'flex', alignItems: 'center'}}>
+              {question.answers.map((answer, aIndex) => (
+                <Grid md={6} xs={12} key={aIndex}>
+                  <Box sx={{ display: 'flex', alignItems: 'center'}}>
 
-                  <TextField
-                  fullWidth
-                  size="small"
-                  label={`Answer ${aIndex + 1}`}
-                  value={answer.text}
-                  onChange={(e) => { handleAnswerChange(qIndex, aIndex, 'text', e.target.value); }}
-                  sx={{ mr: 2 }}
-                />
-                <FormControlLabel
-                  control={
-                    <Checkbox
+                    <TextField
+                      fullWidth
                       size="small"
-                      checked={answer.is_correct}
-                      onChange={(e) => { handleAnswerChange(qIndex, aIndex, 'is_correct', e.target.checked); }}
+                      label={`Answer ${String(aIndex + 1)}`}
+                      value={answer.text}
+                      onChange={(e) => { handleAnswerChange(qIndex, aIndex, 'text', e.target.value); }}
+                      sx={{ mr: 2 }}
                     />
-                  }
-                  label="Correct"
-                  componentsProps={{ typography: { fontSize: 14 } }}
-                  sx={{ mr: 1}}
-                  // labelPlacement="bottom"
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          size="small"
+                          checked={answer.is_correct}
+                          onChange={(e) => { handleAnswerChange(qIndex, aIndex, 'is_correct', e.target.checked); }}
+                        />
+                      }
+                      label="Correct"
+                      componentsProps={{ typography: { fontSize: 14 } }}
+                      sx={{ mr: 1}}
+                      // labelPlacement="bottom"
 
-                />
-                <IconButton aria-label="delete answer" onClick={() => { deleteAnswer(qIndex, aIndex); }} color="error" size="medium">
-                  <TrashIcon height={20} width={20} />
-                </IconButton>
+                    />
+                    <IconButton aria-label="delete answer" onClick={() => { deleteAnswer(qIndex, aIndex); }} color="error" size="medium">
+                      <TrashIcon height={20} width={20} />
+                    </IconButton>
                   </Box>
-              </Grid>
-            ))}
+                </Grid>
+              ))}
               <Grid md={6} xs={12}>
                 <Button startIcon={<PlusIcon/>} onClick={() => { addAnswer(qIndex); }}>Add Answer</Button>
               </Grid>
@@ -182,7 +220,10 @@ export function NewQuestionForm({ quest, onCreateSuccess, onCancelCreate }: NewQ
         </Card>
       ))}
 
-      {!formValid && <Alert severity="error">There must be at least one question and one answer option.</Alert>}
+      {!formValid &&
+        <Alert severity="error" sx={{mb: 2}}>There must be at least one question and one answer option.</Alert>
+      }
+
       <CardActions sx={{ justifyContent: 'space-between' }}>
         <Button startIcon={<PlusIcon/>} onClick={addQuestion} >
           Add Question
@@ -191,11 +232,36 @@ export function NewQuestionForm({ quest, onCreateSuccess, onCancelCreate }: NewQ
           <Button startIcon={<XCircleIcon />} onClick={onCancelCreate}>
             Cancel
           </Button>
-          <Button endIcon={<PaperPlaneTiltIcon />} type="submit" variant="contained">
+          <Button startIcon={<FilePlusIcon />} type="submit" variant="contained">
             Create Questions
           </Button>
         </Stack>
       </CardActions>
+
+      <Dialog
+        open={openDialog}
+        onClose={handleDialogClose}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Confirm Submission"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to create these questions for this quest?
+          </DialogContentText>
+          <DialogContentText id="alert-dialog-description">
+            These questions cannot be edited or deleted once created.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleDialogClose} color="primary" startIcon={<XCircleIcon />} >
+            Cancel
+          </Button>
+          <Button onClick={handleDialogConfirm} color="primary" variant="contained" startIcon={<CheckCircleIcon />}>
+            Confirm
+          </Button>
+        </DialogActions>
+      </Dialog>
     </form>
   );
 }

@@ -5,6 +5,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
 import { XCircle as XCircleIcon } from '@phosphor-icons/react/dist/ssr/XCircle';
+import { Funnel as FunnelIcon } from '@phosphor-icons/react/dist/ssr/Funnel';
 import apiService from "@/api/api-service";
 import {AxiosError, type AxiosResponse} from "axios";
 import { logger } from '@/lib/default-logger'
@@ -78,6 +79,7 @@ export default function Page(): React.JSX.Element {
         <Typography variant="h4">All Quests</Typography>
 
         <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
+          <FunnelIcon height={20} width={20}/>
           <FormControl size="small">
             <Select
               value={selectedCourseId || ''}

@@ -211,7 +211,7 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
   return (
     <form onSubmit={handleSubmit}>
     <Card>
-      <CardHeader title="New Quest" subheader="Create a new Quest for this Import"/>
+      <CardHeader title="New Quest Import" subheader="Create a new Quest for this Import"/>
       <Divider/>
 
       <CardContent sx={{pb:'16px'}}>

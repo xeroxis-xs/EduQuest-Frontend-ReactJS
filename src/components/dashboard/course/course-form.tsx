@@ -296,7 +296,7 @@ export function CourseForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.
         </CardContent>
 
         <CardActions sx={{ justifyContent: 'flex-end' }}>
-          <Button endIcon={<FilePlusIcon fontSize="var(--icon-fontSize-md)"/>} type="submit" variant="contained">Add</Button>
+          <Button startIcon={<FilePlusIcon fontSize="var(--icon-fontSize-md)"/>} type="submit" variant="contained">Add</Button>
         </CardActions>
 
       </Card>

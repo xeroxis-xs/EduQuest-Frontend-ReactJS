@@ -162,7 +162,7 @@ export function ImportCardUserAttempt(
       ))}
 
       <Box sx={{display: "flex", justifyContent: "center", mt: 6}}>
-        <Button endIcon={<CheckFatIcon/>} type="submit" variant="contained">Grade Attempts</Button>
+        <Button startIcon={<CheckFatIcon/>} type="submit" variant="contained">Grade Attempts</Button>
       </Box>
 
     </form>

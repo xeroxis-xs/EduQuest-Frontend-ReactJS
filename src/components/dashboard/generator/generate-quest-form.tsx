@@ -452,7 +452,7 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
         </CardContent>
 
         <CardActions sx={{ justifyContent: 'flex-end' }}>
-          <Button endIcon={<MagicWandIcon fontSize="var(--icon-fontSize-md)"/>} type="submit" variant="contained">Generate</Button>
+          <Button startIcon={<MagicWandIcon fontSize="var(--icon-fontSize-md)"/>} type="submit" variant="contained">Generate</Button>
         </CardActions>
 
       </Card>

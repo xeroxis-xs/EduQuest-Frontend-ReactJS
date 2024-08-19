@@ -14,6 +14,7 @@ import { SkeletonQuestCard } from "@/components/dashboard/skeleton/skeleton-ques
 import {useUser} from "@/hooks/use-user";
 import type { SelectChangeEvent } from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
+import {Funnel as FunnelIcon} from "@phosphor-icons/react/dist/ssr/Funnel";
 
 
 export default function Page(): React.JSX.Element {
@@ -66,33 +67,34 @@ export default function Page(): React.JSX.Element {
 
   return (
     <Stack spacing={3}>
-      <Stack direction="row" spacing={3}>
-        <Stack spacing={1} sx={{flex: '1 1 auto'}}>
-          <Typography variant="h4">My Quests</Typography>
-        </Stack>
-        <FormControl size="small">
-          <Select
-            value={selectedCourseId || ''}
-            onChange={handleCourseChange}
-            displayEmpty
-            sx={{minWidth: 200}}
-          >
-            <MenuItem value="">
-              <em>All Courses</em>
-            </MenuItem>
-            {courseIds.map(courseId => (
-              <MenuItem key={courseId} value={courseId}>
-                {courseId}
+      <Stack direction="row" spacing={1} sx={{justifyContent: 'space-between'}}>
+        <Typography variant="h4">My Quests</Typography>
+        <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
+          <FunnelIcon height={20} width={20}/>
+          <FormControl size="small">
+            <Select
+              value={selectedCourseId || ''}
+              onChange={handleCourseChange}
+              displayEmpty
+              sx={{minWidth: 200}}
+            >
+              <MenuItem value="">
+                <em>All Courses</em>
               </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
+              {courseIds.map(courseId => (
+                <MenuItem key={courseId} value={courseId}>
+                  {courseId}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Stack>
       </Stack>
       {loading ? (
-        <SkeletonQuestCard/>
-      ) : (
-        <QuestCard rows={filteredQuests} onQuestDeleteSuccess={getMyQuests}/>
-      )}
+          <SkeletonQuestCard/>
+        ) : (
+          <QuestCard rows={filteredQuests} onQuestDeleteSuccess={getMyQuests}/>
+        )}
     </Stack>
   );
 }

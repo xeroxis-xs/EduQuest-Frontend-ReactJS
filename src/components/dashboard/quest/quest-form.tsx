@@ -190,7 +190,7 @@ export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Ele
             <Grid md={4} xs={12}>
               <FormControl fullWidth required>
                 <InputLabel>Quest Type</InputLabel>
-                <Select defaultValue="" label="Quest Type" inputRef={questTypeRef} name="type">
+                <Select defaultValue="Eduquest MCQ" label="Quest Type" inputRef={questTypeRef} name="type">
                   <MenuItem value="Eduquest MCQ"><Chip variant="outlined" label="Eduquest MCQ" color="primary" size="small"/></MenuItem>
                   <MenuItem value="Private"><Chip variant="outlined" label="Private" color="secondary" size="small"/></MenuItem>
                   <MenuItem value="Kahoot!"><Chip variant="outlined" label="Kahoot!" color="violet" size="small"/></MenuItem>
@@ -201,7 +201,7 @@ export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Ele
             <Grid md={4} xs={12}>
               <FormControl fullWidth required>
                 <InputLabel>Quest Status</InputLabel>
-                <Select defaultValue="" label="Quest Status" inputRef={questStatusRef} name="status">
+                <Select defaultValue="Active" label="Quest Status" inputRef={questStatusRef} name="status">
                   <MenuItem value="Active"><Chip variant="outlined" label="Active" color="success" size="small"/></MenuItem>
                   <MenuItem value="Expired"><Chip variant="outlined" label="Expired" color="secondary" size="small"/></MenuItem>
                 </Select>
@@ -320,7 +320,7 @@ export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Ele
         </CardContent>
 
         <CardActions sx={{ justifyContent: 'flex-end' }}>
-          <Button endIcon={<FilePlusIcon fontSize="var(--icon-fontSize-md)"/>} type="submit" variant="contained">Add</Button>
+          <Button startIcon={<FilePlusIcon fontSize="var(--icon-fontSize-md)"/>} type="submit" variant="contained">Add</Button>
         </CardActions>
 
       </Card>

@@ -86,7 +86,7 @@ export function AccountDetailsForm(): React.JSX.Element {
       });
       // console.log(user);
     }
-  }) //intentionally left the dependency blank.
+  }, []) //intentionally left the dependency blank.
 
   return (
     <form onSubmit={handleSubmit}>
