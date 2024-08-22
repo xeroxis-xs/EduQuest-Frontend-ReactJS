@@ -45,17 +45,17 @@ export function UserProvider({ children }: UserProviderProps): React.JSX.Element
       const { data, error } = await authClient.getUser();
 
       if (error) {
-        logger.error(error);
+        logger.error("authClient error: ", error);
         setState((prev) => ({
             ...prev,
             user: null,
             eduquestUser: null,
-            error: 'Something went wrong',
+            error,
             isLoading: false
           }));
         return;
       }
-
+      // Set user and eduquestUser in the state
       setState((prev) => ({
         ...prev,
         user: data.user ?? null,

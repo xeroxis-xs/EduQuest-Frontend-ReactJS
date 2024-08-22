@@ -44,9 +44,22 @@ class AuthClient {
         }
       };
     }
-
+    // token is present, set it in the msal instance
     const msalUser = msalInstance.getActiveAccount();
     const eduquestUser = await this.getEduquestUser(msalUser?.username ?? '');
+    // check if the email domain is '@e.ntu.edu.sg' or '@ntu.edu.sg'
+    if (msalUser?.username && !msalUser.username.includes('@e.ntu.edu.sg') && !msalUser.username.includes('@ntu.edu.sg')) {
+      logger.debug('User is not from NTU, redirect to Login');
+      // await this.signInWithMsal();
+      return {
+        data: {
+          user: null,
+          eduquestUser: null
+        },
+        error: 'Please sign in with your NTU email account.'
+      };
+    }
+    // return the user and eduquest user
     return { data: { user: msalUser, eduquestUser } };
   }
 

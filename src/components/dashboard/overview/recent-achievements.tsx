@@ -113,9 +113,10 @@ export function RecentAchievements({ recentBadges = [], sx }: RecentAchievements
                       from
                       <Box
                         component="span"
-                        sx={{ display: 'inline', cursor: 'pointer', verticalAlign: 'middle', mx: '6px', fontWeight: '600' }}
+                        sx={{ display: 'inline-block', cursor: 'pointer', mx: '6px', fontWeight: '600' }}
                         onClick={() => { handleRouteToCourse(recentBadge.course_completed.course.id.toString()); }}
                       >
+
                       {recentBadge.course_completed.course.code} {recentBadge.course_completed.course.name}
                       </Box>
                       </Typography>
@@ -154,7 +155,7 @@ export function RecentAchievements({ recentBadges = [], sx }: RecentAchievements
                       from
                       <Box
                         component="span"
-                        sx={{ display: 'inline', cursor: 'pointer', verticalAlign: 'middle', mx: '6px', fontWeight: '600' }}
+                        sx={{ display: 'inline', cursor: 'pointer', mx: '6px', fontWeight: '600' }}
                         onClick={() => { handleRouteToQuest(recentBadge.quest_attempted.quest.id.toString()); }}
                       >
                       {recentBadge.quest_attempted.quest.name}
