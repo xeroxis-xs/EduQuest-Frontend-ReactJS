@@ -48,7 +48,7 @@ class AuthClient {
     const msalUser = msalInstance.getActiveAccount();
     const eduquestUser = await this.getEduquestUser(msalUser?.username ?? '');
     // check if the email domain is '@e.ntu.edu.sg' or '@ntu.edu.sg'
-    if (msalUser?.username && !msalUser.username.includes('@e.ntu.edu.sg') && !msalUser.username.includes('@ntu.edu.sg')) {
+    if (msalUser?.username && !msalUser.username.includes('@e.ntu.edu.sg') && !msalUser.username.includes('@ntu.edu.sg') && !msalUser.username.includes('@staff.main.ntu.edu.sg')) {
       logger.debug('User is not from NTU, redirect to Login');
       // await this.signInWithMsal();
       return {
