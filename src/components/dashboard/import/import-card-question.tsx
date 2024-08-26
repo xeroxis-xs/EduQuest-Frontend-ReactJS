@@ -84,10 +84,10 @@ export function ImportCardQuestion({ questions, onQuestionUpdateSuccess }: Impor
 
       <CardContent sx={{pb:'16px'}}>
 
-        <Grid container spacing={5}>
+        <Grid container spacing={5} >
 
           {updatedQuestions.map((question) => (
-            <Grid container key={question.id} spacing={1} >
+            <Grid container key={question.id} spacing={1} sx={{width: '100%'}}>
               <Grid xs={12}>
                 <Typography variant="h6" sx={{mb:2}}>{question.number}. {question.text}</Typography>
               </Grid>

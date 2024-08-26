@@ -147,7 +147,7 @@ export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Ele
     try {
       const response: AxiosResponse<Quest> = await apiService.post(`/api/Quest/`, newQuest);
       onFormSubmitSuccess();
-      logger.debug('Create Success:', response.data);
+      logger.debug('New Quest has been created successfully:', response.data);
       setSubmitStatus({type: 'success', message: 'Create Successful'});
     }
     catch (error: unknown) {
@@ -177,7 +177,7 @@ export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Ele
   return (
     <form onSubmit={handleSubmit}>
       <Card>
-        <CardHeader subheader="Add new quest to the database" title="New Quest" />
+        <CardHeader subheader="Add new quest to the system" title="New Quest" />
         <Divider />
         <CardContent>
           <Grid container spacing={3}>

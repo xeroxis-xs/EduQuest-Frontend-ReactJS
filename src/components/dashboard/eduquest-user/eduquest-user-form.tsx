@@ -53,7 +53,7 @@ export function EduquestUserForm({ onCreateSuccess }: EduquestUserFormProps): Re
   return (
     <form onSubmit={handleSubmit}>
       <Card>
-        <CardHeader subheader="Add new user to the database" title="New User" />
+        <CardHeader subheader="Add new user to the system" title="New User" />
         <Divider />
         <CardContent>
           <Grid container spacing={3}>

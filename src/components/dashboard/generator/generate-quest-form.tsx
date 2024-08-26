@@ -370,13 +370,25 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
             <Grid md={4} xs={12}>
               <FormControl fullWidth required>
                 <InputLabel>Max Attempts</InputLabel>
-                <OutlinedInput defaultValue="1" label="Max Attempts" type="number" inputRef={questMaxAttemptsRef} />
+                <OutlinedInput
+                  defaultValue="1"
+                  label="Max Attempts"
+                  type="number"
+                  inputRef={questMaxAttemptsRef}
+                  inputProps={{ min: 1 }}
+                />
               </FormControl>
             </Grid>
             <Grid md={4} xs={12}>
               <FormControl fullWidth required>
                 <InputLabel>Number of Questions</InputLabel>
-                <OutlinedInput defaultValue="3" label="Number of Questions" type="number" inputRef={numQuestionsRef} />
+                <OutlinedInput
+                  defaultValue="3"
+                  label="Number of Questions"
+                  type="number"
+                  inputRef={numQuestionsRef}
+                  inputProps={{ min: 1 }}
+                />
               </FormControl>
             </Grid>
             <Grid md={4} xs={12}>

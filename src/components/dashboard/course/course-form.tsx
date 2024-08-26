@@ -130,7 +130,7 @@ export function CourseForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.
     try {
       const response: AxiosResponse<Course> = await apiService.post(`/api/Course/`, newCourse);
       onFormSubmitSuccess();
-      logger.debug('Create Success:', response.data);
+      logger.debug('New Course has been created successfully:', response.data);
       setSubmitStatus({type: 'success', message: 'Create Successful'});
     }
     catch (error: unknown) {
@@ -168,7 +168,7 @@ export function CourseForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.
   return (
     <form onSubmit={handleSubmit}>
       <Card>
-        <CardHeader subheader="Add new course to the database" title="New Course" />
+        <CardHeader subheader="Add new course to the system" title="New Course" />
         <Divider />
         <CardContent>
           <Grid container spacing={3}>

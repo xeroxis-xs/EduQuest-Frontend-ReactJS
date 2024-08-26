@@ -49,7 +49,7 @@ export function GuestGuard({ children }: GuestGuardProps): React.JSX.Element | n
   if (isChecking) {
     return (
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
-        <CircularProgress />
+        <CircularProgress sx={{mr:2}}/>
         <Typography variant="h6" textAlign="center">
           Verifying...
         </Typography>

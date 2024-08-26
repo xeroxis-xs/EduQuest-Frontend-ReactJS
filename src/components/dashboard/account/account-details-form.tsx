@@ -17,9 +17,10 @@ import {logger} from "@/lib/default-logger";
 import Avatar from "@mui/material/Avatar";
 import {FloppyDisk as FloppyDiskIcon} from "@phosphor-icons/react/dist/ssr/FloppyDisk";
 import Typography from "@mui/material/Typography";
-import type {AxiosResponse} from "axios";
+import {AxiosError, AxiosResponse} from "axios";
 import type {Course} from "@/types/course";
 import apiService from "@/api/api-service";
+import {authClient} from "@/lib/auth/client";
 
 export function AccountDetailsForm(): React.JSX.Element {
   const { eduquestUser } = useUser();
@@ -55,8 +56,15 @@ export function AccountDetailsForm(): React.JSX.Element {
         // await getCourse();
         // setShowForm(false)
       } catch (error) {
-        logger.error('Submit Error:', error);
-        // setSubmitStatus({ type: 'error', message: 'Update Failed. Please try again.' });
+        if (error instanceof AxiosError) {
+          if (error.response?.status === 401) {
+            await authClient.signInWithMsal();
+          }
+          else {
+            logger.error('Code: ', error.response?.status);
+            logger.error('Message: ', error.response?.data);
+          }
+        }
 
       }
     }
