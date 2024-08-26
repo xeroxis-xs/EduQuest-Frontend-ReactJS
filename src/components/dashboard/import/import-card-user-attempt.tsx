@@ -21,6 +21,7 @@ import LinearProgress from "@mui/material/LinearProgress";
 import Pagination from "@mui/material/Pagination";
 import { setSubmitted } from "@/components/dashboard/quest/question/attempt/question-attempt-card";
 import {authClient} from "@/lib/auth/client";
+import {Loading} from "@/components/dashboard/loading/loading";
 
 
 // eslint-disable-next-line camelcase -- 'all_questions_submitted' is a backend field and must match the API response
@@ -37,9 +38,16 @@ export function ImportCardUserAttempt(
     { userQuestQuestionAttempts: UserQuestQuestionAttempt[],
       userQuestAttempts: UserQuestAttempt[] }
 ): React.JSX.Element {
+  enum LoadingState {
+    Idle = "Idle",
+    SettingAllAttemptsAsSubmitted = "SettingAllAttemptsAsSubmitted",
+    IssuingBadges = 'IssuingBadges',
+    SettingQuestAsExpired = 'SettingQuestAsExpired',
+  }
   const [page, setPage] = React.useState(1);
   const rowsPerPage = 1; // Each page will show one card
   const router = useRouter();
+  const [loadingState, setLoadingState] = React.useState<LoadingState>(LoadingState.Idle);
 
   const handleChangePage = (_event: React.ChangeEvent<unknown>, newPage: number): void => {
     setPage(newPage);
@@ -47,6 +55,7 @@ export function ImportCardUserAttempt(
 
   const bulkUpdateUserQuestQuestionAttempt = async (updateUserQuestQuestionAttempt: UserQuestQuestionAttempt[]): Promise<void> => {
     try {
+      setLoadingState(LoadingState.SettingAllAttemptsAsSubmitted);
       const response = await apiService.patch(`/api/UserQuestQuestionAttempt/bulk-update/`, updateUserQuestQuestionAttempt);
       if (response.status === 200) {
         logger.debug('Bulk Update UserQuestQuestionAttempt Success:', response.data);
@@ -63,6 +72,7 @@ export function ImportCardUserAttempt(
 
   const bulkUpdateUserQuestAttempt = async (updatedUserQuestAttempt: UserQuestAttempt[]): Promise<void> => {
     try {
+      setLoadingState(LoadingState.IssuingBadges); // not really but backend signal will do it eventually
       const response = await apiService.patch(`/api/UserQuestAttempt/bulk-update/`, updatedUserQuestAttempt);
       if (response.status === 200) {
         logger.debug('Bulk Update UserQuestAttempt Success:', response.data);
@@ -77,6 +87,24 @@ export function ImportCardUserAttempt(
     }
   }
 
+  const setQuestToExpire = async (questId: number): Promise<void> => {
+    try {
+      setLoadingState(LoadingState.SettingQuestAsExpired);
+      const data = { status: 'Expired' };
+      const response = await apiService.patch(`/api/Quest/${questId.toString()}/`, data);
+      if (response.status === 200) {
+        logger.debug('Quest expired:', response.data);
+      }
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 401) {
+          await authClient.signInWithMsal();
+        }
+        logger.error('Failed to expire quest:', error.response?.data);
+      }
+    }
+  }
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     try {
@@ -84,6 +112,7 @@ export function ImportCardUserAttempt(
       await bulkUpdateUserQuestQuestionAttempt(updateUserQuestQuestionAttempt);
       const updatedUserQuestAttempt = setAllQuestionsSubmitted(userQuestAttempts, true);
       await bulkUpdateUserQuestAttempt(updatedUserQuestAttempt);
+      await setQuestToExpire(userQuestQuestionAttempts[0].question.from_quest);
       logger.debug('Bulk Update both UserQuestAttempt and UserQuestQuestionAttempt Success');
       router.push(`/dashboard/quest/${userQuestQuestionAttempts[0].question.from_quest.toString()}`);
     }
@@ -160,6 +189,10 @@ export function ImportCardUserAttempt(
             </Table>
         </Card>
       ))}
+
+      {loadingState === LoadingState.SettingAllAttemptsAsSubmitted ? <Loading text="Setting all Attempts as 'Submitted'..." /> : null}
+      {loadingState === LoadingState.IssuingBadges ? <Loading text="Issuing Badges..." /> : null}
+      {loadingState === LoadingState.SettingQuestAsExpired ? <Loading text='Setting Quest as "Expired"...' /> : null}
 
       <Box sx={{display: "flex", justifyContent: "center", mt: 6}}>
         <Button startIcon={<CheckFatIcon/>} type="submit" variant="contained">Grade Attempts</Button>

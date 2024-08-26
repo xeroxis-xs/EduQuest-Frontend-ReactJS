@@ -106,6 +106,9 @@ export default function Page(): React.JSX.Element {
       {loading ? (
         <SkeletonQuestCard />
       ) : (
+        quests.length === 0 ? (
+            <Typography variant="h6" align="center" mt={4}>No data available.</Typography>
+          ) :
         <QuestCard rows={filteredQuests} onQuestDeleteSuccess={getQuests}/>
       )}
     </Stack>

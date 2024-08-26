@@ -3,13 +3,11 @@
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import Alert from '@mui/material/Alert';
-import CircularProgress from '@mui/material/CircularProgress';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 
 import { paths } from '@/paths';
 import { logger } from '@/lib/default-logger';
 import { useUser } from '@/hooks/use-user';
+import { Verifying } from '@/components/dashboard/loading/veryfying';
 
 export interface GuestGuardProps {
   children: React.ReactNode;
@@ -48,12 +46,7 @@ export function GuestGuard({ children }: GuestGuardProps): React.JSX.Element | n
 
   if (isChecking) {
     return (
-      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
-        <CircularProgress sx={{mr:2}}/>
-        <Typography variant="h6" textAlign="center">
-          Verifying...
-        </Typography>
-      </Box>
+      <Verifying/>
     );
   }
 

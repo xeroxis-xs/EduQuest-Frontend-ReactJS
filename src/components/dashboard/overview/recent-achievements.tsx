@@ -169,7 +169,7 @@ export function RecentAchievements({ recentBadges = [], sx }: RecentAchievements
             </React.Fragment>
           ))
         ) : (
-          <Typography variant="subtitle2" align="center" mt={1}>No data available</Typography>
+          <Typography variant="subtitle2" align="center" mt={1}>No data available.</Typography>
         )}
       </CardContent>
     </Card>

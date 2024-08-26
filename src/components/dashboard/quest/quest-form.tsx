@@ -294,13 +294,13 @@ export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Ele
               <Grid md={3} xs={6}>
                 <Typography variant="overline" color="text.secondary">Course Year / Term</Typography>
                 <Typography variant="body2">
-                  AY {selectedCourse?.term.academic_year.start_year || courses[0]?.term.academic_year.start_year}-{selectedCourse?.term.academic_year.end_year || courses[0].term.academic_year.end_year} / {selectedCourse?.term.name || courses[0].term.name}
+                  AY {selectedCourse?.term?.academic_year.start_year || courses[0]?.term?.academic_year.start_year}-{selectedCourse?.term?.academic_year.end_year || courses[0].term?.academic_year.end_year} / {selectedCourse?.term?.name || courses[0].term.name}
                 </Typography>
               </Grid>
               <Grid md={3} xs={6}>
                 <Typography variant="overline" color="text.secondary">Course Duration</Typography>
                 <Typography variant="body2">
-                  From {selectedCourse?.term.start_date || courses[0]?.term.start_date} to {selectedCourse?.term.end_date || courses[0].term.end_date}
+                  From {selectedCourse?.term?.start_date || courses[0]?.term?.start_date} to {selectedCourse?.term?.end_date || courses[0].term?.end_date}
                 </Typography>
               </Grid>
               <Grid xs={12}>

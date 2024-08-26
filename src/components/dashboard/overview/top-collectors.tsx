@@ -40,7 +40,7 @@ export function TopCollectors({ topCollectors = [], sx }: TopCollectorsProps): R
         { topCollectors?.length > 0 ? (
           <TopCollectorChart topCollectors={topCollectors}/>
         ) : (
-          <Typography variant="subtitle2" align="center" mt={4}>No data available</Typography>
+          <Typography variant="subtitle2" align="center" mt={4}>No data available.</Typography>
         )}
 
       </CardContent>

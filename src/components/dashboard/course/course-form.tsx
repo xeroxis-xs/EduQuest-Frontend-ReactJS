@@ -24,7 +24,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Alert from "@mui/material/Alert";
 import { FilePlus as FilePlusIcon } from '@phosphor-icons/react/dist/ssr/FilePlus';
 import type {Image} from "@/types/image";
-import {CardMedia} from "@mui/material";
+import {CardMedia, TextField} from "@mui/material";
 import Chip from "@mui/material/Chip";
 
 interface CourseFormProps {
@@ -203,10 +203,18 @@ export function CourseForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.
                 </Select>
               </FormControl>
             </Grid>
-            <Grid md={6} xs={6}>
+            <Grid xs={12}>
               <FormControl fullWidth required>
                 <InputLabel>Course Description</InputLabel>
-                <OutlinedInput defaultValue="" label="Description" name="description" inputRef={courseDescriptionRef}/>
+                <TextField
+
+                  label="Course Description"
+                  inputRef={courseDescriptionRef}
+                  name="Course Description"
+                  multiline
+                  required
+                  rows={2}
+                />
               </FormControl>
             </Grid>
 

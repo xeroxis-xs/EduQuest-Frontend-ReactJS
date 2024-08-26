@@ -57,6 +57,9 @@ export default function Page(): React.JSX.Element {
 
       <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
         {loadingBadge ? <SkeletonBadgeCard/> : (
+          badges.length === 0 ? (
+              <Typography variant="h6" align="center" mt={4}>No data available</Typography>
+            ) :
           <BadgeCard badges={badges}/>
         )}
       </Stack>

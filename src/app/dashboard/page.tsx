@@ -215,9 +215,8 @@ export default function Page(): React.JSX.Element {
         </Grid>
         <Grid lg={3} sm={6} xs={12}>
           { analyticsPartOneLoading? <SkeletonShortestUser /> :
-            (analyticsPartOne.shortest_time_user ?
-              <ShortestUser shortestTimeUser={analyticsPartOne.shortest_time_user} sx={{ height: '100%' }} /> : null
-            )
+              <ShortestUser shortestTimeUser={analyticsPartOne.shortest_time_user} sx={{ height: '100%' }} />
+
           }
         </Grid>
         <Grid lg={8} md={12} xs={12}>
@@ -234,14 +233,14 @@ export default function Page(): React.JSX.Element {
               <MyBadgeProgress userBadgeProgression={analyticsPartTwo.user_badge_progression} sx={{ height: "100%" }}/> : null
         )}
           </Grid>
-        <Grid lg={5} md={12} xs={12}>
+        <Grid lg={6} md={12} xs={12}>
           {analyticsPartThreeLoading ? <SkeletonTopCollector /> :
             (analyticsPartThree.top_users_with_most_badges ?
                 <TopCollectors topCollectors={analyticsPartThree.top_users_with_most_badges} sx={{ height: '100%' }} /> : null
             )
           }
         </Grid>
-        <Grid lg={7} md={12} xs={12}>
+        <Grid lg={6} md={12} xs={12}>
           {analyticsPartThreeLoading ? <SkeletonRecentAchievements /> :
             (analyticsPartThree.recent_badge_awards ?
                 <RecentAchievements recentBadges={analyticsPartThree.recent_badge_awards} sx={{ height: '100%' }} /> : null

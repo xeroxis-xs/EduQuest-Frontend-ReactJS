@@ -18,6 +18,7 @@ import Tooltip from "@mui/material/Tooltip";
 import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
 import Stack from "@mui/material/Stack";
 import type { UserCourseProgression } from "@/types/analytics/user-course-progression";
+import Typography from "@mui/material/Typography";
 
 export interface MyEnrolledCoursesProps {
   userCourseProgression?: UserCourseProgression[];
@@ -58,26 +59,31 @@ export function MyCourseProgress({ userCourseProgression = [], sx }: MyEnrolledC
       </Stack>
       <Divider />
       <Box sx={{ flex: 1, overflow: 'auto' }}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Term</TableCell>
-              <TableCell>Course</TableCell>
-              <TableCell>Progress</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {userCourseProgression.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((aUserCourseProgression) => (
-              <TableRow hover key={aUserCourseProgression.course_id} >
-                <TableCell sx={{ borderBottom: "none", pr:0 }}>{aUserCourseProgression.course_term}</TableCell>
-                <TableCell sx={{ borderBottom: "none", pr:0 }}>{aUserCourseProgression.course_name}</TableCell>
-                <TableCell sx={{ width: '40%', borderBottom: "none" }}>
-                  <CourseChart aUserCourseProgression={aUserCourseProgression}/>
-                </TableCell>
+        { userCourseProgression.length === 0 ? (
+          <Typography variant="subtitle2" align="center" mt={4}>No data available.</Typography>
+        ) : (
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Term</TableCell>
+                <TableCell>Course</TableCell>
+                <TableCell>Progress</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHead>
+            <TableBody>
+              {userCourseProgression.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((aUserCourseProgression) => (
+                <TableRow hover key={aUserCourseProgression.course_id} >
+                  <TableCell sx={{ borderBottom: "none", pr:0 }}>{aUserCourseProgression.course_term}</TableCell>
+                  <TableCell sx={{ borderBottom: "none", pr:0 }}>{aUserCourseProgression.course_name}</TableCell>
+                  <TableCell sx={{ width: '40%', borderBottom: "none" }}>
+                    <CourseChart aUserCourseProgression={aUserCourseProgression}/>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        ) }
+
       </Box>
       {/*<Divider/>*/}
       <TablePagination

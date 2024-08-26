@@ -15,6 +15,7 @@ import type { Question } from '@/types/question';
 import Box from "@mui/material/Box";
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
+import {Loading} from "@/components/dashboard/loading/loading";
 
 
 interface ImportCardQuestionProps {
@@ -24,6 +25,7 @@ interface ImportCardQuestionProps {
 
 export function ImportCardQuestion({ questions, onQuestionUpdateSuccess }: ImportCardQuestionProps): React.JSX.Element {
   const [updatedQuestions, setUpdatedQuestions] = React.useState(questions);
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const handleAnswerChange = (questionId: number, answerId: number, isCorrect: boolean): void => {
     logger.debug('handleAnswerChange', questionId, answerId, isCorrect);
@@ -47,6 +49,7 @@ export function ImportCardQuestion({ questions, onQuestionUpdateSuccess }: Impor
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
+    setIsLoading(true);
     logger.debug('Submitting updated questions', updatedQuestions);
 
     try {
@@ -64,17 +67,8 @@ export function ImportCardQuestion({ questions, onQuestionUpdateSuccess }: Impor
       logger.error('Failed to save data', error);
       // onSaveResult({ type: 'error', message: 'Save Failed. Please try again.' });
     }
+    setIsLoading(false);
   }
-
-  // React.useEffect(() => {
-  //   const fetchData = async (): Promise<void> => {
-  //
-  //   };
-  //
-  //   fetchData().catch((error: unknown) => {
-  //     logger.error('Failed to fetch data', error);
-  //   });
-  // }, []);
 
   return (
     <form onSubmit={handleSubmit}>
@@ -116,10 +110,12 @@ export function ImportCardQuestion({ questions, onQuestionUpdateSuccess }: Impor
       </CardContent>
     </Card>
 
+      {isLoading ? <Loading text="Updating Questions..." /> : null}
 
     <Box sx={{display: "flex", justifyContent: "center", mt: 6}}>
       <Button endIcon={<CaretRightIcon/>} type="submit" variant="contained">Next: View Attempts</Button>
     </Box>
+
       </form>
     // {submitStatus ? <Alert severity={submitStatus.type} sx={{marginTop: 2}}>
     //   {submitStatus.message}

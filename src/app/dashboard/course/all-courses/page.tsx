@@ -74,6 +74,9 @@ export default function Page(): React.JSX.Element {
       {loading ? (
         <SkeletonCourseCard />
       ) : (
+        courses.length === 0 ? (
+          <Typography variant="h6" align="center" mt={4}>No data available.</Typography>
+          ) :
         <CourseCard rows={courses} onEnrolledSuccess={getCourses} />
       )}
     </Stack>

@@ -26,6 +26,7 @@ import {useUser} from "@/hooks/use-user";
 import Box from "@mui/material/Box";
 import Alert from "@mui/material/Alert";
 import Chip from "@mui/material/Chip";
+import {Loading} from "@/components/dashboard/loading/loading";
 
 
 const VisuallyHiddenInput = styled('input')({
@@ -52,7 +53,7 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
   const questDescriptionRef = React.useRef<HTMLInputElement>(null);
   const questCourseIdRef = React.useRef<HTMLInputElement>(null);
   const questImageIdRef = React.useRef<HTMLInputElement>(null);
-
+  const [isLoading, setIsLoading] = React.useState(false);
   const [courses, setCourses] = React.useState<Course[]>([]);
   const [images, setImages] = React.useState<Image[]>([]);
   const [selectedCourse, setSelectedCourse] = React.useState<Course | null>(null);
@@ -149,7 +150,7 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
-
+    setIsLoading(true);
     // Create FormData
     const formData = new FormData();
     // Append other data as needed
@@ -193,7 +194,7 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
       logger.error('No file selected');
       setSubmitStatus({ type: 'error', message: 'No file selected' });
     }
-
+    setIsLoading(false);
 
   };
 
@@ -376,13 +377,13 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
         {typeof submitStatus.message === 'string' ? submitStatus.message : 'An error occurred'}
       </Alert> : null}
 
+      {isLoading ? <Loading text="Creating Quest and Questions..." /> : null}
+
     <Box sx={{display: "flex", justifyContent: "center", mt: 6}}>
       <Button endIcon={<CaretRightIcon/>} type="submit" variant="contained">Next: Edit Question</Button>
     </Box>
+
     </form>
-    // {submitStatus ? <Alert severity={submitStatus.type} sx={{marginTop: 2}}>
-    //   {submitStatus.message}
-    // </Alert> : null}
 
   );
 }
