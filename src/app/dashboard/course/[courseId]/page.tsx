@@ -31,30 +31,16 @@ import Box from "@mui/material/Box";
 import {Users as UsersIcon} from "@phosphor-icons/react/dist/ssr/Users";
 import IconButton, { type IconButtonProps } from '@mui/material/IconButton';
 import { CaretDown as CaretDownIcon } from "@phosphor-icons/react/dist/ssr/CaretDown";
-import {styled, useTheme} from '@mui/material/styles';
+import {styled} from '@mui/material/styles';
 import Collapse from '@mui/material/Collapse';
 import { SkeletonQuestCard } from "@/components/dashboard/skeleton/skeleton-quest-card";
 import { SkeletonCourseDetailCard } from "@/components/dashboard/skeleton/skeleton-course-detail-card";
 import {CourseEditForm} from "@/components/dashboard/course/course-edit-form";
-import ToggleButtonGroup, { toggleButtonGroupClasses } from '@mui/material/ToggleButtonGroup';
 import { Plus as PlusIcon } from "@phosphor-icons/react/dist/ssr/Plus";
-import { CheckCircle as CheckCircleIcon } from "@phosphor-icons/react/dist/ssr/CheckCircle";
 import { XCircle as XCircleIcon } from "@phosphor-icons/react/dist/ssr/XCircle";
 import {QuestNewForm} from "@/components/dashboard/quest/quest-new-form";
 import {useState} from "react";
 import {IOSSwitch} from "@/components/dashboard/misc/buttons";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import List from "@mui/material/List";
-import ListItem from "@mui/material/ListItem";
-import ListItemAvatar from "@mui/material/ListItemAvatar";
-import Avatar from "@mui/material/Avatar";
-import ExpertBadge from "../../../../../public/assets/expert_badge.svg";
-import ListItemText from "@mui/material/ListItemText";
-import SpeedsterBadge from "../../../../../public/assets/speedster_badge.svg";
-import DialogActions from "@mui/material/DialogActions";
-import Dialog from "@mui/material/Dialog";
 import {CourseExpiresDialog} from "@/components/dashboard/dialog/course-expires-dialog";
 
 
@@ -75,21 +61,6 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
   }),
 }));
 
-const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
-  [`& .${toggleButtonGroupClasses.grouped}`]: {
-    margin: theme.spacing(0.5),
-    border: 0,
-    borderRadius: theme.shape.borderRadius,
-    [`&.${toggleButtonGroupClasses.disabled}`]: {
-      border: 0,
-    },
-  },
-  [`& .${toggleButtonGroupClasses.middleButton},& .${toggleButtonGroupClasses.lastButton}`]:
-    {
-      marginLeft: -1,
-      borderLeft: '1px solid transparent',
-    },
-}));
 
 export default function Page({ params }: { params: { courseId: string } }) : React.JSX.Element {
   const { eduquestUser } = useUser();
@@ -245,7 +216,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
                     <IOSSwitch
                       checked={course.status === 'Active'}
                       onClick={handleDialogOpen}
-                      inputProps={{ 'aria-hidden': false }}
+                      inputProps={{ 'aria-hidden': false, 'aria-modal': true }}
                     />
                     <Typography variant="overline" color="text.secondary">
                       {course.status === 'Active' ? 'Active' : 'Expired'}

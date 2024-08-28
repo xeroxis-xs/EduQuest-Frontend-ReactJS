@@ -37,21 +37,7 @@ import { SkeletonQuestAttemptTable } from "@/components/dashboard/skeleton/skele
 import {NewQuestionForm} from "@/components/dashboard/quest/question/new-question-form";
 import QuestEditForm from "@/components/dashboard/quest/question/quest-edit-form";
 import {IOSSwitch} from "@/components/dashboard/misc/buttons";
-import DialogTitle from "@mui/material/DialogTitle";
-import DialogContent from "@mui/material/DialogContent";
-import DialogContentText from "@mui/material/DialogContentText";
-import DialogActions from "@mui/material/DialogActions";
-import {CheckCircle as CheckCircleIcon} from "@phosphor-icons/react/dist/ssr/CheckCircle";
-import Dialog from "@mui/material/Dialog";
 import {useState} from "react";
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemText from '@mui/material/ListItemText';
-import ListItemAvatar from '@mui/material/ListItemAvatar';
-import Avatar from '@mui/material/Avatar';
-import ExpertBadge from "../../../../../public/assets/expert_badge.svg";
-import SpeedsterBadge from "../../../../../public/assets/speedster_badge.svg";
-import Box from "@mui/material/Box";
 import Tooltip from "@mui/material/Tooltip";
 import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
 import {QuestExpiresDialog} from "@/components/dashboard/dialog/quest-expires-dialog";
@@ -260,7 +246,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
                     <IOSSwitch
                       checked={quest.status === 'Active'}
                       onClick={handleDialogOpen}
-                      inputProps={{ 'aria-hidden': false }}
+                      inputProps={{ 'aria-hidden': false, 'aria-modal': true }}
                     />
                     <Typography variant="overline" color="text.secondary">
                       {quest.status === 'Active' ? 'Active' : 'Expired'}

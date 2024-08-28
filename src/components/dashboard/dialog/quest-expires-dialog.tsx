@@ -99,7 +99,7 @@ export function QuestExpiresDialog({ quest, openDialog, handleDialogClose, handl
             Cancel
           </Button>
           <Button
-            onClick={() => handleDialogConfirm(quest.status === 'Active' ? 'Expired' : 'Active')}
+            onClick={() => { handleDialogConfirm(quest.status === 'Active' ? 'Expired' : 'Active'); }}
             color="primary"
             variant="contained"
             startIcon={<CheckCircleIcon />}
