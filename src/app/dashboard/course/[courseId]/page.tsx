@@ -41,6 +41,21 @@ import { Plus as PlusIcon } from "@phosphor-icons/react/dist/ssr/Plus";
 import { CheckCircle as CheckCircleIcon } from "@phosphor-icons/react/dist/ssr/CheckCircle";
 import { XCircle as XCircleIcon } from "@phosphor-icons/react/dist/ssr/XCircle";
 import {QuestNewForm} from "@/components/dashboard/quest/quest-new-form";
+import {useState} from "react";
+import {IOSSwitch} from "@/components/dashboard/misc/buttons";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import ListItemAvatar from "@mui/material/ListItemAvatar";
+import Avatar from "@mui/material/Avatar";
+import ExpertBadge from "../../../../../public/assets/expert_badge.svg";
+import ListItemText from "@mui/material/ListItemText";
+import SpeedsterBadge from "../../../../../public/assets/speedster_badge.svg";
+import DialogActions from "@mui/material/DialogActions";
+import Dialog from "@mui/material/Dialog";
+import {CourseExpiresDialog} from "@/components/dashboard/dialog/course-expires-dialog";
 
 
 
@@ -86,6 +101,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
   const [loadingQuests, setLoadingQuests] = React.useState(true);
   const [loadingCourse, setLoadingCourse] = React.useState(true);
   const [submitStatus, setSubmitStatus] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [openDialog, setOpenDialog] = useState(false);
 
   const handleExpandClick = (): void => {
     setExpanded(!expanded);
@@ -98,6 +114,36 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
   const toggleEditForm = (): void => {
     setShowEditForm(!showEditForm);
   };
+
+  const handleDialogOpen = (): void => {
+    setOpenDialog(true);
+  }
+
+  const handleDialogClose = (): void => {
+    setOpenDialog(false);
+  };
+
+  const handleDialogConfirm = async (status: 'Active' | 'Expired'): Promise<void> => {
+    setOpenDialog(false);
+    await handleStatusChange(status);
+  };
+
+  const handleStatusChange = async (status : string): Promise<void> => {
+    try {
+      const data = {status: status}
+      const response : AxiosResponse<Course> = await apiService.patch(`/api/Course/${params.courseId}/`, data);
+      setSubmitStatus({ type: 'success', message: `Course has been set to '${status}'` });
+      setCourse(response.data);
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 401) {
+          await authClient.signInWithMsal();
+        }
+        logger.error('Failed to expire course', error);
+        setSubmitStatus({type: 'error', message: 'Failed to change course status. Please try again.'});
+      }
+    }
+  }
 
   const getCourse = async (): Promise<void> => {
     try {
@@ -193,9 +239,22 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
             subheader={`ID: ${course.id.toString()}`}
             action={
               eduquestUser?.is_staff ?
-                <Button startIcon={<PenIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleEditForm}>
-                  Edit Course
-                </Button> : null
+                <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }} color="error">
+                  <Stack direction="row" spacing={1} sx={{alignItems: 'center'}}>
+
+                    <IOSSwitch
+                      checked={course.status === 'Active'}
+                      onClick={handleDialogOpen}
+                      inputProps={{ 'aria-hidden': false }}
+                    />
+                    <Typography variant="overline" color="text.secondary">
+                      {course.status === 'Active' ? 'Active' : 'Expired'}
+                    </Typography>
+                  </Stack>
+                  <Button startIcon={<PenIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleEditForm}>
+                    Edit Course
+                  </Button>
+                </Stack> : null
             }
           />
           <CardMedia
@@ -291,6 +350,14 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
               <Button endIcon={<SignInIcon/>} onClick={() => handleEnroll()} variant="contained">Enroll</Button>
             )}
           </CardActions>
+
+          <CourseExpiresDialog
+            openDialog={openDialog}
+            handleDialogClose={handleDialogClose}
+            handleDialogConfirm={handleDialogConfirm}
+            course={course}
+          />
+
         </Card>
           ) : (
             <Typography variant="body1">Course details not available.</Typography>
@@ -318,15 +385,15 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
           <Typography variant="h5">Quests</Typography>
           <Typography variant="body2" color="text.secondary">Quests available for this course.</Typography>
         </Box>
-
-        <Button
-          startIcon={showCreateForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PlusIcon fontSize="var(--icon-fontSize-md)" />}
-          variant={showCreateForm ? 'text' : 'contained'}
-          color={showCreateForm ? 'error' : 'primary'}
-          onClick={toggleCreateForm}
-        >
-          {showCreateForm ? 'Cancel' : 'Create Quest'}
-        </Button>
+        { eduquestUser?.is_staff ?
+          <Button
+            startIcon={showCreateForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PlusIcon fontSize="var(--icon-fontSize-md)" />}
+            variant={showCreateForm ? 'text' : 'contained'}
+            color={showCreateForm ? 'error' : 'primary'}
+            onClick={toggleCreateForm}
+          >
+            {showCreateForm ? 'Cancel' : 'Create Quest'}
+          </Button> : null }
       </Stack>
 
       {showCreateForm && course ? <QuestNewForm onFormSubmitSuccess={getQuests} courseId={course.id}/> : null}

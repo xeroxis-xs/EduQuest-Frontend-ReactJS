@@ -1,5 +1,5 @@
 import { styled } from "@mui/material/styles";
-import Switch, { SwitchProps } from "@mui/material/Switch";
+import Switch, { type SwitchProps } from "@mui/material/Switch";
 
 
 export const IOSSwitch = styled((props: SwitchProps) => (

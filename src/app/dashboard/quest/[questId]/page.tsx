@@ -4,8 +4,6 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { CaretLeft as CaretLeftIcon } from "@phosphor-icons/react/dist/ssr/CaretLeft";
 import { Pen as PenIcon } from "@phosphor-icons/react/dist/ssr/Pen";
-import { FloppyDisk as FloppyDiskIcon } from "@phosphor-icons/react/dist/ssr/FloppyDisk";
-import { Trash as TrashIcon } from "@phosphor-icons/react/dist/ssr/Trash";
 import { GameController as GameControllerIcon } from "@phosphor-icons/react/dist/ssr/GameController";
 import { FilePlus as FilePlusIcon } from "@phosphor-icons/react/dist/ssr/FilePlus";
 import type { Course } from '@/types/course';
@@ -18,17 +16,10 @@ import { logger } from '@/lib/default-logger'
 import { authClient } from "@/lib/auth/client";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
-import Divider from "@mui/material/Divider";
 import CardContent from "@mui/material/CardContent";
 import Grid from "@mui/material/Unstable_Grid2";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import OutlinedInput from "@mui/material/OutlinedInput";
-import Select, { type SelectChangeEvent } from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
 import CardActions from "@mui/material/CardActions";
 import Link, { default as RouterLink } from "next/link";
-import {paths} from "@/paths";
 import Alert from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
 import {useRouter} from "next/navigation";
@@ -39,10 +30,8 @@ import {UserQuestAttemptTable} from "@/components/dashboard/quest/attempt/quest-
 import { CardMedia } from "@mui/material";
 import IconButton, { type IconButtonProps } from '@mui/material/IconButton';
 import { CaretDown as CaretDownIcon } from "@phosphor-icons/react/dist/ssr/CaretDown";
-import { CalendarX as CalendarXIcon } from "@phosphor-icons/react/dist/ssr/CalendarX";
 import { styled } from '@mui/material/styles';
 import Collapse from '@mui/material/Collapse';
-import {type Image} from "@/types/image";
 import { SkeletonQuestDetailCard } from "@/components/dashboard/skeleton/skeleton-quest-detail-card";
 import { SkeletonQuestAttemptTable } from "@/components/dashboard/skeleton/skeleton-quest-attempt-table";
 import {NewQuestionForm} from "@/components/dashboard/quest/question/new-question-form";
@@ -65,6 +54,7 @@ import SpeedsterBadge from "../../../../../public/assets/speedster_badge.svg";
 import Box from "@mui/material/Box";
 import Tooltip from "@mui/material/Tooltip";
 import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
+import {QuestExpiresDialog} from "@/components/dashboard/dialog/quest-expires-dialog";
 
 
 interface ExpandMoreProps extends IconButtonProps {
@@ -86,21 +76,10 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
 export default function Page({ params }: { params: { questId: string } }) : React.JSX.Element {
   const router = useRouter();
   const { eduquestUser } = useUser();
-  // const questTypeRef = React.useRef<HTMLInputElement>(null);
-  // const questNameRef = React.useRef<HTMLInputElement>(null);
-  // const questDescriptionRef = React.useRef<HTMLInputElement>(null);
-  // const questMaxAttemptsRef = React.useRef<HTMLInputElement>(null);
-  // const questStatusRef = React.useRef<HTMLInputElement>(null);
-  // const questExpirationDateRef = React.useRef<HTMLInputElement>(null);
-  // const questCourseIdRef = React.useRef<HTMLInputElement>(null);
-  // const questImageIdRef = React.useRef<HTMLInputElement>(null);
   const [quest, setQuest] = React.useState<Quest>();
   const [courses, setCourses] = React.useState<Course[]>();
   const [course, setCourse] = React.useState<Course>();
-  // const [images, setImages] = React.useState<Image[]>();
   const [userQuestAttempts, setUserQuestAttempts] = React.useState<UserQuestAttempt[]>();
-  // const [selectedCourse, setSelectedCourse] = React.useState<Course | null>(null);
-  // const [selectedImage, setSelectedImage] = React.useState<Image | null>(null);
   const [submitStatus, setSubmitStatus] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [showEditQuestForm, setShowEditQuestForm] = React.useState(false);
   const [showNewQuestionForm, setShowNewQuestionForm] = React.useState(false);
@@ -467,71 +446,12 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
             ) : null}
           </CardActions>
 
-          <Dialog
-            open={openDialog}
-            onClose={handleDialogClose}
-            aria-labelledby="alert-dialog-title"
-            aria-describedby="alert-dialog-description"
-          >
-            <DialogTitle id="alert-dialog-title">Confirm State Change</DialogTitle>
-            <DialogContent sx={{pb:0}}>
-              <DialogContentText id="alert-dialog-description" pb={1}>
-                Are you sure you want to set this quest to
-                <Typography fontWeight={600} display='inline'> {quest.status === 'Active' ? 'Expired' : 'Active'}</Typography>
-                  ?
-              </DialogContentText>
-              { quest.status === 'Active' ?
-                <Box>
-                  <DialogContentText id="alert-dialog-description">
-                    The following state-sensitive badges will be issued to qualified users upon setting the quest to {quest.status === 'Active' ? 'Expired' : 'Active'}:
-                  </DialogContentText>
-                  <DialogContentText id="alert-dialog-description">
-                    <List sx={{ width: '100%' }}>
-                      <ListItem>
-                        <ListItemAvatar>
-                          <Avatar sx={{ backgroundColor: 'transparent' }}>
-                            <ExpertBadge size={28}/>
-                          </Avatar>
-                        </ListItemAvatar>
-                        <ListItemText primary="Expert Badge" secondary="Awarded to the user with the highest score for this quest." />
-                      </ListItem>
-                      <ListItem>
-                        <ListItemAvatar>
-                          <Avatar sx={{ backgroundColor: 'transparent' }}>
-                          <SpeedsterBadge size={28}/>
-                          </Avatar>
-                        </ListItemAvatar>
-                        <ListItemText primary="Speedster Badge" secondary="Awarded to the user with the fastest attempt for this quest. " />
-                      </ListItem>
-                    </List>
-                  </DialogContentText>
-                  <DialogContentText id="alert-dialog-description">
-                    <Typography variant="body2">*Note: The expiry date of this quest will be reset.</Typography>
-
-                  </DialogContentText>
-                </Box>
-              :
-                <Box>
-                  <DialogContentText id="alert-dialog-description">
-                    Setting this quest to {quest.status === 'Active' ? 'Expired' : 'Active'} again will not re-issue the same badges to users who have already received them.
-                  </DialogContentText>
-                </Box>
-              }
-            </DialogContent>
-            <DialogActions>
-              <Button onClick={handleDialogClose} color="error" startIcon={<XCircleIcon />} >
-                Cancel
-              </Button>
-              <Button
-                onClick={() => handleDialogConfirm(quest.status === 'Active' ? 'Expired' : 'Active')}
-                color="primary"
-                variant="contained"
-                startIcon={<CheckCircleIcon />}
-              >
-                Confirm
-              </Button>
-            </DialogActions>
-          </Dialog>
+          <QuestExpiresDialog
+            openDialog={openDialog}
+            handleDialogClose={handleDialogClose}
+            handleDialogConfirm={handleDialogConfirm}
+            quest={quest}
+          />
 
 
         </Card>
