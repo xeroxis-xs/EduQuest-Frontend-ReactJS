@@ -10,7 +10,7 @@ import apiService from "@/api/api-service";
 import {AxiosError, type AxiosResponse} from "axios";
 import { logger } from '@/lib/default-logger'
 import { authClient } from "@/lib/auth/client";
-import { QuestForm } from "@/components/dashboard/quest/quest-form";
+import { QuestNewForm } from "@/components/dashboard/quest/quest-new-form";
 import { QuestCard } from "@/components/dashboard/quest/quest-card";
 import type { Quest } from '@/types/quest';
 import { SkeletonQuestCard } from "@/components/dashboard/skeleton/skeleton-quest-card";
@@ -102,7 +102,7 @@ export default function Page(): React.JSX.Element {
             </Button> : null}
         </Stack>
       </Stack>
-      {showForm ? <QuestForm onFormSubmitSuccess={getQuests}/> : null} {/* Conditional rendering */}
+      {showForm ? <QuestNewForm onFormSubmitSuccess={getQuests}/> : null} {/* Conditional rendering */}
       {loading ? (
         <SkeletonQuestCard />
       ) : (

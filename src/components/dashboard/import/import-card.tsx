@@ -27,6 +27,7 @@ import Box from "@mui/material/Box";
 import Alert from "@mui/material/Alert";
 import Chip from "@mui/material/Chip";
 import {Loading} from "@/components/dashboard/loading/loading";
+import { Skeleton } from '@mui/material';
 
 
 const VisuallyHiddenInput = styled('input')({
@@ -53,7 +54,9 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
   const questDescriptionRef = React.useRef<HTMLInputElement>(null);
   const questCourseIdRef = React.useRef<HTMLInputElement>(null);
   const questImageIdRef = React.useRef<HTMLInputElement>(null);
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [isProcessing, setIsProcessing] = React.useState(false);
+  const [isCoursesLoading, setIsCoursesLoading] = React.useState(true);
+  const [isImagesLoading, setIsImagesLoading] = React.useState(true);
   const [courses, setCourses] = React.useState<Course[]>([]);
   const [images, setImages] = React.useState<Image[]>([]);
   const [selectedCourse, setSelectedCourse] = React.useState<Course | null>(null);
@@ -76,6 +79,8 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
         }
       }
       logger.error('Error: ', error);
+    } finally {
+      setIsCoursesLoading(false);
     }
   }
 
@@ -93,6 +98,8 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
         }
       }
       logger.error('Error: ', error);
+    } finally {
+      setIsImagesLoading(false);
     }
   }
 
@@ -123,6 +130,7 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
       setSelectedCourse({
         id: course.id,
         code: course.code,
+        group: course.group,
         name: course.name,
         description: course.description,
         status: course.status,
@@ -150,7 +158,7 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
-    setIsLoading(true);
+    setIsProcessing(true);
     // Create FormData
     const formData = new FormData();
     // Append other data as needed
@@ -194,20 +202,25 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
       logger.error('No file selected');
       setSubmitStatus({ type: 'error', message: 'No file selected' });
     }
-    setIsLoading(false);
+    setIsProcessing(false);
 
   };
 
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
-      await getCourses();
+      console.log('isCoursesLoading', isCoursesLoading);
       await getImages();
+      await getCourses();
     };
 
     fetchData().catch((error: unknown) => {
       logger.error('Failed to fetch data', error);
     });
   }, []);
+
+  // React.useEffect(() => {
+  //   console.log('isCoursesLoading', isCoursesLoading);
+  // }, [isCoursesLoading]);
 
   return (
     <form onSubmit={handleSubmit}>
@@ -276,7 +289,8 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
       <CardHeader title="Quest Thumbnail" subheader="Select a Thumbnail for this Quest"/>
       <Divider/>
       <CardContent sx={{pb:'16px'}}>
-        {images && images.length>0 ?
+        {isImagesLoading ? <Skeleton variant="rectangular" height={160} width='100%'/>
+          : images.length > 0 ?
           <Grid container spacing={3} >
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
@@ -317,7 +331,8 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
         <CardHeader title="Associated Course" subheader="Select an associated Course for this Quest"/>
         <Divider/>
         <CardContent sx={{pb:'16px'}}>
-          {courses && courses.length > 0 ?
+          {isCoursesLoading ? <Skeleton variant="rectangular" height={160} width='100%'/>
+            : courses.length > 0 ?
             <Grid container spacing={3} >
               <Grid md={6} xs={12}>
                 <FormControl fullWidth required>
@@ -333,21 +348,26 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
                 </FormControl>
               </Grid>
               <Grid md={6} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
-              <Grid md={3} xs={6}>
-                <Typography variant="overline" color="text.secondary">Course Name</Typography>
-                <Typography variant="body2">{selectedCourse?.name || courses[0].name }</Typography>
-              </Grid>
-              <Grid md={3} xs={6}>
+
+              <Grid md={6} xs={12}>
                 <Typography variant="overline" color="text.secondary">Course Code</Typography>
                 <Typography variant="body2">{selectedCourse?.code || courses[0].code}</Typography>
               </Grid>
-              <Grid md={3} xs={6}>
+              <Grid md={6} xs={12}>
+                <Typography variant="overline" color="text.secondary">Course Name</Typography>
+                <Typography variant="body2">{selectedCourse?.name || courses[0].name }</Typography>
+              </Grid>
+              <Grid md={6} xs={12}>
+                <Typography variant="overline" color="text.secondary">Course Group</Typography>
+                <Typography variant="body2">{selectedCourse?.group || courses[0].group}</Typography>
+              </Grid>
+              <Grid md={6} xs={12}>
                 <Typography variant="overline" color="text.secondary">Course Year / Term</Typography>
                 <Typography variant="body2">
                   AY {selectedCourse?.term.academic_year.start_year || courses[0].term.academic_year.start_year}-{selectedCourse?.term.academic_year.end_year || courses[0].term.academic_year.end_year} / {selectedCourse?.term.name || courses[0].term.name}
                 </Typography>
               </Grid>
-              <Grid md={3} xs={6}>
+              <Grid md={6} xs={12}>
                 <Typography variant="overline" color="text.secondary">Course Duration</Typography>
                 <Typography variant="body2">
                   From {selectedCourse?.term.start_date || courses[0].term.start_date} to {selectedCourse?.term.end_date || courses[0].term.end_date}
@@ -377,7 +397,7 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
         {typeof submitStatus.message === 'string' ? submitStatus.message : 'An error occurred'}
       </Alert> : null}
 
-      {isLoading ? <Loading text="Creating Quest and Questions..." /> : null}
+      {isProcessing ? <Loading text="Creating Quest and Questions..." /> : null}
 
     <Box sx={{display: "flex", justifyContent: "center", mt: 6}}>
       <Button endIcon={<CaretRightIcon/>} type="submit" variant="contained">Next: Edit Question</Button>

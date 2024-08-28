@@ -79,7 +79,7 @@ export function CourseCard({ rows = [], onEnrolledSuccess }: CourseCardProps): R
         <Grid key={course.id} lg={4} md={6} xs={12} >
           <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <CardActionArea href={`/dashboard/course/${course.id.toString()}` } sx={{ height: '100%', borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }} component={RouterLink}>
-              <CardHeader title={course.name} subheader={course.code}/>
+              <CardHeader title={`${course.code} ${course.name}`} subheader={`Group: ${course.group}`}/>
               <CardMedia
                 component="img"
                 alt={course.image.name}

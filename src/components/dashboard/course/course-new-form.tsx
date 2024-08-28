@@ -26,14 +26,16 @@ import { FilePlus as FilePlusIcon } from '@phosphor-icons/react/dist/ssr/FilePlu
 import type {Image} from "@/types/image";
 import {CardMedia, TextField} from "@mui/material";
 import Chip from "@mui/material/Chip";
+import Skeleton from "@mui/material/Skeleton";
 
 interface CourseFormProps {
   onFormSubmitSuccess: () => void;
 }
 
-export function CourseForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.Element {
+export function CourseNewForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.Element {
   const courseCodeRef = React.useRef<HTMLInputElement>(null);
   const courseNameRef = React.useRef<HTMLInputElement>(null);
+  const courseGroupRef = React.useRef<HTMLInputElement>(null);
   const courseDescriptionRef = React.useRef<HTMLInputElement>(null);
   const courseStatusRef = React.useRef<HTMLInputElement>(null);
   const courseTypeRef = React.useRef<HTMLInputElement>(null);
@@ -41,6 +43,8 @@ export function CourseForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.
   const courseImageIdRef = React.useRef<HTMLInputElement>(null);
   const [images, setImages] = React.useState<Image[]>();
   const [terms, setTerms] = React.useState<Term[]>();
+  const [isTermsLoading, setIsTermsLoading] = React.useState<boolean>(true);
+  const [isImagesLoading, setIsImagesLoading] = React.useState<boolean>(true);
   const [selectedTerm, setSelectedTerm] = React.useState<Term | null>(null);
   const [selectedImage, setSelectedImage] = React.useState<Image | null>(null);
   const [submitStatus, setSubmitStatus] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -49,8 +53,9 @@ export function CourseForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.
     try {
       const response: AxiosResponse<Term[]> = await apiService.get<Term[]>(`/api/Term/`);
       const data: Term[] = response.data;
-      setTerms(data);
-      logger.debug('terms', data);
+      const filteredData = data.filter((term) => term.name !== 'Private Term' && term.academic_year.start_year !== 0);
+      setTerms(filteredData);
+      logger.debug('Filtered Terms', filteredData);
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         if (error.response?.status === 401) {
@@ -62,6 +67,8 @@ export function CourseForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.
         }
       }
       logger.error('Failed to fetch data', error);
+    } finally {
+      setIsTermsLoading(false);
     }
   };
 
@@ -82,6 +89,8 @@ export function CourseForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.
         }
       }
       logger.error('Failed to fetch data', error);
+    } finally {
+      setIsImagesLoading(false);
     }
   }
 
@@ -172,20 +181,26 @@ export function CourseForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.
         <Divider />
         <CardContent>
           <Grid container spacing={3}>
-            <Grid md={3} xs={6}>
+            <Grid md={6} xs={12}>
               <FormControl fullWidth required>
                 <InputLabel>Course Name</InputLabel>
                 <OutlinedInput defaultValue="" label="Name" name="name" inputRef={courseNameRef} />
               </FormControl>
             </Grid>
-            <Grid md={3} xs={6}>
+            <Grid md={6} xs={12}>
               <FormControl fullWidth required>
                 <InputLabel>Course Code</InputLabel>
                 <OutlinedInput defaultValue="" label="Code" name="code" inputRef={courseCodeRef} />
               </FormControl>
             </Grid>
+            <Grid md={6} xs={12}>
+              <FormControl fullWidth required>
+                <InputLabel>Course Group</InputLabel>
+                <OutlinedInput defaultValue="" label="Group" name="group" inputRef={courseGroupRef} />
+              </FormControl>
+            </Grid>
 
-            <Grid md={3} xs={6}>
+            <Grid md={6} xs={12}>
               <FormControl fullWidth required>
                 <InputLabel>Course Type</InputLabel>
                 <Select defaultValue="Public" label="Quest Type" inputRef={courseTypeRef} name="type">
@@ -194,7 +209,7 @@ export function CourseForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.
                 </Select>
               </FormControl>
             </Grid>
-            <Grid md={3} xs={6}>
+            <Grid md={6} xs={12}>
               <FormControl fullWidth required>
                 <InputLabel>Course Status</InputLabel>
                 <Select defaultValue="Active" label="Quest Status" inputRef={courseStatusRef} name="type">
@@ -213,15 +228,19 @@ export function CourseForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.
                   name="Course Description"
                   multiline
                   required
-                  rows={2}
+                  rows={4}
                 />
               </FormControl>
             </Grid>
 
           </Grid>
 
+          <Divider sx={{my:3}}/>
+
           <Typography sx={{my:3}} variant="h6">Thumbnail</Typography>
-          {images ?
+
+          {isImagesLoading ? <Skeleton variant="rectangular" height={50}/>
+            : images ?
             <Grid container spacing={3} >
               <Grid md={6} xs={12}>
                 <FormControl fullWidth required>
@@ -259,8 +278,8 @@ export function CourseForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.
           <Divider sx={{my:3}}/>
 
           <Typography sx={{my:3}} variant="h6">Term</Typography>
-
-          {terms ?
+          {isTermsLoading ? <Skeleton variant="rectangular" height={50}/>
+          : terms ?
             <Grid container spacing={3} >
               <Grid md={6} xs={12}>
                 <FormControl fullWidth required>

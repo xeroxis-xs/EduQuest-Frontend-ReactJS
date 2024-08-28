@@ -32,7 +32,7 @@ interface CourseFormProps {
   onFormSubmitSuccess: () => void;
 }
 
-export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Element {
+export function QuestNewForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Element {
   const { eduquestUser} = useUser();
   const questTypeRef = React.useRef<HTMLInputElement>(null);
   const questNameRef = React.useRef<HTMLInputElement>(null);
@@ -107,6 +107,7 @@ export function QuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Ele
       setSelectedCourse({
         id: course.id,
         code: course.code,
+        group: course.group,
         name: course.name,
         description: course.description,
         status: course.status,

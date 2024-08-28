@@ -6,6 +6,7 @@ export interface Course {
   term: Term;
   name: string;
   code: string;
+  group: string;
   type: string;
   description: string;
   status: string;

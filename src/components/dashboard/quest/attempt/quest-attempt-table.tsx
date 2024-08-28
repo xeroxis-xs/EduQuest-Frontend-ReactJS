@@ -65,37 +65,48 @@ export function UserQuestAttemptTable({ questId = '0', rows = [], totalMaxScore 
                   <TableCell>{row.id}</TableCell>
                   <TableCell>
                     <Typography variant="body2">
-                      {new Date(row.first_attempted_on).toLocaleTimeString("en-SG", {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit'
-                      })}
+                      { row.first_attempted_on === null || row.first_attempted_on === "" ? "Not Available"
+                        : new Date(row.first_attempted_on).toLocaleTimeString("en-SG", {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          second: '2-digit'
+                        })
+                      }
                     </Typography>
                     <Typography variant="body2">
-                      {new Date(row.first_attempted_on).toLocaleDateString("en-SG", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric"
-                      })}
+                      { row.first_attempted_on === null || row.first_attempted_on === "" ? null
+                        : new Date(row.first_attempted_on).toLocaleDateString("en-SG", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric"
+                        })
+                      }
                     </Typography>
                   </TableCell>
                   <TableCell>
                     <Typography variant="body2">
-                      {new Date(row.last_attempted_on).toLocaleTimeString("en-SG", {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit'
-                      })}
+                      { row.last_attempted_on === null || row.last_attempted_on === "" ? "Not Available"
+                        : new Date(row.last_attempted_on).toLocaleTimeString("en-SG", {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          second: '2-digit'
+                        })
+                      }
+
                     </Typography>
                     <Typography variant="body2">
-                      {new Date(row.last_attempted_on).toLocaleDateString("en-SG", {
-                        day: "2-digit",
-                        month: "short",
-                        year: "numeric"
-                      })}
+                      { row.last_attempted_on === null || row.last_attempted_on === "" ? null
+                        : new Date(row.last_attempted_on).toLocaleDateString("en-SG", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric"
+                        })
+                      }
                     </Typography>
                   </TableCell>
-                  <TableCell>{formatTime(row.time_taken)}</TableCell>
+                  <TableCell>
+                    { row.time_taken === 0 ? "Not Available" : formatTime(row.time_taken)}
+                  </TableCell>
                   <TableCell>
                     <Chip
                       label={row.all_questions_submitted ? "Submitted" : "In Progress"}

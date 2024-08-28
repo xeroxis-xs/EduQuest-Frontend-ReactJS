@@ -10,7 +10,7 @@ import apiService from "@/api/api-service";
 import {AxiosError, type AxiosResponse} from "axios";
 import { logger } from '@/lib/default-logger'
 import { authClient } from "@/lib/auth/client";
-import { CourseForm } from "@/components/dashboard/course/course-form";
+import { CourseNewForm } from "@/components/dashboard/course/course-new-form";
 import { CourseCard } from "@/components/dashboard/course/course-card";
 import { SkeletonCourseCard } from "@/components/dashboard/skeleton/skeleton-course-card";
 import {useUser} from "@/hooks/use-user";
@@ -70,7 +70,7 @@ export default function Page(): React.JSX.Element {
           </Stack> : null}
 
       </Stack>
-      {showForm ? <CourseForm onFormSubmitSuccess={getCourses} /> : null}
+      {showForm ? <CourseNewForm onFormSubmitSuccess={getCourses} /> : null}
       {loading ? (
         <SkeletonCourseCard />
       ) : (
