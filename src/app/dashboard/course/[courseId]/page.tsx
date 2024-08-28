@@ -42,6 +42,7 @@ import {QuestNewForm} from "@/components/dashboard/quest/quest-new-form";
 import {useState} from "react";
 import {IOSSwitch} from "@/components/dashboard/misc/buttons";
 import {CourseExpiresDialog} from "@/components/dashboard/dialog/course-expires-dialog";
+import {CalendarX as CalendarXIcon} from "@phosphor-icons/react/dist/ssr/CalendarX";
 
 
 
@@ -216,7 +217,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
                     <IOSSwitch
                       checked={course.status === 'Active'}
                       onClick={handleDialogOpen}
-                      inputProps={{ 'aria-hidden': false, 'aria-modal': true }}
+                      inputProps={{ 'aria-label': 'Change State' }}
                     />
                     <Typography variant="overline" color="text.secondary">
                       {course.status === 'Active' ? 'Active' : 'Expired'}
@@ -317,9 +318,11 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
             </Box>
             {eduquestUser && course.enrolled_users.includes(eduquestUser?.id.toString()) ? (
               <Button endIcon={<CheckIcon/>} disabled>Enrolled</Button>
-            ) : (
+            ) : course.status === 'Expired' ?
+              <Button startIcon={<CalendarXIcon/>} disabled>Expired</Button>
+              :
               <Button endIcon={<SignInIcon/>} onClick={() => handleEnroll()} variant="contained">Enroll</Button>
-            )}
+            }
           </CardActions>
 
           <CourseExpiresDialog

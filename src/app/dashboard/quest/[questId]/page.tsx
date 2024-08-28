@@ -246,7 +246,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
                     <IOSSwitch
                       checked={quest.status === 'Active'}
                       onClick={handleDialogOpen}
-                      inputProps={{ 'aria-hidden': false, 'aria-modal': true }}
+                      inputProps={{ 'aria-label': 'Change State' }}
                     />
                     <Typography variant="overline" color="text.secondary">
                       {quest.status === 'Active' ? 'Active' : 'Expired'}

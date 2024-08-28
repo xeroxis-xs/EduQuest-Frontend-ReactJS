@@ -15,6 +15,7 @@ import {CardMedia, Divider} from "@mui/material";
 import { SignIn as SignInIcon } from "@phosphor-icons/react/dist/ssr/SignIn";
 import { Users as UsersIcon } from "@phosphor-icons/react/dist/ssr/Users";
 import { Check as CheckIcon } from "@phosphor-icons/react/dist/ssr/Check";
+import { CalendarX as CalendarXIcon } from "@phosphor-icons/react/dist/ssr/CalendarX";
 import apiService from "@/api/api-service";
 import {logger} from "@/lib/default-logger";
 import {AxiosError} from "axios";
@@ -114,7 +115,9 @@ export function CourseCard({ rows = [], onEnrolledSuccess }: CourseCardProps): R
                 </Box>
                 {eduquestUser && course.enrolled_users.includes(eduquestUser?.id.toString()) ? (
                   <Button endIcon={<CheckIcon/>} disabled>Enrolled</Button>
-                ) : (
+                ) : course.status === 'Expired' ?
+                  <Button startIcon={<CalendarXIcon/>} disabled>Expired</Button>
+                  : (
                   <Button endIcon={<SignInIcon/>} onClick={() => handleEnroll(course.id)}>Enroll</Button>
 
                 )}
