@@ -31,6 +31,7 @@ import {FloppyDisk as FloppyDiskIcon} from "@phosphor-icons/react/dist/ssr/Flopp
 import {useUser} from "@/hooks/use-user";
 import {paths} from "@/paths";
 import {useRouter} from "next/navigation";
+import Stack from "@mui/material/Stack";
 
 
 interface CourseFormProps {
@@ -181,9 +182,11 @@ export function CourseEditForm({ setSubmitStatus, course, toggleForm, onUpdateSu
           subheader={`ID: ${course.id.toString()}`}
           action={
             eduquestUser?.is_staff ?
-              <Button startIcon={<XCircleIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
-                Cancel
-              </Button> : null
+              <Stack direction="row" spacing={1} sx={{alignItems: 'center'}} color="error">
+                <Button startIcon={<XCircleIcon fontSize="var(--icon-fontSize-md)" />} onClick={toggleForm} color="error">
+                  Cancel
+                </Button>
+              </Stack> : null
           }
         />
         <Divider/>
@@ -223,7 +226,7 @@ export function CourseEditForm({ setSubmitStatus, course, toggleForm, onUpdateSu
                 <InputLabel>Status</InputLabel>
                 <Select defaultValue={course.status} label="Status" inputRef={courseStatusRef} name="status">
                   <MenuItem value="Active"><Chip variant="outlined" label="Active" color="success" size="small"/></MenuItem>
-                  <MenuItem value="Inactive"><Chip variant="outlined" label="Inactive" color="secondary" size="small"/></MenuItem>
+                  <MenuItem value="Expired"><Chip variant="outlined" label="Expired" color="secondary" size="small"/></MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -329,7 +332,6 @@ export function CourseEditForm({ setSubmitStatus, course, toggleForm, onUpdateSu
             </Grid> : null}
         </CardContent>
 
-        <Divider/>
         <CardActions sx={{justifyContent: 'space-between'}}>
           <Button startIcon={<TrashIcon/>} color="error" onClick={handleDeleteCourse}>Delete Course</Button>
           <Button startIcon={<FloppyDiskIcon/>} type="submit" variant="contained">Update Course</Button>

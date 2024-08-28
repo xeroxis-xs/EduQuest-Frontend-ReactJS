@@ -3,16 +3,12 @@ import * as React from 'react';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
 import { XCircle as XCircleIcon } from '@phosphor-icons/react/dist/ssr/XCircle';
 import apiService from "@/api/api-service";
 import {AxiosError, type AxiosResponse} from "axios";
 import { logger } from '@/lib/default-logger'
 import { authClient } from "@/lib/auth/client";
-import { QuestNewForm } from "@/components/dashboard/quest/quest-new-form";
-import { QuestCard } from "@/components/dashboard/quest/quest-card";
 import type { Quest } from '@/types/quest';
-import { SkeletonQuestCard } from "@/components/dashboard/skeleton/skeleton-quest-card";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
 import {CalendarX as CalendarXIcon} from "@phosphor-icons/react/dist/ssr/CalendarX";
@@ -34,7 +30,7 @@ import {useRouter} from "next/navigation";
 import {useUser} from "@/hooks/use-user";
 import type {Course} from "@/types/course";
 import type {Image} from "@/types/image";
-
+import {IOSSwitch} from "@/components/dashboard/misc/buttons";
 
 interface QuestEditFormProps {
   quest: Quest
@@ -42,17 +38,18 @@ interface QuestEditFormProps {
   setSubmitStatus: React.Dispatch<React.SetStateAction<{ type: 'success' | 'error'; message: string } | null>>;
   toggleForm: () => void;
   onUpdateSuccess: () => void;
-  onExpires: () => void;
+  onStatusChange: (status: string) => void;
 }
 
-export default function QuestEditForm( {quest, courses, toggleForm, setSubmitStatus, onUpdateSuccess, onExpires} : QuestEditFormProps ): React.JSX.Element {
+
+
+export default function QuestEditForm( {quest, courses, toggleForm, setSubmitStatus, onUpdateSuccess, onStatusChange} : QuestEditFormProps ): React.JSX.Element {
   const router = useRouter();
   const { eduquestUser } = useUser();
-
-  // const [courses, setCourses] = React.useState<Course[]>();
   const [images, setImages] = React.useState<Image[]>();
   const [selectedCourse, setSelectedCourse] = React.useState<Course | null>(null);
   const [selectedImage, setSelectedImage] = React.useState<Image | null>(null);
+  const [status, setStatus] = React.useState(quest.status);
 
   const questTypeRef = React.useRef<HTMLInputElement>(null);
   const questNameRef = React.useRef<HTMLInputElement>(null);
@@ -63,27 +60,11 @@ export default function QuestEditForm( {quest, courses, toggleForm, setSubmitSta
   const questCourseIdRef = React.useRef<HTMLInputElement>(null);
   const questImageIdRef = React.useRef<HTMLInputElement>(null);
 
-  // const getCourses = async (output:Quest | undefined): Promise<void> => {
-  //   try {
-  //     const response: AxiosResponse<Course[]> = await apiService.get<Course[]>(`/api/Course/`);
-  //     const data: Course[] = response.data;
-  //     setCourses(data);
-  //     logger.debug('courses', data);
-  //     logger.debug('Quest from_course ID:', output?.from_course?.id);
-  //     const foundCourse = data?.find(c => c.id === output?.from_course?.id);
-  //     logger.debug('course', foundCourse);
-  //     setCourse(foundCourse);
-  //
-  //   } catch (error: unknown) {
-  //     if (error instanceof AxiosError) {
-  //       if (error.response?.status === 401) {
-  //         await authClient.signInWithMsal();
-  //       }
-  //     }
-  //     logger.error('Failed to fetch data', error);
-  //   }
-  // };
-
+  const handleStatusChange = (): void => {
+    const newStatus = status === 'Active' ? 'Expired' : 'Active';
+    setStatus(newStatus);
+    onStatusChange(newStatus);
+  };
 
   const getImages = async (): Promise<void> => {
     try {
@@ -194,16 +175,29 @@ export default function QuestEditForm( {quest, courses, toggleForm, setSubmitSta
 
   return (
     <form onSubmit={handleQuestSubmit}>
+      {quest ?
         <Card>
           <CardHeader
             title="Edit Quest Details"
             subheader={`ID: ${quest.id.toString()}`}
             action={
               eduquestUser?.is_staff ?
-                <Stack direction="row" spacing={1} sx={{alignItems: 'center'}} color="error">
-                  <Button startIcon={<CalendarXIcon fontSize="var(--icon-fontSize-md)"/>} onClick={onExpires}
-                          color="error">Expires Quest</Button>
-                  <Button startIcon={<XCircleIcon fontSize="var(--icon-fontSize-md)"/>} variant="contained"
+                <Stack direction="row" spacing={2} sx={{alignItems: 'center'}}>
+
+                  {/*<Stack direction="row" spacing={1} sx={{alignItems: 'center'}}>*/}
+
+                  {/*  <IOSSwitch*/}
+                  {/*    checked={quest.status === 'Active'}*/}
+                  {/*    onClick={() => onStatusChange(quest.status === 'Active' ? 'Expired' : 'Active')}*/}
+                  {/*  />*/}
+                  {/*  <Typography variant="overline" color="text.secondary">*/}
+                  {/*    {quest.status === 'Active' ? 'Active' : 'Expired'}*/}
+                  {/*  </Typography>*/}
+                  {/*</Stack>*/}
+
+                  {/*<Button startIcon={<CalendarXIcon fontSize="var(--icon-fontSize-md)"/>} onClick={onStatusChange}*/}
+                  {/*        color="error">Expires Quest</Button>*/}
+                  <Button startIcon={<XCircleIcon fontSize="var(--icon-fontSize-md)"/>} color="error"
                           onClick={toggleForm}>
                     Cancel
                   </Button>
@@ -213,6 +207,7 @@ export default function QuestEditForm( {quest, courses, toggleForm, setSubmitSta
           <Divider/>
 
           <CardContent>
+
 
             <Grid container spacing={3}>
               <Grid md={6} xs={12}>
@@ -224,7 +219,7 @@ export default function QuestEditForm( {quest, courses, toggleForm, setSubmitSta
               <Grid md={6} xs={12}>
                 <FormControl fullWidth required>
                   <InputLabel>Quest Type</InputLabel>
-                  <Select defaultValue={quest.type} label="Quest Type" inputRef={questTypeRef} name="type">
+                  <Select defaultValue={quest.type ?? ""} label="Quest Type" inputRef={questTypeRef} name="type">
                     <MenuItem value="Eduquest MCQ"><Chip variant="outlined" label="Eduquest MCQ" color="primary"
                                                          size="small"/></MenuItem>
                     <MenuItem value="Private"><Chip variant="outlined" label="Private" color="secondary" size="small"/></MenuItem>
@@ -239,10 +234,13 @@ export default function QuestEditForm( {quest, courses, toggleForm, setSubmitSta
               <Grid md={6} xs={12}>
                 <FormControl fullWidth required>
                   <InputLabel>Quest Status</InputLabel>
-                  <Select defaultValue={quest.status} label="Quest Status" inputRef={questStatusRef} name="status">
-                    <MenuItem value="Active"><Chip variant="outlined" label="Active" color="success"
-                                                   size="small"/></MenuItem>
-                    <MenuItem value="Expired"><Chip variant="outlined" label="Expired" color="secondary" size="small"/></MenuItem>
+                  <Select value={quest.status ?? ""} label="Quest Status" inputRef={questStatusRef} name="status">
+                    <MenuItem value="Active">
+                      <Chip variant="outlined" label="Active" color="success" size="small"/>
+                    </MenuItem>
+                    <MenuItem value="Expired">
+                      <Chip variant="outlined" label="Expired" color="secondary" size="small"/>
+                    </MenuItem>
                   </Select>
                 </FormControl>
               </Grid>
@@ -283,7 +281,7 @@ export default function QuestEditForm( {quest, courses, toggleForm, setSubmitSta
                 <Grid md={6} xs={12}>
                   <FormControl fullWidth required>
                     <InputLabel>Course ID</InputLabel>
-                    <Select defaultValue={quest.from_course.id} onChange={handleCourseChange}
+                    <Select defaultValue={quest.from_course.id ?? ""} onChange={handleCourseChange}
                             inputRef={questCourseIdRef}
                             label="Course ID" variant="outlined" type="number">
                       {courses.map((option) => (
@@ -336,7 +334,7 @@ export default function QuestEditForm( {quest, courses, toggleForm, setSubmitSta
                 <Grid md={6} xs={12}>
                   <FormControl fullWidth required>
                     <InputLabel>Thumbnail ID</InputLabel>
-                    <Select defaultValue={quest.image.id} onChange={handleImageChange} inputRef={questImageIdRef}
+                    <Select defaultValue={quest.image.id ?? ""} onChange={handleImageChange} inputRef={questImageIdRef}
                             label="Thumbnail ID" variant="outlined" type="number">
                       {images.map((option) => (
                         <MenuItem key={option.id} value={option.id}>
@@ -367,12 +365,12 @@ export default function QuestEditForm( {quest, courses, toggleForm, setSubmitSta
 
           </CardContent>
 
-          <Divider/>
           <CardActions sx={{justifyContent: 'space-between'}}>
             <Button startIcon={<TrashIcon/>} color="error" onClick={handleDeleteQuest}>Delete Quest</Button>
             <Button startIcon={<FloppyDiskIcon/>} type="submit" variant="contained">Update Quest</Button>
           </CardActions>
         </Card>
+       : null }
 
     </form>
   );

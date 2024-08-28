@@ -47,6 +47,24 @@ import { SkeletonQuestDetailCard } from "@/components/dashboard/skeleton/skeleto
 import { SkeletonQuestAttemptTable } from "@/components/dashboard/skeleton/skeleton-quest-attempt-table";
 import {NewQuestionForm} from "@/components/dashboard/quest/question/new-question-form";
 import QuestEditForm from "@/components/dashboard/quest/question/quest-edit-form";
+import {IOSSwitch} from "@/components/dashboard/misc/buttons";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogActions from "@mui/material/DialogActions";
+import {CheckCircle as CheckCircleIcon} from "@phosphor-icons/react/dist/ssr/CheckCircle";
+import Dialog from "@mui/material/Dialog";
+import {useState} from "react";
+import List from '@mui/material/List';
+import ListItem from '@mui/material/ListItem';
+import ListItemText from '@mui/material/ListItemText';
+import ListItemAvatar from '@mui/material/ListItemAvatar';
+import Avatar from '@mui/material/Avatar';
+import ExpertBadge from "../../../../../public/assets/expert_badge.svg";
+import SpeedsterBadge from "../../../../../public/assets/speedster_badge.svg";
+import Box from "@mui/material/Box";
+import Tooltip from "@mui/material/Tooltip";
+import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
 
 
 interface ExpandMoreProps extends IconButtonProps {
@@ -89,6 +107,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
   const [expanded, setExpanded] = React.useState(false);
   const [loadingQuest, setLoadingQuest] = React.useState(true);
   const [loadingQuestAttemptTable, setLoadingQuestAttemptTable] = React.useState(true);
+  const [openDialog, setOpenDialog] = useState(false);
 
   const handleExpandClick = (): void => {
     setExpanded(!expanded);
@@ -100,6 +119,19 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
 
   const toggleNewQuestionForm = (): void => {
     setShowNewQuestionForm(!showNewQuestionForm);
+  };
+
+  const handleDialogOpen = (): void => {
+    setOpenDialog(true);
+  }
+
+  const handleDialogClose = (): void => {
+    setOpenDialog(false);
+  };
+
+  const handleDialogConfirm = async (status: 'Active' | 'Expired'): Promise<void> => {
+    setOpenDialog(false);
+    await handleStatusChange(status);
   };
 
 
@@ -144,23 +176,6 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
       logger.error('Failed to fetch data', error);
     }
   };
-  //
-  //
-  // const getImages = async (): Promise<void> => {
-  //   try {
-  //     const response: AxiosResponse<Image[]> = await apiService.get<Image[]>(`/api/Image/`);
-  //     const data: Image[] = response.data;
-  //     setImages(data);
-  //     logger.debug('images', data);
-  //   } catch (error: unknown) {
-  //     if (error instanceof AxiosError) {
-  //       if (error.response?.status === 401) {
-  //         await authClient.signInWithMsal();
-  //       }
-  //     }
-  //     logger.error('Failed to fetch data', error);
-  //   }
-  // };
 
   const getUserQuestAttempts = async (): Promise<void> => {
     if (eduquestUser) {
@@ -182,85 +197,6 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
     }
   }
 
-  // const handleCourseChange = (event: SelectChangeEvent<number>): void => {
-  //   // Since the value is now explicitly a number, ensure that the state and logic that depend on this value are correctly typed and implemented.
-  //   const courseId = Number(event.target.value); // Convert the value to a number
-  //   const newCourse = courses?.find(c => c.id === courseId);
-  //   if (newCourse) {
-  //     setSelectedCourse({
-  //       id: newCourse.id,
-  //       name: newCourse.name,
-  //       code: newCourse.code,
-  //       group: newCourse.group,
-  //       description: newCourse.description,
-  //       status: newCourse.status,
-  //       type: newCourse.type,
-  //       term: newCourse.term,
-  //       enrolled_users: newCourse.enrolled_users,
-  //       image: newCourse.image,
-  //     });
-  //   }
-  // };
-  //
-  // const handleImageChange = (event: SelectChangeEvent<number>): void => {
-  //   const imageId = Number(event.target.value); // Convert the value to a number
-  //   const image = images?.find(i => i.id === imageId);
-  //   if (image) {
-  //     setSelectedImage({
-  //       id: image.id,
-  //       name: image.name,
-  //       filename: image.filename
-  //     });
-  //   }
-  // };
-  //
-  // const handleQuestSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
-  //   event.preventDefault();
-  //   const updatedQuest = {
-  //     type: questTypeRef.current?.value,
-  //     name: questNameRef.current?.value,
-  //     description: questDescriptionRef.current?.value,
-  //     status: questStatusRef.current?.value,
-  //     expiration_date: questExpirationDateRef.current?.value
-  //       ? new Date(questExpirationDateRef.current.value).toISOString()
-  //       : null,
-  //     max_attempts: questMaxAttemptsRef.current?.value,
-  //     from_course: selectedCourse || quest?.from_course,
-  //     image: selectedImage || quest?.image
-  //   };
-  //
-  //   try {
-  //     const response: AxiosResponse<Quest> = await apiService.patch(`/api/Quest/${params.questId}/`, updatedQuest);
-  //     logger.debug('Update Success:', response.data);
-  //     setSubmitStatus({ type: 'success', message: 'Update Successful' });
-  //     await getQuest();
-  //     setShowEditQuestForm(false)
-  //   } catch (error: unknown) {
-  //     if (error instanceof AxiosError) {
-  //       if (error.response?.status === 401) {
-  //         await authClient.signInWithMsal();
-  //       }
-  //       logger.error('Submit Error:', error);
-  //       setSubmitStatus({type: 'error', message: 'Update Failed. Please try again.'});
-  //     }
-  //   }
-  //
-  // };
-  //
-  // const handleDeleteQuest = async (): Promise<void> => {
-  //   try {
-  //     await apiService.delete(`/api/Quest/${params.questId}`);
-  //     router.push(paths.dashboard.quest.all as string);
-  //   } catch (error: unknown) {
-  //     if (error instanceof AxiosError) {
-  //       if (error.response?.status === 401) {
-  //         await authClient.signInWithMsal();
-  //       }
-  //       logger.error('Failed to delete the quest', error);
-  //       setSubmitStatus({type: 'error', message: 'Delete Failed. Please try again.'});
-  //     }
-  //   }
-  // };
 
   const handleNewAttempt = async (): Promise<void> => {
     try {
@@ -287,19 +223,22 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
     }
   }
 
-  const handleExpires = async (): Promise<void> => {
+  const handleStatusChange = async (status : string): Promise<void> => {
     try {
-      const data = { status: 'Expired' }
+      let data: { status: string; expiration_date?: null } = { status };
+      if (status === 'Active') {
+        data.expiration_date = null;
+      }
       const response : AxiosResponse<Quest> = await apiService.patch(`/api/Quest/${params.questId}/`, data);
       setQuest(response.data);
-      setSubmitStatus({ type: 'success', message: 'Quest has been set to expired' });
+      setSubmitStatus({ type: 'success', message: `Quest has been set to '${status}'` });
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         if (error.response?.status === 401) {
           await authClient.signInWithMsal();
         }
         logger.error('Failed to expire quest', error);
-        setSubmitStatus({type: 'error', message: 'Failed to expire quest. Please try again.'});
+        setSubmitStatus({type: 'error', message: 'Failed to change quest status. Please try again.'});
       }
     }
   }
@@ -336,8 +275,18 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
             subheader={`ID: ${quest.id.toString()}`}
             action={
               eduquestUser?.is_staff ?
-                <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }} color="error">
-                  <Button startIcon={<CalendarXIcon fontSize="var(--icon-fontSize-md)"/>} onClick={handleExpires} color="error" >Expires Quest</Button>
+                <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }} color="error">
+                  <Stack direction="row" spacing={1} sx={{alignItems: 'center'}}>
+
+                    <IOSSwitch
+                      checked={quest.status === 'Active'}
+                      onClick={handleDialogOpen}
+                      inputProps={{ 'aria-hidden': false }}
+                    />
+                    <Typography variant="overline" color="text.secondary">
+                      {quest.status === 'Active' ? 'Active' : 'Expired'}
+                    </Typography>
+                  </Stack>
                   <Button startIcon={<PenIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleEditQuestForm}>
                     Edit Quest
                   </Button>
@@ -370,11 +319,14 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
                 } size="small"/>
               </Grid>
               <Grid md={6} xs={12}>
-                <Typography variant="overline" color="text.secondary" display="block">Status</Typography>
+                <Stack direction="row" sx={{ alignItems: 'center' }} spacing={0}>
+                  <Typography variant="overline" color="text.secondary">Status</Typography>
+                  <Tooltip title="When the quest is set to 'Expired', it will no longer be available for attempts and the system will issue badges to users." placement="right">
+                    <InfoIcon fontSize="var(--icon-fontSize-sm)" style={{ marginLeft: '8px', cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
+                  </Tooltip>
+                </Stack>
                 <Chip variant="outlined" label={quest.status} color={
-                  quest.status === 'Inactive' ? 'secondary' :
-                    quest.status === 'Active' ? 'success' :
-                      quest.status === 'Expired' ? 'secondary' : 'default'
+                    quest.status === 'Active' ? 'success' : 'secondary'
                   } size="small"/>
               </Grid>
               <Grid md={6} xs={12}>
@@ -392,7 +344,13 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
                 <Typography variant="body2">{quest.max_attempts}</Typography>
               </Grid>
               <Grid md={6} xs={12}>
-                <Typography variant="overline" color="text.secondary">Expiry Date</Typography>
+                <Stack direction="row" sx={{ alignItems: 'center' }} spacing={0}>
+                  <Typography variant="overline" color="text.secondary">Expiry Date</Typography>
+                  <Tooltip title="When the expiry date is reached, the quest will be set to 'Expired'." placement="right">
+                    <InfoIcon fontSize="var(--icon-fontSize-sm)" style={{ marginLeft: '8px', cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
+                  </Tooltip>
+                </Stack>
+
                 {quest.expiration_date ? (
                   <Typography variant="body2">
                     {new Date(quest.expiration_date).toLocaleDateString("en-SG", {
@@ -431,7 +389,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
 
             <Collapse in={expanded} timeout="auto" unmountOnExit>
             <Grid container spacing={3}>
-              <Grid md={6} xs={12}>
+              <Grid xs={12}>
                 <Typography variant="overline" color="text.secondary">Course ID</Typography>
                 <Typography variant="body2">
                   <Link href={`/dashboard/course/${quest.from_course.id.toString()}`}>{quest.from_course.id}</Link>
@@ -446,6 +404,18 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
                 <Typography variant="body2">{quest.from_course.name}</Typography>
               </Grid>
               <Grid md={6} xs={12}>
+                <Typography variant="overline" color="text.secondary">Course Type</Typography>
+                <Typography variant="body2">{quest.from_course.type}</Typography>
+              </Grid>
+              <Grid md={6} xs={12}>
+                <Typography variant="overline" color="text.secondary">Course Status</Typography>
+                <Typography variant="body2">{quest.from_course.status}</Typography>
+              </Grid>
+              <Grid md={6} xs={12}>
+                <Typography variant="overline" color="text.secondary">Course Group</Typography>
+                <Typography variant="body2">{quest.from_course.group}</Typography>
+              </Grid>
+              <Grid xs={12}>
                 <Typography variant="overline" color="text.secondary">Course Description</Typography>
                 <Typography variant="body2">{quest.from_course.description}</Typography>
               </Grid>
@@ -460,6 +430,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
             </Grid>
             </Collapse>
           </CardContent>
+
           <CardActions sx={{ justifyContent: 'center' }}>
 
             {course && eduquestUser && userQuestAttempts ? (
@@ -472,10 +443,6 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
               ) : quest.status === 'Expired' ? (
                 <Button disabled variant='contained'>
                   Quest has Expired
-                </Button>
-              ) : quest.status === 'Inactive' ? (
-                <Button disabled variant='contained'>
-                  Quest is Inactive
                 </Button>
               ) : userQuestAttempts.length >= quest.max_attempts ? (
                 <Button disabled variant='contained'>
@@ -498,9 +465,75 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
                 </Button>
               )
             ) : null}
-
-
           </CardActions>
+
+          <Dialog
+            open={openDialog}
+            onClose={handleDialogClose}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">Confirm State Change</DialogTitle>
+            <DialogContent sx={{pb:0}}>
+              <DialogContentText id="alert-dialog-description" pb={1}>
+                Are you sure you want to set this quest to
+                <Typography fontWeight={600} display='inline'> {quest.status === 'Active' ? 'Expired' : 'Active'}</Typography>
+                  ?
+              </DialogContentText>
+              { quest.status === 'Active' ?
+                <Box>
+                  <DialogContentText id="alert-dialog-description">
+                    The following state-sensitive badges will be issued to qualified users upon setting the quest to {quest.status === 'Active' ? 'Expired' : 'Active'}:
+                  </DialogContentText>
+                  <DialogContentText id="alert-dialog-description">
+                    <List sx={{ width: '100%' }}>
+                      <ListItem>
+                        <ListItemAvatar>
+                          <Avatar sx={{ backgroundColor: 'transparent' }}>
+                            <ExpertBadge size={28}/>
+                          </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText primary="Expert Badge" secondary="Awarded to the user with the highest score for this quest." />
+                      </ListItem>
+                      <ListItem>
+                        <ListItemAvatar>
+                          <Avatar sx={{ backgroundColor: 'transparent' }}>
+                          <SpeedsterBadge size={28}/>
+                          </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText primary="Speedster Badge" secondary="Awarded to the user with the fastest attempt for this quest. " />
+                      </ListItem>
+                    </List>
+                  </DialogContentText>
+                  <DialogContentText id="alert-dialog-description">
+                    <Typography variant="body2">*Note: The expiry date of this quest will be reset.</Typography>
+
+                  </DialogContentText>
+                </Box>
+              :
+                <Box>
+                  <DialogContentText id="alert-dialog-description">
+                    Setting this quest to {quest.status === 'Active' ? 'Expired' : 'Active'} again will not re-issue the same badges to users who have already received them.
+                  </DialogContentText>
+                </Box>
+              }
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={handleDialogClose} color="error" startIcon={<XCircleIcon />} >
+                Cancel
+              </Button>
+              <Button
+                onClick={() => handleDialogConfirm(quest.status === 'Active' ? 'Expired' : 'Active')}
+                color="primary"
+                variant="contained"
+                startIcon={<CheckCircleIcon />}
+              >
+                Confirm
+              </Button>
+            </DialogActions>
+          </Dialog>
+
+
         </Card>
           ) : (
             <Typography variant="body1">Quest details not available.</Typography>
@@ -529,7 +562,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
           setSubmitStatus={setSubmitStatus}
           toggleForm={toggleEditQuestForm}
           onUpdateSuccess={getQuest}
-          onExpires={handleExpires}
+          onStatusChange={handleStatusChange}
         />
       ) : null}
 
@@ -552,6 +585,8 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
           <Typography variant="body1">You have not attempted this quest yet.</Typography>
         )
       )}
+
+
 
 
     </Stack>

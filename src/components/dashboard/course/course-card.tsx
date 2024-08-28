@@ -93,9 +93,7 @@ export function CourseCard({ rows = [], onEnrolledSuccess }: CourseCardProps): R
                       course.type === 'Others' ? 'default' : 'default'
                 } size="small" variant="outlined"/>
                 <Chip label={course.status} sx={{ mb: 1.5 }} color={
-                  course.status === 'Draft' ? 'default' :
-                    course.status === 'Active' ? 'success' :
-                      course.status === 'Expired' ? 'secondary' : 'default'
+                    course.status === 'Active' ? 'success' : 'secondary'
                 } size="small" variant="outlined"/>
                 <Typography variant="subtitle1" mb={1}>
                   AY {course.term.academic_year.start_year}-{course.term.academic_year.end_year} {course.term.name}

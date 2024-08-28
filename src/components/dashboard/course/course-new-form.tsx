@@ -214,7 +214,7 @@ export function CourseNewForm({ onFormSubmitSuccess }: CourseFormProps): React.J
                 <InputLabel>Course Status</InputLabel>
                 <Select defaultValue="Active" label="Quest Status" inputRef={courseStatusRef} name="type">
                   <MenuItem value="Active"><Chip variant="outlined" label="Active" color="success" size="small"/></MenuItem>
-                  <MenuItem value="Inactive"><Chip variant="outlined" label="Inactive" color="secondary" size="small"/></MenuItem>
+                  <MenuItem value="Expired"><Chip variant="outlined" label="Expired" color="secondary" size="small"/></MenuItem>
                 </Select>
               </FormControl>
             </Grid>

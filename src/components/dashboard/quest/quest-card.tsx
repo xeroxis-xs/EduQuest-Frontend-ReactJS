@@ -81,9 +81,7 @@ export function QuestCard({ rows = [], onQuestDeleteSuccess }: QuestCardProps): 
                 } size="small"/>
 
                 <Chip variant="outlined" label={quest.status} sx={{ mb: 1.5 }} color={
-                  quest.status === 'Draft' ? 'default' :
-                    quest.status === 'Active' ? 'success' :
-                      quest.status === 'Expired' ? 'secondary' : 'default'
+                    quest.status === 'Active' ? 'success' : 'secondary'
                 } size="small"/>
 
                 {quest.type !=='Private' && (

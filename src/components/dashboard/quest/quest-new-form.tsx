@@ -36,6 +36,7 @@ export function QuestNewForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.
   const { eduquestUser} = useUser();
   const questTypeRef = React.useRef<HTMLInputElement>(null);
   const questNameRef = React.useRef<HTMLInputElement>(null);
+  const questExpirationDateRef = React.useRef<HTMLInputElement>(null);
   const questDescriptionRef = React.useRef<HTMLInputElement>(null);
   const questStatusRef = React.useRef<HTMLInputElement>(null);
   const questCourseIdRef = React.useRef<HTMLInputElement>(null);
@@ -182,13 +183,24 @@ export function QuestNewForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.
         <Divider />
         <CardContent>
           <Grid container spacing={3}>
-            <Grid md={4} xs={12}>
+            <Grid md={6} xs={12}>
               <FormControl fullWidth required>
                 <InputLabel>Quest Name</InputLabel>
-                <OutlinedInput defaultValue="" label="Name" name="name" inputRef={questNameRef} />
+                <OutlinedInput defaultValue="" label="Quest Name" name="name" inputRef={questNameRef} />
               </FormControl>
             </Grid>
-            <Grid md={4} xs={12}>
+            <Grid md={6} xs={12}>
+              <FormControl fullWidth>
+                <InputLabel shrink>Quest Expiry Date</InputLabel>
+                <OutlinedInput
+                  label="Quest Expiry Date"
+                  inputRef={questExpirationDateRef}
+                  name="Quest Expiry Date"
+                  type="datetime-local"
+                />
+              </FormControl>
+            </Grid>
+            <Grid md={6} xs={12}>
               <FormControl fullWidth required>
                 <InputLabel>Quest Type</InputLabel>
                 <Select defaultValue="Eduquest MCQ" label="Quest Type" inputRef={questTypeRef} name="type">
@@ -199,7 +211,7 @@ export function QuestNewForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.
                 </Select>
               </FormControl>
             </Grid>
-            <Grid md={4} xs={12}>
+            <Grid md={6} xs={12}>
               <FormControl fullWidth required>
                 <InputLabel>Quest Status</InputLabel>
                 <Select defaultValue="Active" label="Quest Status" inputRef={questStatusRef} name="status">
@@ -266,7 +278,7 @@ export function QuestNewForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.
             </Grid> : null}
           <Divider sx={{my:3}}/>
 
-          <Typography sx={{my:3}} variant="h6">Course</Typography>
+          <Typography sx={{my:3}} variant="h6">Associated Course</Typography>
 
           {courses ?
             <Grid container spacing={3} >
@@ -285,12 +297,24 @@ export function QuestNewForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.
               </Grid>
               <Grid md={6} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
               <Grid md={3} xs={6}>
+                <Typography variant="overline" color="text.secondary">Course Code</Typography>
+                <Typography variant="body2">{selectedCourse?.code || courses[0]?.code}</Typography>
+              </Grid>
+              <Grid md={3} xs={6}>
                 <Typography variant="overline" color="text.secondary">Course Name</Typography>
                 <Typography variant="body2">{selectedCourse?.name || courses[0]?.name }</Typography>
               </Grid>
               <Grid md={3} xs={6}>
-                <Typography variant="overline" color="text.secondary">Course Code</Typography>
-                <Typography variant="body2">{selectedCourse?.code || courses[0]?.code}</Typography>
+                <Typography variant="overline" color="text.secondary">Course Group</Typography>
+                <Typography variant="body2">{selectedCourse?.group || courses[0]?.group}</Typography>
+              </Grid>
+              <Grid md={3} xs={6}>
+                <Typography variant="overline" color="text.secondary">Course Type</Typography>
+                <Typography variant="body2">{selectedCourse?.type || courses[0]?.type }</Typography>
+              </Grid>
+              <Grid md={3} xs={6}>
+                <Typography variant="overline" color="text.secondary">Course Status</Typography>
+                <Typography variant="body2">{selectedCourse?.status || courses[0]?.status}</Typography>
               </Grid>
               <Grid md={3} xs={6}>
                 <Typography variant="overline" color="text.secondary">Course Year / Term</Typography>
@@ -304,10 +328,12 @@ export function QuestNewForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.
                   From {selectedCourse?.term?.start_date || courses[0]?.term?.start_date} to {selectedCourse?.term?.end_date || courses[0].term?.end_date}
                 </Typography>
               </Grid>
+
               <Grid xs={12}>
                 <Typography variant="overline" color="text.secondary">Course Description</Typography>
                 <Typography variant="body2">{selectedCourse?.description || courses[0]?.description}</Typography>
               </Grid>
+
               <Grid xs={12}>
                 <Typography variant="overline" color="text.secondary">Course Thumbnail</Typography>
                 <CardMedia
@@ -317,6 +343,7 @@ export function QuestNewForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.
                   sx={{ height: 160, objectFit: 'contain', p: 4, mt:1, backgroundColor: '#fafafa' }}
                 />
               </Grid>
+
             </Grid> : null}
         </CardContent>
 

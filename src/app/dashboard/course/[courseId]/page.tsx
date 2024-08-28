@@ -31,11 +31,17 @@ import Box from "@mui/material/Box";
 import {Users as UsersIcon} from "@phosphor-icons/react/dist/ssr/Users";
 import IconButton, { type IconButtonProps } from '@mui/material/IconButton';
 import { CaretDown as CaretDownIcon } from "@phosphor-icons/react/dist/ssr/CaretDown";
-import { styled } from '@mui/material/styles';
+import {styled, useTheme} from '@mui/material/styles';
 import Collapse from '@mui/material/Collapse';
 import { SkeletonQuestCard } from "@/components/dashboard/skeleton/skeleton-quest-card";
 import { SkeletonCourseDetailCard } from "@/components/dashboard/skeleton/skeleton-course-detail-card";
 import {CourseEditForm} from "@/components/dashboard/course/course-edit-form";
+import ToggleButton from '@mui/material/ToggleButton';
+import ToggleButtonGroup, { toggleButtonGroupClasses } from '@mui/material/ToggleButtonGroup';
+import { CheckCircle as CheckCircleIcon } from "@phosphor-icons/react/dist/ssr/CheckCircle";
+import { XCircle as XCircleIcon } from "@phosphor-icons/react/dist/ssr/XCircle";
+
+
 
 interface ExpandMoreProps extends IconButtonProps {
   expand: boolean;
@@ -53,6 +59,21 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
   }),
 }));
 
+const StyledToggleButtonGroup = styled(ToggleButtonGroup)(({ theme }) => ({
+  [`& .${toggleButtonGroupClasses.grouped}`]: {
+    margin: theme.spacing(0.5),
+    border: 0,
+    borderRadius: theme.shape.borderRadius,
+    [`&.${toggleButtonGroupClasses.disabled}`]: {
+      border: 0,
+    },
+  },
+  [`& .${toggleButtonGroupClasses.middleButton},& .${toggleButtonGroupClasses.lastButton}`]:
+    {
+      marginLeft: -1,
+      borderLeft: '1px solid transparent',
+    },
+}));
 
 export default function Page({ params }: { params: { courseId: string } }) : React.JSX.Element {
   const { eduquestUser } = useUser();
@@ -63,6 +84,9 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
   const [loadingQuests, setLoadingQuests] = React.useState(true);
   const [loadingCourse, setLoadingCourse] = React.useState(true);
   const [submitStatus, setSubmitStatus] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+
+
 
   const handleExpandClick = (): void => {
     setExpanded(!expanded);
@@ -115,12 +139,8 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
   const handleEnroll = async (): Promise<void> => {
     try {
       const data = {
-        user: {
-          id: eduquestUser?.id
-        },
-        course: {
-          id: params.courseId
-        }
+        user: { id: eduquestUser?.id },
+        course: { id: params.courseId }
       }
       const response = await apiService.post(`/api/UserCourse/`, data);
       if (response.status === 201) {
@@ -136,6 +156,15 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
       logger.error('Error enrolling: ', error);
     }
   }
+
+  const [status, setStatus] = React.useState('Active');
+
+  const handleStatusChange = (
+    event: React.MouseEvent<HTMLElement>,
+    newStatus: string,
+  ) => {
+    setStatus(newStatus);
+  };
 
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
@@ -205,10 +234,9 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
               <Grid md={6} xs={12}>
                 <Typography variant="overline" color="text.secondary" display="block">Status</Typography>
                 <Chip label={course.status} color={
-                  course.status === 'Draft' ? 'info' :
-                    course.status === 'Active' ? 'success' :
-                      course.status === 'Expired' ? 'secondary' : 'default'
+                    course.status === 'Active' ? 'success' : 'secondary'
                 } size="small" variant="outlined"/>
+
               </Grid>
               <Grid xs={12}>
                 <Typography variant="overline" color="text.secondary">Description</Typography>
@@ -255,7 +283,6 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
             </Grid>
             </Collapse>
           </CardContent>
-          <Divider/>
           <CardActions sx={{ justifyContent: 'space-between'}}>
             <Box sx={{ mx: '16px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <UsersIcon size={20}/>

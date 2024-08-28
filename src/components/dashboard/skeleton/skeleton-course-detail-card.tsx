@@ -48,7 +48,7 @@ export function SkeletonCourseDetailCard(): React.JSX.Element {
         </Grid>
       </CardContent>
       <Box>
-        <Divider />
+        {/*<Divider />*/}
         <CardActions sx={{ justifyContent: 'space-between' }}>
           <Skeleton width="10%" sx={{my: 1}} />
           <Skeleton width="10%" />

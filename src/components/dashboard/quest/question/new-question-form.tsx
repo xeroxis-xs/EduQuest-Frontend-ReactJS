@@ -28,6 +28,7 @@ import {logger} from "@/lib/default-logger";
 import apiService from "@/api/api-service";
 import {AxiosError} from "axios";
 import {authClient} from "@/lib/auth/client";
+import Typography from "@mui/material/Typography";
 
 interface Answer {
   text: string;
@@ -148,7 +149,7 @@ export function NewQuestionForm({ questId, onCreateSuccess, onCancelCreate }: Ne
             title={`Question ${question.number.toString()}`}
             action={
               <Button startIcon={<TrashIcon/>} onClick={() => { deleteQuestion(qIndex); }} color="error">
-                Delete Question
+                {`Delete Question ${question.number.toString()}`}
               </Button>
             }
           />
@@ -212,7 +213,7 @@ export function NewQuestionForm({ questId, onCreateSuccess, onCancelCreate }: Ne
                 </Grid>
               ))}
               <Grid md={6} xs={12}>
-                <Button startIcon={<PlusIcon/>} onClick={() => { addAnswer(qIndex); }}>Add Answer</Button>
+                <Button startIcon={<PlusIcon/>} onClick={() => { addAnswer(qIndex); }}>Add additional Answer</Button>
               </Grid>
             </Grid>
 
@@ -226,10 +227,10 @@ export function NewQuestionForm({ questId, onCreateSuccess, onCancelCreate }: Ne
 
       <CardActions sx={{ justifyContent: 'space-between' }}>
         <Button startIcon={<PlusIcon/>} onClick={addQuestion} >
-          Add Question
+          Add additional Question
         </Button>
         <Stack direction="row" spacing={2}>
-          <Button startIcon={<XCircleIcon />} onClick={onCancelCreate}>
+          <Button startIcon={<XCircleIcon />} onClick={onCancelCreate} color="error">
             Cancel
           </Button>
           <Button startIcon={<FilePlusIcon />} type="submit" variant="contained">
@@ -249,12 +250,19 @@ export function NewQuestionForm({ questId, onCreateSuccess, onCancelCreate }: Ne
           <DialogContentText id="alert-dialog-description">
             Are you sure you want to create these questions for this quest?
           </DialogContentText>
+          <DialogContentText id="alert-dialog-description" sx={{pb:1}}>
+            These questions
+            <Typography fontWeight={600} display='inline'> cannot be edited </Typography>
+            or
+            <Typography fontWeight={600} display='inline'> deleted </Typography>
+            once they are created for this quest.
+          </DialogContentText>
           <DialogContentText id="alert-dialog-description">
-            These questions cannot be edited or deleted once created.
+            <Typography variant="body2">*Note: To edit these questions, the quest will have to be deleted and recreated.</Typography>
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleDialogClose} color="primary" startIcon={<XCircleIcon />} >
+          <Button onClick={handleDialogClose} color="error" startIcon={<XCircleIcon />} >
             Cancel
           </Button>
           <Button onClick={handleDialogConfirm} color="primary" variant="contained" startIcon={<CheckCircleIcon />}>
