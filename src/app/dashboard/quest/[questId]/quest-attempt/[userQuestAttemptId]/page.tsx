@@ -14,6 +14,7 @@ import {XCircle as XCircleIcon} from "@phosphor-icons/react/dist/ssr/XCircle";
 import type { UserQuestQuestionAttempt} from "@/types/user-quest-question-attempt";
 import { QuestionAttemptCard } from "@/components/dashboard/quest/question/attempt/question-attempt-card";
 import Alert from "@mui/material/Alert";
+import {MagicWand as MagicWandIcon} from "@phosphor-icons/react/dist/ssr/MagicWand";
 
 
 export default function Page({ params }: { params: { userQuestAttemptId: string, questId: string } }) : React.JSX.Element {
@@ -132,9 +133,14 @@ export default function Page({ params }: { params: { userQuestAttemptId: string,
       {attemptedQuestionsAndAnswers && attemptedQuestionsAndAnswers.length > 0 ?
         <Stack direction="row" spacing={3} sx={{justifyContent: 'space-between'}}>
           <Button startIcon={<CaretLeftIcon fontSize="var(--icon-fontSize-md)"/>} href={`/dashboard/quest/${params.questId}`}>Return to Quest</Button>
-        <Button startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PenIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
-          {showForm ? 'Close' : 'Edit Question'}
-        </Button>
+          <Button
+            startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PenIcon fontSize="var(--icon-fontSize-md)" />}
+            variant={showForm ? 'text' : 'contained'}
+            color={showForm ? 'error' : 'primary'}
+            onClick={toggleForm}
+          >
+            {showForm ? 'Cancel' : 'Edit Question'}
+          </Button>
       </Stack> : null
       }
 

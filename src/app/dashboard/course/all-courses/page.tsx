@@ -64,8 +64,13 @@ export default function Page(): React.JSX.Element {
 
         {eduquestUser?.is_staff ?
           <Stack direction="row" sx={{ alignItems: 'center' }}>
-            <Button startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PlusIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
-              {showForm ? 'Close' : 'Create'}
+            <Button
+              startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PlusIcon fontSize="var(--icon-fontSize-md)" />}
+              variant={showForm ? 'text' : 'contained'}
+              color={showForm ? 'error' : 'primary'}
+              onClick={toggleForm}
+            >
+              {showForm ? 'Cancel' : 'Create'}
             </Button>
           </Stack> : null}
 

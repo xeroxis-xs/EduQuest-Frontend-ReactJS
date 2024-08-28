@@ -14,6 +14,7 @@ import type { Quest } from '@/types/quest';
 import { SkeletonQuestCard } from "@/components/dashboard/skeleton/skeleton-quest-card";
 import {GenerateQuestForm} from "@/components/dashboard/generator/generate-quest-form";
 import {useUser} from "@/hooks/use-user";
+import {Plus as PlusIcon} from "@phosphor-icons/react/dist/ssr/Plus";
 
 export default function Page(): React.JSX.Element {
   const { eduquestUser } = useUser();
@@ -64,9 +65,15 @@ export default function Page(): React.JSX.Element {
           <Typography variant="h4">Generated Quests</Typography>
         </Stack>
         <Stack direction="row" sx={{ alignItems: 'center' }}>
-          <Button startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <MagicWandIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
-            {showForm ? 'Close' : 'Generate New Quest'}
+          <Button
+            startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <MagicWandIcon fontSize="var(--icon-fontSize-md)" />}
+            variant={showForm ? 'text' : 'contained'}
+            color={showForm ? 'error' : 'primary'}
+            onClick={toggleForm}
+          >
+            {showForm ? 'Cancel' : 'Generate Quest'}
           </Button>
+
         </Stack>
       </Stack>
       {showForm ? <GenerateQuestForm onFormSubmitSuccess={getPrivateQuests} /> : null}

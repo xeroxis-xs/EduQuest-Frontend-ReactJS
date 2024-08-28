@@ -30,9 +30,10 @@ import Chip from "@mui/material/Chip";
 
 interface CourseFormProps {
   onFormSubmitSuccess: () => void;
+  courseId: number | undefined;
 }
 
-export function QuestNewForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Element {
+export function QuestNewForm({onFormSubmitSuccess, courseId}: CourseFormProps): React.JSX.Element {
   const { eduquestUser} = useUser();
   const questTypeRef = React.useRef<HTMLInputElement>(null);
   const questNameRef = React.useRef<HTMLInputElement>(null);
@@ -73,7 +74,17 @@ export function QuestNewForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.
       const response: AxiosResponse<Course[]> = await apiService.get<Course[]>(`/api/Course/`);
       const data: Course[] = response.data;
       const filteredData = data.filter((course) => course.type !== 'Private');
-      setCourses(filteredData);
+      if (courseId) {
+        // If courseId is provided, filter the data to only show the selected course
+        // This will be set to disabled and selected by default
+        const course = data.find(c => c.id === courseId);
+        if (course) {
+          setCourses([course]);
+        }
+      } else {
+        // If courseId is not provided, show all courses
+        setCourses(filteredData);
+      }
       logger.debug('Filtered Courses', filteredData);
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
@@ -286,7 +297,7 @@ export function QuestNewForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.
                 <FormControl fullWidth required>
                   <InputLabel>Course ID</InputLabel>
                   <Select defaultValue={courses[0]?.id} onChange={handleCourseChange} inputRef={questCourseIdRef}
-                          label="Course ID" variant="outlined" type="number">
+                          label="Course ID" variant="outlined" type="number" disabled={!!courseId}>
                     {courses.map((option) => (
                       <MenuItem key={option.id} value={option.id}>
                         {option.id} - {option.code} {option.name}

@@ -36,10 +36,11 @@ import Collapse from '@mui/material/Collapse';
 import { SkeletonQuestCard } from "@/components/dashboard/skeleton/skeleton-quest-card";
 import { SkeletonCourseDetailCard } from "@/components/dashboard/skeleton/skeleton-course-detail-card";
 import {CourseEditForm} from "@/components/dashboard/course/course-edit-form";
-import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup, { toggleButtonGroupClasses } from '@mui/material/ToggleButtonGroup';
+import { Plus as PlusIcon } from "@phosphor-icons/react/dist/ssr/Plus";
 import { CheckCircle as CheckCircleIcon } from "@phosphor-icons/react/dist/ssr/CheckCircle";
 import { XCircle as XCircleIcon } from "@phosphor-icons/react/dist/ssr/XCircle";
+import {QuestNewForm} from "@/components/dashboard/quest/quest-new-form";
 
 
 
@@ -79,22 +80,23 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
   const { eduquestUser } = useUser();
   const [course, setCourse] = React.useState<Course>();
   const [quests, setQuests] = React.useState<Quest[]>();
-  const [showForm, setShowForm] = React.useState(false);
+  const [showEditForm, setShowEditForm] = React.useState(false);
+  const [showCreateForm, setShowCreateForm] = React.useState(false);
   const [expanded, setExpanded] = React.useState(false);
   const [loadingQuests, setLoadingQuests] = React.useState(true);
   const [loadingCourse, setLoadingCourse] = React.useState(true);
   const [submitStatus, setSubmitStatus] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-
-
-
   const handleExpandClick = (): void => {
     setExpanded(!expanded);
   };
 
+  const toggleCreateForm = (): void => {
+    setShowCreateForm(!showCreateForm);
+  };
 
-  const toggleForm = (): void => {
-    setShowForm(!showForm);
+  const toggleEditForm = (): void => {
+    setShowEditForm(!showEditForm);
   };
 
   const getCourse = async (): Promise<void> => {
@@ -157,14 +159,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
     }
   }
 
-  const [status, setStatus] = React.useState('Active');
 
-  const handleStatusChange = (
-    event: React.MouseEvent<HTMLElement>,
-    newStatus: string,
-  ) => {
-    setStatus(newStatus);
-  };
 
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
@@ -187,7 +182,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
 
       </Stack>
 
-      {!showForm && (
+      {!showEditForm && (
         loadingCourse ? (
           <SkeletonCourseDetailCard />
         ) : (
@@ -198,7 +193,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
             subheader={`ID: ${course.id.toString()}`}
             action={
               eduquestUser?.is_staff ?
-                <Button startIcon={<PenIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleForm}>
+                <Button startIcon={<PenIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleEditForm}>
                   Edit Course
                 </Button> : null
             }
@@ -303,11 +298,11 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
         )
       )}
 
-      { showForm && course ?
+      { showEditForm && course ?
         <CourseEditForm
           setSubmitStatus={setSubmitStatus}
           course={course}
-          toggleForm={toggleForm}
+          toggleForm={toggleEditForm}
           onUpdateSuccess={getCourse}
         />
         : null }
@@ -318,15 +313,31 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
         </Alert>
       ) : null}
 
+      <Stack direction="row" sx={{justifyContent: 'space-between', alignItems: 'center', verticalAlign: 'center', pt:3}}>
+        <Box>
+          <Typography variant="h5">Quests</Typography>
+          <Typography variant="body2" color="text.secondary">Quests available for this course.</Typography>
+        </Box>
 
-      <Typography variant="h5">Quests</Typography>
+        <Button
+          startIcon={showCreateForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PlusIcon fontSize="var(--icon-fontSize-md)" />}
+          variant={showCreateForm ? 'text' : 'contained'}
+          color={showCreateForm ? 'error' : 'primary'}
+          onClick={toggleCreateForm}
+        >
+          {showCreateForm ? 'Cancel' : 'Create Quest'}
+        </Button>
+      </Stack>
+
+      {showCreateForm && course ? <QuestNewForm onFormSubmitSuccess={getQuests} courseId={course.id}/> : null}
+
       {loadingQuests ? (
         <SkeletonQuestCard />
       ) : (
         quests && quests.length > 0 ? (
           <QuestCard rows={quests} onQuestDeleteSuccess={getQuests}/>
         ) : (
-          <Typography variant="body1">New quests are coming soon for this course!</Typography>
+          <Typography variant="body1">No quests available for this course.</Typography>
         )
       )}
 
