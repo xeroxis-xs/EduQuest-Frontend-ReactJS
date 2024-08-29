@@ -30,7 +30,7 @@ import Chip from "@mui/material/Chip";
 
 interface CourseFormProps {
   onFormSubmitSuccess: () => void;
-  courseId: number | undefined;
+  courseId: number | null;
 }
 
 export function QuestNewForm({onFormSubmitSuccess, courseId}: CourseFormProps): React.JSX.Element {
@@ -113,8 +113,8 @@ export function QuestNewForm({onFormSubmitSuccess, courseId}: CourseFormProps): 
   };
 
   const handleCourseChange = (event: SelectChangeEvent<number>): void => {
-    const courseId = Number(event.target.value); // Convert the value to a number
-    const course = courses?.find(c => c.id === courseId);
+    const cId = Number(event.target.value); // Convert the value to a number
+    const course = courses?.find(c => c.id === cId);
     if (course) {
       setSelectedCourse({
         id: course.id,
@@ -297,7 +297,7 @@ export function QuestNewForm({onFormSubmitSuccess, courseId}: CourseFormProps): 
                 <FormControl fullWidth required>
                   <InputLabel>Course ID</InputLabel>
                   <Select defaultValue={courses[0]?.id} onChange={handleCourseChange} inputRef={questCourseIdRef}
-                          label="Course ID" variant="outlined" type="number" disabled={!!courseId}>
+                          label="Course ID" variant="outlined" type="number" disabled={Boolean(courseId)}>
                     {courses.map((option) => (
                       <MenuItem key={option.id} value={option.id}>
                         {option.id} - {option.code} {option.name}

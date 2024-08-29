@@ -40,14 +40,14 @@ export function QuestExpiresDialog({ quest, openDialog, handleDialogClose, handl
         <DialogTitle id="alert-dialog-title">Confirm State Change</DialogTitle>
         <DialogContent sx={{pb:0}}>
           <DialogContentText id="alert-dialog-description" pb={1}>
-            <Typography component='span' display='inline'>Are you sure you want to set this quest to</Typography>
-            <Typography component='span' fontWeight={600} display='inline'> {quest.status === 'Active' ? 'Expired' : 'Active'}</Typography>
-            <Typography component='span' display='inline'>?</Typography>
+            <Typography component='span' >Are you sure you want to set this quest to</Typography>
+            <Typography component='span' fontWeight={600} > {quest.status === 'Active' ? 'Expired' : 'Active'}</Typography>
+            <Typography component='span' >?</Typography>
           </DialogContentText>
           { quest.status === 'Active' ?
             <Box>
               <DialogContentText id="alert-dialog-description">
-                <Typography component='span' display='inline'>
+                <Typography component='span' >
                   The following state-sensitive badges will be issued to qualified users upon setting the quest to {quest.status === 'Active' ? 'Expired' : 'Active'}:
                 </Typography>
                 </DialogContentText>

@@ -44,10 +44,11 @@ const VisuallyHiddenInput = styled('input')({
 
 interface ImportCardProps {
   onImportSuccess: (questions : Question[]) => void;
+  courseId: string | null;
 }
 
 
-export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Element {
+export function ImportCard({ onImportSuccess, courseId }: ImportCardProps): React.JSX.Element {
   const { eduquestUser} = useUser();
   const questTypeRef = React.useRef<HTMLInputElement>(null);
   const questNameRef = React.useRef<HTMLInputElement>(null);
@@ -70,7 +71,14 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
       const response: AxiosResponse<Course[]> = await apiService.get<Course[]>('/api/Course/');
       const data: Course[] = response.data;
       const filteredData = data.filter((course) => course.type !== 'Private');
-      setCourses(filteredData);
+      if (courseId) {
+        const course = filteredData.find(c => c.id === Number(courseId));
+        if (course) {
+          setCourses([course]);
+        }
+      } else {
+        setCourses(filteredData);
+      }
       logger.debug('Filtered Courses', filteredData);
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
@@ -124,8 +132,8 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
   };
 
   const handleCourseChange = (event: SelectChangeEvent<number>): void => {
-    const courseId = Number(event.target.value); // Convert the value to a number
-    const course = courses?.find(c => c.id === courseId);
+    const cId = Number(event.target.value); // Convert the value to a number
+    const course = courses?.find(c => c.id === cId);
     if (course) {
       setSelectedCourse({
         id: course.id,
@@ -208,7 +216,6 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
 
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
-      console.log('isCoursesLoading', isCoursesLoading);
       await getImages();
       await getCourses();
     };
@@ -235,7 +242,7 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
           <Grid md={6} xs={12}>
             <FormControl fullWidth required>
               <InputLabel>Quest Name</InputLabel>
-              <OutlinedInput defaultValue="" label="Name" name="name" inputRef={questNameRef} />
+              <OutlinedInput defaultValue="" label="Quest Name" name="name" inputRef={questNameRef} />
             </FormControl>
           </Grid>
           <Grid md={6} xs={12}>
@@ -336,12 +343,12 @@ export function ImportCard({ onImportSuccess }: ImportCardProps): React.JSX.Elem
             <Grid container spacing={3} >
               <Grid md={6} xs={12}>
                 <FormControl fullWidth required>
-                  <InputLabel>Course ID</InputLabel>
+                  <InputLabel>Course Group - Course Name</InputLabel>
                   <Select defaultValue={courses[0]?.id} onChange={handleCourseChange} inputRef={questCourseIdRef}
-                          label="Course ID" variant="outlined" type="number">
+                          label="Course Group - Course Name" variant="outlined" type="number" disabled={Boolean(courseId)}>
                     {courses.map((option) => (
                       <MenuItem key={option.id} value={option.id}>
-                        {option.id} - {option.code} {option.name}
+                        {option.group} - {option.code} {option.name}
                       </MenuItem>
                     ))}
                   </Select>

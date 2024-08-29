@@ -11,16 +11,10 @@ import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Divider from '@mui/material/Divider';
 import Alert from '@mui/material/Alert';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
 import { FilePlus as FilePlusIcon } from "@phosphor-icons/react/dist/ssr/FilePlus";
 import { Trash as TrashIcon } from '@phosphor-icons/react/dist/ssr/Trash';
 import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
 import { XCircle as XCircleIcon } from '@phosphor-icons/react/dist/ssr/XCircle';
-import { CheckCircle as CheckCircleIcon } from '@phosphor-icons/react/dist/ssr/CheckCircle';
 import CardHeader from "@mui/material/CardHeader";
 import { IconButton } from '@mui/material';
 import Stack from "@mui/material/Stack";
@@ -28,7 +22,7 @@ import {logger} from "@/lib/default-logger";
 import apiService from "@/api/api-service";
 import {AxiosError} from "axios";
 import {authClient} from "@/lib/auth/client";
-import Typography from "@mui/material/Typography";
+import {QuestionNewDialog} from "@/components/dashboard/dialog/question-new-dialog";
 
 interface Answer {
   text: string;
@@ -95,7 +89,14 @@ export function NewQuestionForm({ questId, onCreateSuccess, onCancelCreate }: Ne
 
   const deleteQuestion = (qIndex: number): void => {
     const newQuestions = questions.filter((_, index) => index !== qIndex);
-    setQuestions(newQuestions);
+
+    // Reassign the question numbers after deletion
+    const updatedQuestions = newQuestions.map((question, index) => ({
+      ...question,
+      number: index + 1,
+    }));
+
+    setQuestions(updatedQuestions);
   };
 
   const deleteAnswer = (qIndex: number, aIndex: number): void => {
@@ -173,7 +174,7 @@ export function NewQuestionForm({ questId, onCreateSuccess, onCancelCreate }: Ne
                   type="number"
                   defaultValue={question.max_score}
                   size="small"
-                  onChange={(e) => { handleQuestionChange(qIndex, 'number', parseInt(e.target.value)); }}
+                  onChange={(e) => { handleQuestionChange(qIndex, 'max_score', parseInt(e.target.value)); }}
                   sx={{ mb: 2 }}
                   inputProps={{ min: 1 }}
                 />
@@ -239,37 +240,11 @@ export function NewQuestionForm({ questId, onCreateSuccess, onCancelCreate }: Ne
         </Stack>
       </CardActions>
 
-      <Dialog
-        open={openDialog}
-        onClose={handleDialogClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">{"Confirm Submission"}</DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Are you sure you want to create these questions for this quest?
-          </DialogContentText>
-          <DialogContentText id="alert-dialog-description" sx={{pb:1}}>
-            These questions
-            <Typography fontWeight={600} display='inline'> cannot be edited </Typography>
-            or
-            <Typography fontWeight={600} display='inline'> deleted </Typography>
-            once they are created for this quest.
-          </DialogContentText>
-          <DialogContentText id="alert-dialog-description">
-            <Typography variant="body2">*Note: To edit these questions, the quest will have to be deleted and recreated.</Typography>
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDialogClose} color="error" startIcon={<XCircleIcon />} >
-            Cancel
-          </Button>
-          <Button onClick={handleDialogConfirm} color="primary" variant="contained" startIcon={<CheckCircleIcon />}>
-            Confirm
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <QuestionNewDialog
+        openDialog={openDialog}
+        handleDialogClose={handleDialogClose}
+        handleDialogConfirm={handleDialogConfirm}
+      />
     </form>
   );
 }

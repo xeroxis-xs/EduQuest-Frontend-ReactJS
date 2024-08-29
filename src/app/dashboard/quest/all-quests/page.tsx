@@ -6,6 +6,7 @@ import Typography from '@mui/material/Typography';
 import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
 import { XCircle as XCircleIcon } from '@phosphor-icons/react/dist/ssr/XCircle';
 import { Funnel as FunnelIcon } from '@phosphor-icons/react/dist/ssr/Funnel';
+import { Upload as UploadIcon } from '@phosphor-icons/react/dist/ssr/Upload';
 import apiService from "@/api/api-service";
 import {AxiosError, type AxiosResponse} from "axios";
 import { logger } from '@/lib/default-logger'
@@ -18,6 +19,8 @@ import Select, {type SelectChangeEvent} from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import {useUser} from "@/hooks/use-user";
+import RouterLink from "next/link";
+import {paths} from "@/paths";
 
 export default function Page(): React.JSX.Element {
   const [quests, setQuests] = React.useState<Quest[]>([]);
@@ -98,18 +101,23 @@ export default function Page(): React.JSX.Element {
             </Select>
           </FormControl>
           {eduquestUser?.is_staff ?
-            <Button
-              startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PlusIcon fontSize="var(--icon-fontSize-md)" />}
-              variant={showForm ? 'text' : 'contained'}
-              color={showForm ? 'error' : 'primary'}
-              onClick={toggleForm}
-            >
-              {showForm ? 'Cancel' : 'Create'}
-            </Button>
+            <Stack direction='row' spacing={1}>
+              <Button startIcon={<UploadIcon/>} variant="contained" color="primary" component={RouterLink} href={paths.dashboard.import}>
+                Import
+              </Button>
+              <Button
+                startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PlusIcon fontSize="var(--icon-fontSize-md)" />}
+                variant={showForm ? 'text' : 'contained'}
+                color={showForm ? 'error' : 'primary'}
+                onClick={toggleForm}
+              >
+                {showForm ? 'Cancel' : 'Create'}
+              </Button>
+            </Stack>
             : null}
         </Stack>
       </Stack>
-      {showForm ? <QuestNewForm onFormSubmitSuccess={getQuests} courseId={undefined}/> : null} {/* Conditional rendering */}
+      {showForm ? <QuestNewForm onFormSubmitSuccess={getQuests} courseId={null}/> : null} {/* Conditional rendering */}
       {loading ? (
         <SkeletonQuestCard />
       ) : (

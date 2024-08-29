@@ -5,7 +5,6 @@ import Typography from '@mui/material/Typography';
 import { CaretLeft as CaretLeftIcon } from "@phosphor-icons/react/dist/ssr/CaretLeft";
 import { Pen as PenIcon } from "@phosphor-icons/react/dist/ssr/Pen";
 import { GameController as GameControllerIcon } from "@phosphor-icons/react/dist/ssr/GameController";
-import { FilePlus as FilePlusIcon } from "@phosphor-icons/react/dist/ssr/FilePlus";
 import type { Course } from '@/types/course';
 import type { Quest } from '@/types/quest';
 import type { UserQuestAttempt } from '@/types/user-quest-attempt';
@@ -23,7 +22,7 @@ import Link, { default as RouterLink } from "next/link";
 import Alert from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
 import {useRouter} from "next/navigation";
-import {XCircle as XCircleIcon} from "@phosphor-icons/react/dist/ssr/XCircle";
+import {ListChecks  as ListChecksIcon} from "@phosphor-icons/react/dist/ssr/ListChecks";
 import Chip from "@mui/material/Chip";
 import {useUser} from "@/hooks/use-user";
 import {UserQuestAttemptTable} from "@/components/dashboard/quest/attempt/quest-attempt-table";
@@ -275,7 +274,19 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
                 <Typography variant="body2">{quest.description}</Typography>
               </Grid>
               <Grid md={6} xs={12}>
-                <Typography variant="overline" color="text.secondary" display="block">Type</Typography>
+                <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
+                  <Typography variant="overline" color="text.secondary">Type</Typography>
+                  <Tooltip title={
+                    <React.Fragment>
+                      <Typography fontSize="inherit">Eduquest MCQ - Quest developed in-house</Typography>
+                      <Typography fontSize="inherit">Wooclap - Quest imported from Wooclap</Typography>
+                      <Typography fontSize="inherit">Kahoot! - Quest imported from Kahoot!</Typography>
+                      <Typography fontSize="inherit">Private - Quest for personal quest generation use only</Typography>
+                    </React.Fragment>
+                  } placement="right">
+                    <InfoIcon style={{ cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
+                  </Tooltip>
+                </Stack>
                 <Chip variant="outlined" label={quest.type} color={
                   quest.type === 'Eduquest MCQ' ? 'primary' :
                     quest.type === 'Wooclap' ? 'neon' :
@@ -284,10 +295,10 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
                 } size="small"/>
               </Grid>
               <Grid md={6} xs={12}>
-                <Stack direction="row" sx={{ alignItems: 'center' }} spacing={0}>
+                <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
                   <Typography variant="overline" color="text.secondary">Status</Typography>
                   <Tooltip title="When the quest is set to 'Expired', it will no longer be available for attempts and the system will issue badges to users." placement="right">
-                    <InfoIcon fontSize="var(--icon-fontSize-sm)" style={{ marginLeft: '8px', cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
+                    <InfoIcon style={{ cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
                   </Tooltip>
                 </Stack>
                 <Chip variant="outlined" label={quest.status} color={
@@ -295,24 +306,10 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
                   } size="small"/>
               </Grid>
               <Grid md={6} xs={12}>
-                <Typography variant="overline" color="text.secondary">Number of Questions</Typography>
-                <Typography variant="body2">{quest.total_questions}</Typography>
-              </Grid>
-
-              <Grid md={6} xs={12}>
-                <Typography variant="overline" color="text.secondary">Maximum Score</Typography>
-                <Typography variant="body2">{quest.total_max_score}</Typography>
-              </Grid>
-
-              <Grid md={6} xs={12}>
-                <Typography variant="overline" color="text.secondary">Maximum Number of Attempts</Typography>
-                <Typography variant="body2">{quest.max_attempts}</Typography>
-              </Grid>
-              <Grid md={6} xs={12}>
-                <Stack direction="row" sx={{ alignItems: 'center' }} spacing={0}>
+                <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
                   <Typography variant="overline" color="text.secondary">Expiry Date</Typography>
-                  <Tooltip title="When the expiry date is reached, the quest will be set to 'Expired'." placement="right">
-                    <InfoIcon fontSize="var(--icon-fontSize-sm)" style={{ marginLeft: '8px', cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
+                  <Tooltip title="When the expiry date is reached, the quest status will be set to 'Expired'." placement="right">
+                    <InfoIcon style={{ cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
                   </Tooltip>
                 </Stack>
 
@@ -334,6 +331,21 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
                 )}
 
               </Grid>
+              <Grid md={6} xs={12}>
+                <Typography variant="overline" color="text.secondary">Number of Questions</Typography>
+                <Typography variant="body2">{quest.total_questions}</Typography>
+              </Grid>
+
+              <Grid md={6} xs={12}>
+                <Typography variant="overline" color="text.secondary">Maximum Score</Typography>
+                <Typography variant="body2">{quest.total_max_score}</Typography>
+              </Grid>
+
+              <Grid md={6} xs={12}>
+                <Typography variant="overline" color="text.secondary">Maximum Number of Attempts</Typography>
+                <Typography variant="body2">{quest.max_attempts}</Typography>
+              </Grid>
+
               <Grid md={6} xs={12}>
                 <Typography variant="overline" color="text.secondary">Created By</Typography>
                 <Typography variant="body2">{quest.organiser.username}</Typography>
@@ -401,7 +413,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
             {course && eduquestUser && userQuestAttempts ? (
               quest.total_questions === 0 ? (
                 eduquestUser.is_staff ? (
-                  <Button startIcon={<FilePlusIcon/>} variant='contained' onClick={toggleNewQuestionForm}>
+                  <Button startIcon={<ListChecksIcon/>} variant='contained' onClick={toggleNewQuestionForm}>
                     Create New Questions
                   </Button>
                 ) : null

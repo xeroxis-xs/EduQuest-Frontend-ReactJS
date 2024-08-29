@@ -15,7 +15,7 @@ import type {UserQuestAttempt} from "@/types/user-quest-attempt";
 
 
 
-export default function Page(): React.JSX.Element {
+export default function Page({ params }: { params: { courseId: string } }): React.JSX.Element {
 
   const [questions, setQuestions] = React.useState<Question[]>([]);
   const [userQuestQuestionAttempts, setUserQuestQuestionAttempts] = React.useState<UserQuestQuestionAttempt[]>([]);
@@ -68,7 +68,10 @@ export default function Page(): React.JSX.Element {
 
       </Stack>
       { questions.length === 0 &&
-        <ImportCard courseId={null} onImportSuccess={handleQuestions}/>
+        <ImportCard
+          onImportSuccess={handleQuestions}
+          courseId={params.courseId}
+        />
       }
 
       { questions.length > 0 && userQuestQuestionAttempts.length === 0 &&
@@ -82,7 +85,10 @@ export default function Page(): React.JSX.Element {
       }
 
       { userQuestQuestionAttempts.length > 0 && userQuestAttempts.length > 0 &&
-        <ImportCardUserAttempt userQuestQuestionAttempts={userQuestQuestionAttempts} userQuestAttempts={userQuestAttempts}/>
+        <ImportCardUserAttempt
+          userQuestQuestionAttempts={userQuestQuestionAttempts}
+          userQuestAttempts={userQuestAttempts}
+        />
       }
 
 

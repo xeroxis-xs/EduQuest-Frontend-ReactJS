@@ -13,7 +13,6 @@ import { logger } from '@/lib/default-logger'
 import { authClient } from "@/lib/auth/client";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
-import Divider from "@mui/material/Divider";
 import CardContent from "@mui/material/CardContent";
 import Grid from "@mui/material/Unstable_Grid2";
 import CardActions from "@mui/material/CardActions";
@@ -43,6 +42,7 @@ import {useState} from "react";
 import {IOSSwitch} from "@/components/dashboard/misc/buttons";
 import {CourseExpiresDialog} from "@/components/dashboard/dialog/course-expires-dialog";
 import {CalendarX as CalendarXIcon} from "@phosphor-icons/react/dist/ssr/CalendarX";
+import {Upload as UploadIcon} from "@phosphor-icons/react/dist/ssr/Upload";
 
 
 
@@ -360,14 +360,20 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
           <Typography variant="body2" color="text.secondary">Quests available for this course.</Typography>
         </Box>
         { eduquestUser?.is_staff ?
-          <Button
-            startIcon={showCreateForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PlusIcon fontSize="var(--icon-fontSize-md)" />}
-            variant={showCreateForm ? 'text' : 'contained'}
-            color={showCreateForm ? 'error' : 'primary'}
-            onClick={toggleCreateForm}
-          >
-            {showCreateForm ? 'Cancel' : 'Create Quest'}
-          </Button> : null }
+          <Stack direction='row' spacing={1}>
+            <Button startIcon={<UploadIcon/>} variant="contained" color="primary" component={RouterLink} href={`${paths.dashboard.import}/${params.courseId.toString()}`}>
+              Import
+            </Button>
+            <Button
+              startIcon={showCreateForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PlusIcon fontSize="var(--icon-fontSize-md)" />}
+              variant={showCreateForm ? 'text' : 'contained'}
+              color={showCreateForm ? 'error' : 'primary'}
+              onClick={toggleCreateForm}
+            >
+              {showCreateForm ? 'Cancel' : 'Create Quest'}
+            </Button>
+          </Stack>
+          : null }
       </Stack>
 
       {showCreateForm && course ? <QuestNewForm onFormSubmitSuccess={getQuests} courseId={course.id}/> : null}

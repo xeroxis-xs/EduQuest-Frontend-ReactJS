@@ -22,6 +22,8 @@ import Pagination from "@mui/material/Pagination";
 import { setSubmitted } from "@/components/dashboard/quest/question/attempt/question-attempt-card";
 import {authClient} from "@/lib/auth/client";
 import {Loading} from "@/components/dashboard/loading/loading";
+import { CheckCircle as CheckCircleIcon } from "@phosphor-icons/react/dist/ssr/CheckCircle";
+import Stack from "@mui/material/Stack";
 
 
 // eslint-disable-next-line camelcase -- 'all_questions_submitted' is a backend field and must match the API response
@@ -33,11 +35,13 @@ export function setAllQuestionsSubmitted(data: UserQuestAttempt[], all_questions
   }));
 }
 
-export function ImportCardUserAttempt(
-  { userQuestQuestionAttempts, userQuestAttempts }:
-    { userQuestQuestionAttempts: UserQuestQuestionAttempt[],
-      userQuestAttempts: UserQuestAttempt[] }
-): React.JSX.Element {
+interface ImportCardUserAttemptProps {
+  userQuestQuestionAttempts: UserQuestQuestionAttempt[];
+  userQuestAttempts: UserQuestAttempt[];
+}
+
+
+export function ImportCardUserAttempt( { userQuestQuestionAttempts, userQuestAttempts }:ImportCardUserAttemptProps): React.JSX.Element {
   enum LoadingState {
     Idle = "Idle",
     SettingAllAttemptsAsSubmitted = "SettingAllAttemptsAsSubmitted",
@@ -121,14 +125,14 @@ export function ImportCardUserAttempt(
     }
   }
 
-  // Aggregate data to calculate the percentage of each selected answer
-  const aggregateData = userQuestQuestionAttempts.reduce<Record<string, Record<string, { count: number, total: number }>>>((acc, attempt) => {
+// Aggregate data to calculate the percentage of each selected answer
+  const aggregateData = userQuestQuestionAttempts.reduce<Record<string, Record<string, { count: number, total: number, isCorrect: boolean }>>>((acc, attempt) => {
     attempt.selected_answers.forEach(answer => {
       if (!acc[attempt.question.text]) {
         acc[attempt.question.text] = {};
       }
       if (!acc[attempt.question.text][answer.answer.text]) {
-        acc[attempt.question.text][answer.answer.text] = { count: 0, total: 0 };
+        acc[attempt.question.text][answer.answer.text] = { count: 0, total: 0, isCorrect: answer.answer.is_correct };
       }
       acc[attempt.question.text][answer.answer.text].total += 1;
       if (answer.is_selected) {
@@ -140,8 +144,9 @@ export function ImportCardUserAttempt(
 
   const aggregatedResults = Object.entries(aggregateData).map(([questionText, answers]) => ({
     questionText,
-    answers: Object.entries(answers).map(([answerText, { count, total }]) => ({
+    answers: Object.entries(answers).map(([answerText, { count, total, isCorrect }]) => ({
       answerText,
+      isCorrect,
       count,
       total,
       percentage: ((count / total) * 100).toFixed(2)
@@ -171,7 +176,12 @@ export function ImportCardUserAttempt(
               <TableBody>
                 {result.answers.map((answer, idx) => (
                   <TableRow hover key={idx}>
-                    <TableCell sx={{px:'24px'}}>{answer.answerText}</TableCell>
+                    <TableCell sx={{px:'24px'}}>
+                      <Stack direction="row" spacing={1}>
+                        <Typography variant="body2">{answer.answerText}</Typography>
+                       {answer.isCorrect ? <CheckCircleIcon size={20} color="#66bb6a"/> : null}
+                      </Stack>
+                      </TableCell>
                     <TableCell sx={{px:'24px'}}>{answer.count} / {answer.total}</TableCell>
                     <TableCell sx={{px:'24px'}}>
                       <Box sx={{ display: 'flex', alignItems: 'center' }}>

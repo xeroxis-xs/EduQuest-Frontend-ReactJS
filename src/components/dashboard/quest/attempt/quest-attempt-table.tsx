@@ -123,12 +123,21 @@ export function UserQuestAttemptTable({ questId = '0', rows = [], totalMaxScore 
                     /> : null}
                   </TableCell>
                   <TableCell>
-                    <Button
-                      component={RouterLink}
-                      href={`/dashboard/quest/${questId}/quest-attempt/${row.id.toString()}`}
-                      disabled={questStatus === 'Expired'}>
-                      {row.all_questions_submitted ? "View" : "Continue"}
-                    </Button>
+                    {row.all_questions_submitted ? (
+                      <Button
+                        component={RouterLink}
+                        href={`/dashboard/quest/${questId}/quest-attempt/${row.id.toString()}`}
+                      >
+                        View
+                      </Button>
+                    ) :
+                      <Button
+                        component={RouterLink}
+                        href={`/dashboard/quest/${questId}/quest-attempt/${row.id.toString()}`}
+                        disabled={questStatus === 'Expired'}>
+                        Continue
+                      </Button>
+                    }
                   </TableCell>
                 </TableRow>
               );

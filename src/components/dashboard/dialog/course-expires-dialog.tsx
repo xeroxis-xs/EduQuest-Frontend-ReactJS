@@ -49,7 +49,7 @@ export function CourseExpiresDialog({ course, openDialog, handleDialogClose, han
             <Box>
               <DialogContentText id="alert-dialog-description">
                 <Typography component='span'>
-                  The following state-sensitive badges will be issued to qualified users upon setting the course to {course.status === 'Active' ? 'Expired' : 'Active'}:
+                  The following state-sensitive badges will be issued to qualified users upon setting this course to {course.status === 'Active' ? 'Expired' : 'Active'}:
                 </Typography>
                 </DialogContentText>
               <Box>
