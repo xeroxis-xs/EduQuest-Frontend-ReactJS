@@ -17,7 +17,7 @@ import {logger} from "@/lib/default-logger";
 import Avatar from "@mui/material/Avatar";
 import {FloppyDisk as FloppyDiskIcon} from "@phosphor-icons/react/dist/ssr/FloppyDisk";
 import Typography from "@mui/material/Typography";
-import {AxiosError, AxiosResponse} from "axios";
+import {AxiosError, type AxiosResponse} from "axios";
 import type {Course} from "@/types/course";
 import apiService from "@/api/api-service";
 import {authClient} from "@/lib/auth/client";

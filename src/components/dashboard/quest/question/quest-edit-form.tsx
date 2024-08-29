@@ -11,7 +11,6 @@ import { authClient } from "@/lib/auth/client";
 import type { Quest } from '@/types/quest';
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
-import {CalendarX as CalendarXIcon} from "@phosphor-icons/react/dist/ssr/CalendarX";
 import Divider from "@mui/material/Divider";
 import CardContent from "@mui/material/CardContent";
 import Grid from "@mui/material/Unstable_Grid2";
@@ -30,7 +29,6 @@ import {useRouter} from "next/navigation";
 import {useUser} from "@/hooks/use-user";
 import type {Course} from "@/types/course";
 import type {Image} from "@/types/image";
-import {IOSSwitch} from "@/components/dashboard/misc/buttons";
 
 interface QuestEditFormProps {
   quest: Quest
@@ -60,11 +58,6 @@ export default function QuestEditForm( {quest, courses, toggleForm, setSubmitSta
   const questCourseIdRef = React.useRef<HTMLInputElement>(null);
   const questImageIdRef = React.useRef<HTMLInputElement>(null);
 
-  const handleStatusChange = (): void => {
-    const newStatus = status === 'Active' ? 'Expired' : 'Active';
-    setStatus(newStatus);
-    onStatusChange(newStatus);
-  };
 
   const getImages = async (): Promise<void> => {
     try {

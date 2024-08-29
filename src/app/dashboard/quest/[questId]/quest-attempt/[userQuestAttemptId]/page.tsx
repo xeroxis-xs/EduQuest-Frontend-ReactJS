@@ -14,7 +14,6 @@ import {XCircle as XCircleIcon} from "@phosphor-icons/react/dist/ssr/XCircle";
 import type { UserQuestQuestionAttempt} from "@/types/user-quest-question-attempt";
 import { QuestionAttemptCard } from "@/components/dashboard/quest/question/attempt/question-attempt-card";
 import Alert from "@mui/material/Alert";
-import {MagicWand as MagicWandIcon} from "@phosphor-icons/react/dist/ssr/MagicWand";
 
 
 export default function Page({ params }: { params: { userQuestAttemptId: string, questId: string } }) : React.JSX.Element {

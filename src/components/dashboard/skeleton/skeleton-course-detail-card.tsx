@@ -5,7 +5,6 @@ import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 import CardActions from '@mui/material/CardActions';
 import Skeleton from '@mui/material/Skeleton';
-import Divider from '@mui/material/Divider';
 import Grid from "@mui/material/Unstable_Grid2";
 import Typography from "@mui/material/Typography";
 
