@@ -47,7 +47,7 @@ export default function Page(): React.JSX.Element {
   }, []);
 
   return (
-    <Stack spacing={3}>
+    <Stack spacing={1}>
       <Stack direction="row" spacing={1} justifyContent="space-between">
           <Typography variant="h4">Eduquest Users</Typography>
 

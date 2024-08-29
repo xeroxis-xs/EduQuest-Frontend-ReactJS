@@ -15,6 +15,8 @@ import TableRow from '@mui/material/TableRow';
 import { useSelection } from '@/hooks/use-selection';
 
 import { type EduquestUser } from '@/types/eduquest-user';
+import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
 
 interface EduquestUserTableProps {
   rows?: EduquestUser[];
@@ -32,7 +34,7 @@ export function EduquestUserTable({
   const selectedSome = (selected?.size ?? 0) > 0 && (selected?.size ?? 0) < rows.length;
   const selectedAll = rows.length > 0 && selected?.size === rows.length;
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(15);
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
@@ -49,6 +51,9 @@ export function EduquestUserTable({
   };
 
   return (
+    <Stack spacing={4}>
+    <Typography variant="body1">Total number of users in the system: {rows?.length}</Typography>
+
     <Card>
       <Box sx={{ overflowX: 'auto' }}>
         <Table sx={{ minWidth: '800px' }}>
@@ -111,8 +116,9 @@ export function EduquestUserTable({
         onRowsPerPageChange={handleChangeRowsPerPage}
         page={page}
         rowsPerPage={rowsPerPage}
-        rowsPerPageOptions={[5, 10, 25]}
+        rowsPerPageOptions={[15, 20, 25]}
       />
     </Card>
+    </Stack>
   );
 }
