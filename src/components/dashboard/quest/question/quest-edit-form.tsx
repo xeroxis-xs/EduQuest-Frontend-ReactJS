@@ -39,15 +39,12 @@ interface QuestEditFormProps {
   onStatusChange: (status: string) => void;
 }
 
-
-
-export default function QuestEditForm( {quest, courses, toggleForm, setSubmitStatus, onUpdateSuccess, onStatusChange} : QuestEditFormProps ): React.JSX.Element {
+export default function QuestEditForm( {quest, courses, toggleForm, setSubmitStatus, onUpdateSuccess } : QuestEditFormProps ): React.JSX.Element {
   const router = useRouter();
   const { eduquestUser } = useUser();
   const [images, setImages] = React.useState<Image[]>();
   const [selectedCourse, setSelectedCourse] = React.useState<Course | null>(null);
   const [selectedImage, setSelectedImage] = React.useState<Image | null>(null);
-  const [status, setStatus] = React.useState(quest.status);
 
   const questTypeRef = React.useRef<HTMLInputElement>(null);
   const questNameRef = React.useRef<HTMLInputElement>(null);
