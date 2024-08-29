@@ -4,7 +4,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import CardHeader from "@mui/material/CardHeader";
-import {CardMedia, TextField} from "@mui/material";
+import {CardMedia, TextField, Skeleton } from "@mui/material";
 import Divider from "@mui/material/Divider";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
@@ -27,7 +27,7 @@ import Box from "@mui/material/Box";
 import Alert from "@mui/material/Alert";
 import Chip from "@mui/material/Chip";
 import {Loading} from "@/components/dashboard/loading/loading";
-import { Skeleton } from '@mui/material';
+
 
 
 const VisuallyHiddenInput = styled('input')({

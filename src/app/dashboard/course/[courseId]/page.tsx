@@ -102,7 +102,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
 
   const handleStatusChange = async (status : string): Promise<void> => {
     try {
-      const data = {status: status}
+      const data = {status}
       const response : AxiosResponse<Course> = await apiService.patch(`/api/Course/${params.courseId}/`, data);
       setSubmitStatus({ type: 'success', message: `Course has been set to '${status}'` });
       setCourse(response.data);

@@ -25,7 +25,7 @@ export function QuestionNewDialog({ openDialog, handleDialogClose, handleDialogC
         aria-labelledby="alert-dialog-title"
         aria-describedby="alert-dialog-description"
       >
-        <DialogTitle id="alert-dialog-title">{"Confirm Submission"}</DialogTitle>
+        <DialogTitle id="alert-dialog-title">Confirm Submission</DialogTitle>
         <DialogContent>
           <DialogContentText id="alert-dialog-description">
             <Typography component='span'>

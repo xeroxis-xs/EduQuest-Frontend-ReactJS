@@ -16,7 +16,7 @@ import Button from "@mui/material/Button";
 import {XCircle as XCircleIcon} from "@phosphor-icons/react/dist/ssr/XCircle";
 import {CheckCircle as CheckCircleIcon} from "@phosphor-icons/react/dist/ssr/CheckCircle";
 import Dialog from "@mui/material/Dialog";
-import {Quest} from "@/types/quest";
+import {type Quest} from "@/types/quest";
 
 
 interface CourseExpiresDialogProps {
@@ -109,8 +109,8 @@ export function QuestExpiresDialog({ quest, openDialog, handleDialogClose, handl
         </DialogActions>
       </Dialog>
     );
-  } else {
-    return <></>;
   }
+    return <></>;
+
 
 }

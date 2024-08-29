@@ -189,7 +189,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
 
   const handleStatusChange = async (status : string): Promise<void> => {
     try {
-      let data: { status: string; expiration_date?: null } = { status };
+      const data: { status: string; expiration_date?: null } = { status };
       if (status === 'Active') {
         data.expiration_date = null;
       }

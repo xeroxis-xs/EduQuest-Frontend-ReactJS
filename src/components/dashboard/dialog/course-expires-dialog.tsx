@@ -17,7 +17,7 @@ import Button from "@mui/material/Button";
 import {XCircle as XCircleIcon} from "@phosphor-icons/react/dist/ssr/XCircle";
 import {CheckCircle as CheckCircleIcon} from "@phosphor-icons/react/dist/ssr/CheckCircle";
 import Dialog from "@mui/material/Dialog";
-import {Course} from "@/types/course"; // Grid version 2
+import {type Course} from "@/types/course"; // Grid version 2
 
 
 interface CourseExpiresDialogProps {
@@ -126,7 +126,7 @@ export function CourseExpiresDialog({ course, openDialog, handleDialogClose, han
             Cancel
           </Button>
           <Button
-            onClick={() => handleDialogConfirm(course.status === 'Active' ? 'Expired' : 'Active')}
+            onClick={() => { handleDialogConfirm(course.status === 'Active' ? 'Expired' : 'Active'); }}
             color="primary"
             variant="contained"
             startIcon={<CheckCircleIcon />}
@@ -136,8 +136,8 @@ export function CourseExpiresDialog({ course, openDialog, handleDialogClose, han
         </DialogActions>
       </Dialog>
     );
-  } else {
-    return <></>;
   }
+    return <></>;
+
 
 }
