@@ -13,7 +13,7 @@ export default function Page(): React.JSX.Element {
       <iframe
         src="https://docs.google.com/forms/d/e/1FAIpQLSdgCny3HLRptSokCimNY5zvNwOU8wPiYS9fnKRfUOPk79npgQ/viewform?embedded=true"
         width="640"
-        height="1000"
+        height="1200"
         title="Feedback Form"
         style={{ border: 0 }}
       >

@@ -8,9 +8,6 @@ import '@/styles/global.css';
 import { UserProvider } from '@/contexts/user-context';
 import { LocalizationProvider } from '@/components/core/localization-provider';
 import { ThemeProvider } from '@/components/core/theme-provider/theme-provider';
-// import { initializeMsal, msalInstance } from "@/app/msal/msal";
-// import { MsalProvider } from "@azure/msal-react";
-// import MyMsalProvider from "@/components/auth/msal-provider";
 
 export const viewport = { width: 'device-width', initialScale: 1 } satisfies Viewport;
 
@@ -19,11 +16,7 @@ interface LayoutProps {
 }
 
 export default function Layout({ children }: LayoutProps): React.JSX.Element {
-  // console.log("Layout");
-  // React.useEffect(() => {
-  //
-  //   initializeMsal();
-  // }, []);
+
   return (
     <html lang="en">
     <head>
@@ -36,13 +29,14 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
       <title>EduQuest</title>
     </head>
     <body>
-    {/*<MyMsalProvider>*/}
+
     <LocalizationProvider>
       <UserProvider>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
       </UserProvider>
     </LocalizationProvider>
-    {/*</MyMsalProvider>*/}
 
     </body>
     </html>
