@@ -33,6 +33,7 @@ import {SkeletonShortestUser} from "@/components/dashboard/skeleton/analytics/sk
 import {SkeletonMyBadgeProgress} from "@/components/dashboard/skeleton/analytics/skeleton-my-badge-progress";
 import Stack from "@mui/material/Stack";
 import {LiveIndicator} from "@/components/dashboard/overview/chart/LiveIndicator";
+import Typography from "@mui/material/Typography";
 
 
 export interface AnalyticsPartOne {
@@ -160,7 +161,8 @@ export default function Page(): React.JSX.Element {
 
   return (
     <Stack>
-      <Stack direction='row' justifyContent='flex-end'>
+      <Stack direction='row' justifyContent='space-between' pb={3}>
+        <Typography variant="h4">Dashboard</Typography>
         <LiveIndicator />
       </Stack>
 

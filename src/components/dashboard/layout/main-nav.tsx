@@ -11,21 +11,19 @@ import {usePopover} from '@/hooks/use-popover';
 import {useUser} from '@/hooks/use-user';
 import {getUserPhotoAvatar} from "@/app/msal/msal-graph";
 import {logger} from '@/lib/default-logger';
-
 import {MobileNav} from './mobile-nav';
 import {UserPopover} from './user-popover';
+import { LinearProgressForLevel, } from "@/components/dashboard/misc/linear-progress-with-label";
 
 export function MainNav(): React.JSX.Element {
   const [openNav, setOpenNav] = React.useState<boolean>(false);
-
   const userPopover = usePopover<HTMLDivElement>();
   const [userPhoto, setUserPhoto] = React.useState<string | null>(null);
   const [showUserInitials, setShowUserInitials] = React.useState(false);
   const [userAvatarProps, setUserAvatarProps] = React.useState<UserAvatarProps>({
     name: '?',
   });
-
-  const { user } = useUser();
+  const { user, eduquestUser } = useUser();
 
 
   React.useEffect(() => {
@@ -80,6 +78,8 @@ export function MainNav(): React.JSX.Element {
           spacing={2}
           sx={{ alignItems: 'center', justifyContent: 'space-between', minHeight: '64px', px: 2 }}
         >
+
+
           <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
             <IconButton
               onClick={(): void => {
@@ -92,6 +92,16 @@ export function MainNav(): React.JSX.Element {
 
           </Stack>
           <Stack sx={{ alignItems: 'center' }} direction="row" spacing={2}>
+            {eduquestUser ?
+              <LinearProgressForLevel
+                sx={{ width: '200px' }}
+                value={eduquestUser.total_points % 100}
+                level={`Level ${Math.floor(eduquestUser.total_points / 100) + 1}`}
+                absValue={Math.round(eduquestUser.total_points * 100) / 100}
+              />
+              : null}
+
+
 
             {
               showUserInitials ?

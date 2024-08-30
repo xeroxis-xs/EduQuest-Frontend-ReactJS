@@ -22,6 +22,9 @@ import {logger} from "@/lib/default-logger";
 import apiService from "@/api/api-service";
 import {AxiosError} from "axios";
 import {authClient} from "@/lib/auth/client";
+import Points from "../../../../../../public/assets/point.svg";
+import Stack from "@mui/material/Stack";
+import { useUser } from '@/hooks/use-user';
 
 
 interface QuestionAttemptCardProps {
@@ -32,11 +35,37 @@ interface QuestionAttemptCardProps {
 }
 
 
-export function setSubmitted(data: UserQuestQuestionAttempt[], submitted: boolean) : UserQuestQuestionAttempt[] {
+export function setSubmitted(data: UserQuestQuestionAttempt[]) : UserQuestQuestionAttempt[] {
   return data.map(attempt => ({
     ...attempt,
-    submitted
+    submitted: true
   }));
+}
+
+export function setScoreAchievedSubmittedLastAttemptedOn(data: UserQuestQuestionAttempt[]): UserQuestQuestionAttempt[] {
+  const lastAttemptedOn = new Date().toISOString();
+  return data.map(attempt => {
+    const totalAnswers = attempt.question.answers.length;
+    const scorePerAnswer = attempt.question.max_score / totalAnswers;
+
+    let scoreAchieved = 0;
+
+    attempt.question.answers.forEach(answer => {
+      const isSelected = attempt.selected_answers.some(selectedAnswerRecord => selectedAnswerRecord.answer.id === answer.id && selectedAnswerRecord.is_selected);
+      if ((answer.is_correct && isSelected) || (!answer.is_correct && !isSelected)) {
+        scoreAchieved += scorePerAnswer;
+      }
+    });
+
+    scoreAchieved = Math.max(0, scoreAchieved);
+
+    return {
+      ...attempt,
+      score_achieved: scoreAchieved,
+      submitted: true,
+      last_attempted_on: lastAttemptedOn
+    };
+  });
 }
 
 export function setLastAttemptedOn(data: UserQuestQuestionAttempt[]) : UserQuestQuestionAttempt[] {
@@ -48,6 +77,7 @@ export function setLastAttemptedOn(data: UserQuestQuestionAttempt[]) : UserQuest
 
 
 export function QuestionAttemptCard({ data = [], onDataChange, onSubmitResult, onSaveResult }: QuestionAttemptCardProps): React.JSX.Element {
+  const { checkSession } = useUser();
   const [page, setPage] = React.useState(1);
   const [showExplanation, setShowExplanation] = React.useState<Record<number, boolean>>({});
   const rowsPerPage = 1;
@@ -56,6 +86,12 @@ export function QuestionAttemptCard({ data = [], onDataChange, onSubmitResult, o
 
   const handleChangePage = (_event: React.ChangeEvent<unknown>, newPage: number): void => {
     setPage(newPage);
+  };
+
+  const refreshUser = async () => {
+    if (checkSession) {
+      await checkSession();
+    }
   };
 
   const handleCheckboxChange = (answerId: number, isChecked: boolean): void => {
@@ -87,15 +123,15 @@ export function QuestionAttemptCard({ data = [], onDataChange, onSubmitResult, o
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
-    const updatedData = setLastAttemptedOn(data);
-    const submittedData = setSubmitted(updatedData, true);
-    logger.debug("Submit button clicked, updated data ", submittedData);
+    const updatedData = setScoreAchievedSubmittedLastAttemptedOn(data);
+    logger.debug("Submit button clicked, updated data ", updatedData);
 
     try {
-      const response = await apiService.patch(`/api/UserQuestQuestionAttempt/bulk-update/`, submittedData);
+      const response = await apiService.patch(`/api/UserQuestQuestionAttempt/bulk-update/`, updatedData);
       if (response.status === 200) {
         logger.debug('Submit Success:', response.data);
         onSubmitResult({ type: 'success', message: 'Submit Successful' });
+        await refreshUser();
       }
     }
     catch (error: unknown) {
@@ -129,7 +165,12 @@ export function QuestionAttemptCard({ data = [], onDataChange, onSubmitResult, o
               <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                 <CardHeader
                   title={`Question ${attemptedQuestionsAndAnswers.question.number.toString()}`}
-                  subheader={`${attemptedQuestionsAndAnswers.question.max_score.toString()} point(s)`}
+                  subheader={
+                    <Stack direction="row" spacing='6px' sx={{ alignItems: 'center', pt:0.5 }}>
+                      <Typography variant="body2">{attemptedQuestionsAndAnswers.question.max_score}</Typography>
+                      <Points height={18}/>
+                    </Stack>
+                }
                   action={
                     attemptedQuestionsAndAnswers.submitted &&
                     attemptedQuestionsAndAnswers.question.answers.some(answer => answer.reason) ? <Button

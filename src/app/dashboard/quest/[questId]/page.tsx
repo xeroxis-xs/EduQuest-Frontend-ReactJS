@@ -40,6 +40,7 @@ import {useState} from "react";
 import Tooltip from "@mui/material/Tooltip";
 import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
 import {QuestExpiresDialog} from "@/components/dashboard/dialog/quest-expires-dialog";
+import Points from "../../../../../public/assets/point.svg";
 
 
 interface ExpandMoreProps extends IconButtonProps {
@@ -337,8 +338,11 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
               </Grid>
 
               <Grid md={6} xs={12}>
-                <Typography variant="overline" color="text.secondary">Maximum Score</Typography>
-                <Typography variant="body2">{quest.total_max_score}</Typography>
+                <Typography variant="overline" color="text.secondary">Maximum Points</Typography>
+                <Stack direction="row" spacing='6px' sx={{ alignItems: 'center' }}>
+                  <Typography variant="body2">{quest.total_max_score}</Typography>
+                  <Points height={18}/>
+                </Stack>
               </Grid>
 
               <Grid md={6} xs={12}>

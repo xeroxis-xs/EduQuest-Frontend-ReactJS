@@ -32,10 +32,9 @@ import type { Document } from "@/types/document";
 import type { GeneratedQuestion } from "@/types/generated-question";
 import type { GeneratedQuestions } from "@/types/generated-questions";
 import type { EduquestUser } from "@/types/eduquest-user";
-import LinearProgress, { type LinearProgressProps, linearProgressClasses } from '@mui/material/LinearProgress';
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
-import { styled } from '@mui/material/styles';
+import { LinearProgressWithLabel } from '@/components/dashboard/misc/linear-progress-with-label';
 
 
 interface CourseFormProps {
@@ -53,37 +52,7 @@ interface NewQuestType {
   image: Image | undefined;
 }
 
-const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
-  height: 10,
-  borderRadius: 5,
-  [`&.${linearProgressClasses.colorPrimary}`]: {
-    backgroundColor: theme.palette.grey[theme.palette.mode === 'light' ? 200 : 800],
-  },
-  [`& .${linearProgressClasses.bar}`]: {
-    borderRadius: 5,
-    backgroundColor: theme.palette.mode === 'light' ? 'primary' : 'primary',
-  },
-}));
 
-
-function LinearProgressWithLabel(props: LinearProgressProps & { value: number, status: string }): React.JSX.Element {
-  return (
-    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-      <Box sx={{ width: '100%', mr: 1 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-          <Typography variant="body2" color="text.secondary">
-            {props.status}
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            {`${Math.round(props.value).toString()}%`}
-          </Typography>
-        </Box>
-
-        <BorderLinearProgress variant="determinate" {...props} />
-      </Box>
-    </Box>
-  );
-}
 
 export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Element {
   const { eduquestUser} = useUser();

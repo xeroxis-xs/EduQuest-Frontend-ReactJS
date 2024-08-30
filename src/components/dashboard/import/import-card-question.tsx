@@ -16,16 +16,25 @@ import Box from "@mui/material/Box";
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import {Loading} from "@/components/dashboard/loading/loading";
+import {UserQuestQuestionAttempt} from "@/types/user-quest-question-attempt";
+import {UserQuestAttempt} from "@/types/user-quest-attempt";
 
 
 interface ImportCardQuestionProps {
   questions: Question[];
-  onQuestionUpdateSuccess: (questId: number) => void;
+  onQuestQuestionAttemptsUpdate: (updatedQuestQuestionAttempts: UserQuestQuestionAttempt[]) => void;
+  onQuestAttemptsUpdate: (updatedUserQuestAttempts: UserQuestAttempt[]) => void;
 }
 
-export function ImportCardQuestion({ questions, onQuestionUpdateSuccess }: ImportCardQuestionProps): React.JSX.Element {
+export function ImportCardQuestion({ questions, onQuestQuestionAttemptsUpdate, onQuestAttemptsUpdate }: ImportCardQuestionProps): React.JSX.Element {
+  enum LoadingState {
+    Idle = "Idle",
+    UpdatingQuestions = "UpdatingQuestions",
+    GettingUserAttempts = 'GettingUserAttempts',
+    ConsolidatingUserAttempts = 'ConsolidatingUserAttempts',
+  }
   const [updatedQuestions, setUpdatedQuestions] = React.useState(questions);
-  const [isLoading, setIsLoading] = React.useState(false);
+  const [loadingState, setLoadingState] = React.useState<LoadingState>(LoadingState.Idle);
 
   const handleAnswerChange = (questionId: number, answerId: number, isCorrect: boolean): void => {
     logger.debug('handleAnswerChange', questionId, answerId, isCorrect);
@@ -47,16 +56,13 @@ export function ImportCardQuestion({ questions, onQuestionUpdateSuccess }: Impor
     setUpdatedQuestions(newQuestions);
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
-    event.preventDefault();
-    setIsLoading(true);
-    logger.debug('Submitting updated questions', updatedQuestions);
-
+  const bulkUpdateQuestions = async (): Promise<number | undefined> => {
     try {
+      setLoadingState(LoadingState.UpdatingQuestions);
       const response = await apiService.patch(`/api/Question/bulk-update/`, updatedQuestions);
       if (response.status === 200) {
         logger.debug('Update Success:', response.data);
-        onQuestionUpdateSuccess(updatedQuestions[0].from_quest);
+        return updatedQuestions[0].from_quest;
       }
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
@@ -65,9 +71,53 @@ export function ImportCardQuestion({ questions, onQuestionUpdateSuccess }: Impor
         }
       }
       logger.error('Failed to save data', error);
-      // onSaveResult({ type: 'error', message: 'Save Failed. Please try again.' });
     }
-    setIsLoading(false);
+  }
+
+  const getQuestQuestionAttempts = async (questId:number): Promise<void> => {
+    try {
+      setLoadingState(LoadingState.GettingUserAttempts);
+      const response = await apiService.get<UserQuestQuestionAttempt[]>(`/api/UserQuestQuestionAttempt/by-quest/${questId.toString()}`);
+      const data: UserQuestQuestionAttempt[] = response.data;
+      onQuestQuestionAttemptsUpdate(data);
+      logger.debug('UserQuestQuestionAttempt', data);
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 401) {
+          await authClient.signInWithMsal();
+        }
+      }
+      logger.error('Error getting UserQuestQuestionAttempt: ', error);
+    }
+  };
+
+  const getQuestAttempts = async (questId:number): Promise<void> => {
+    try {
+      setLoadingState(LoadingState.ConsolidatingUserAttempts);
+      const response = await apiService.get<UserQuestAttempt[]>(`/api/UserQuestAttempt/by-quest/${questId.toString()}`);
+      const data: UserQuestAttempt[] = response.data;
+      onQuestAttemptsUpdate(data);
+      logger.debug('UserQuestAttempt', data);
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 401) {
+          await authClient.signInWithMsal();
+        }
+      }
+      logger.error('Error getting UserQuestAttempt: ', error);
+    }
+  }
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
+    event.preventDefault();
+    const questId = await bulkUpdateQuestions();
+    if (questId) {
+      await getQuestQuestionAttempts(questId);
+      await getQuestAttempts(questId);
+    }
+
+
+
   }
 
   return (
@@ -110,7 +160,10 @@ export function ImportCardQuestion({ questions, onQuestionUpdateSuccess }: Impor
       </CardContent>
     </Card>
 
-      {isLoading ? <Loading text="Updating Questions..." /> : null}
+      {loadingState === LoadingState.UpdatingQuestions ? <Loading text="Updating Questions..." /> : null}
+      {loadingState === LoadingState.GettingUserAttempts ? <Loading text="Getting User Attempts..." /> : null}
+      {loadingState === LoadingState.ConsolidatingUserAttempts ? <Loading text="Consolidating User Attempts..." /> : null}
+
 
     <Box sx={{display: "flex", justifyContent: "center", mt: 6}}>
       <Button endIcon={<CaretRightIcon/>} type="submit" variant="contained">Next: View Attempts</Button>

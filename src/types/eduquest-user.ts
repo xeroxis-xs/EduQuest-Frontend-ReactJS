@@ -10,4 +10,5 @@ export interface EduquestUser {
   is_superuser: boolean;
   is_active: boolean;
   is_staff: boolean;
+  total_points: number;
 }

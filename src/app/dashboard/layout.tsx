@@ -8,7 +8,7 @@ import { MainNav } from '@/components/dashboard/layout/main-nav';
 import { SideNav } from '@/components/dashboard/layout/side-nav';
 import { metadata as dashboardMetadata } from '@/app/dashboard/metadata';
 import type { Metadata } from 'next';
-import {Footer} from "@/components/core/footer";
+import { Footer } from '@/components/core/footer';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -28,6 +28,10 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
             '--SideNav-zIndex': 1100,
             '--MobileNav-width': '320px',
             '--MobileNav-zIndex': 1100,
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: '100vh',
+            margin: 0,
           },
         }}
       />
@@ -36,8 +40,7 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
           bgcolor: 'var(--mui-palette-background-default)',
           display: 'flex',
           flexDirection: 'column',
-          position: 'relative',
-          minHeight: '100%',
+          flex: '1 0 auto',
         }}
       >
         <SideNav />
@@ -46,12 +49,12 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
           <main>
             <Container maxWidth="xl" sx={{ py: '64px' }}>
               {children}
-
             </Container>
-
-            <Footer />
           </main>
         </Box>
+      </Box>
+      <Box sx={{ pl: { lg: 'var(--SideNav-width)' } }}>
+        <Footer />
       </Box>
     </AuthGuard>
   );

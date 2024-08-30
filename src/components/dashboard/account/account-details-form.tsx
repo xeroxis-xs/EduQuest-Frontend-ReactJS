@@ -21,16 +21,25 @@ import {AxiosError, type AxiosResponse} from "axios";
 import type {Course} from "@/types/course";
 import apiService from "@/api/api-service";
 import {authClient} from "@/lib/auth/client";
+import Alert from "@mui/material/Alert";
+import Points from "../../../../public/assets/point.svg";
+import Stack from "@mui/material/Stack";
 
 export function AccountDetailsForm(): React.JSX.Element {
-  const { eduquestUser } = useUser();
-  const { user } = useUser();
+  const { eduquestUser, checkSession, user } = useUser();
   const nicknameRef = React.useRef<HTMLInputElement>(null);
   const [userPhoto, setUserPhoto] = React.useState<string | null>(null);
   const [showUserInitials, setShowUserInitials] = React.useState(false);
   const [userAvatarProps, setUserAvatarProps] = React.useState<UserAvatarProps>({
     name: '?',
   });
+  const [submitStatus, setSubmitStatus] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
+
+  const refreshUser = async () => {
+    if (checkSession) {
+      await checkSession();
+    }
+  };
 
   function onImgError() : void  {
     setShowUserInitials(true);
@@ -51,10 +60,8 @@ export function AccountDetailsForm(): React.JSX.Element {
       try {
         const response: AxiosResponse<Course> = await apiService.patch(`/api/EduquestUser/${eduquestUser.email.toString()}/`, updatedNickname);
         logger.debug('Update Success:', response.data);
-        window.location.reload();
-        // setSubmitStatus({ type: 'success', message: 'Update Successful' });
-        // await getCourse();
-        // setShowForm(false)
+        setSubmitStatus({ type: 'success', message: 'Update Successful' });
+        await refreshUser();
       } catch (error) {
         if (error instanceof AxiosError) {
           if (error.response?.status === 401) {
@@ -142,6 +149,13 @@ export function AccountDetailsForm(): React.JSX.Element {
                 <Typography variant="body2">{eduquestUser.email} </Typography>
               </Grid>
               <Grid sm={6} xs={12}>
+                <Typography variant="overline" color="text.secondary">Total points</Typography>
+                <Stack direction="row" spacing='6px' sx={{ alignItems: 'center' }}>
+                  <Typography variant="body2">{eduquestUser.total_points}</Typography>
+                  <Points height={18}/>
+                </Stack>
+              </Grid>
+              <Grid sm={6} xs={12}>
                 <Typography variant="overline" color="text.secondary">Last login</Typography>
                 <Typography variant="body2">
                   {new Date(eduquestUser.last_login).toLocaleDateString("en-SG", {
@@ -189,6 +203,10 @@ export function AccountDetailsForm(): React.JSX.Element {
           <Button startIcon={<FloppyDiskIcon/>} type="submit" variant="contained">Update</Button>
         </CardActions>
       </Card>
+      {submitStatus ? <Alert severity={submitStatus.type} sx={{ marginTop: 2 }}>
+        {submitStatus.message}
+      </Alert> : null}
+
     </form>
   );
 }

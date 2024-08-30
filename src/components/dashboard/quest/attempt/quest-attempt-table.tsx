@@ -14,9 +14,9 @@ import RouterLink from "next/link";
 import type { UserQuestAttempt } from '@/types/user-quest-attempt';
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
-import LinearProgress from "@mui/material/LinearProgress";
 import Typography from "@mui/material/Typography";
 import { formatTime } from "@/components/dashboard/overview/shortest-user"
+import {LinearProgressSlim} from "@/components/dashboard/misc/linear-progress-with-label";
 
 interface UserQuestAttemptTableProps {
   questId?: string;
@@ -115,12 +115,9 @@ export function UserQuestAttemptTable({ questId = '0', rows = [], totalMaxScore 
                       size="small"/>
                   </TableCell>
                   <TableCell sx={{ width: '15%'}}>
-                    {row.all_questions_submitted ? `${parseFloat(row.total_score_achieved.toFixed(2)).toString()} / ${totalMaxScore?.toString()}` : "Not Available"}
                     {row.all_questions_submitted ?
-                      <LinearProgress
-                      variant="determinate"
-                      value={(row.total_score_achieved / totalMaxScore) * 100}
-                    /> : null}
+                      <LinearProgressSlim value={(row.total_score_achieved / totalMaxScore) * 100} text={`${Math.round(row.total_score_achieved * 100) / 100} / ${totalMaxScore}`} />
+                       : "Not Available"}
                   </TableCell>
                   <TableCell>
                     {row.all_questions_submitted ? (

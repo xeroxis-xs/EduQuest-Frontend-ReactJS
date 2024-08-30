@@ -202,7 +202,7 @@ export function ImportCard({ onImportSuccess, courseId }: ImportCardProps): Reac
             logger.error('Code: ', error.response?.status);
             logger.error('Message: ', error.response?.data);
           }
-          setSubmitStatus({ type: 'error', message: error.response?.data || 'Quest Import Failed. Please try again.' });
+          setSubmitStatus({ type: 'error', message: JSON.stringify(error.response?.data) });
         }
       }
     }
@@ -399,10 +399,10 @@ export function ImportCard({ onImportSuccess, courseId }: ImportCardProps): Reac
       </CardContent>
     </Card>
 
-    {submitStatus ?
-      <Alert severity={submitStatus.type} sx={{ mt: 4 }}>
-        {typeof submitStatus.message === 'string' ? submitStatus.message : 'An error occurred'}
-      </Alert> : null}
+      {submitStatus ?
+        <Alert severity={submitStatus.type} sx={{ mt: 4 }}>
+          {String(submitStatus.message)}
+        </Alert> : null}
 
       {isProcessing ? <Loading text="Creating Quest and Questions..." /> : null}
 

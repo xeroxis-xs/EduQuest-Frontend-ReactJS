@@ -19,11 +19,12 @@ import TableCell from "@mui/material/TableCell";
 import TableBody from "@mui/material/TableBody";
 import LinearProgress from "@mui/material/LinearProgress";
 import Pagination from "@mui/material/Pagination";
-import { setSubmitted } from "@/components/dashboard/quest/question/attempt/question-attempt-card";
+import { setScoreAchievedSubmittedLastAttemptedOn } from "@/components/dashboard/quest/question/attempt/question-attempt-card";
 import {authClient} from "@/lib/auth/client";
 import {Loading} from "@/components/dashboard/loading/loading";
 import { CheckCircle as CheckCircleIcon } from "@phosphor-icons/react/dist/ssr/CheckCircle";
 import Stack from "@mui/material/Stack";
+import {useUser} from "@/hooks/use-user";
 
 
 // eslint-disable-next-line camelcase -- 'all_questions_submitted' is a backend field and must match the API response
@@ -48,6 +49,8 @@ export function ImportCardUserAttempt( { userQuestQuestionAttempts, userQuestAtt
     IssuingBadges = 'IssuingBadges',
     SettingQuestAsExpired = 'SettingQuestAsExpired',
   }
+  const { checkSession } = useUser();
+
   const [page, setPage] = React.useState(1);
   const rowsPerPage = 1; // Each page will show one card
   const router = useRouter();
@@ -55,6 +58,12 @@ export function ImportCardUserAttempt( { userQuestQuestionAttempts, userQuestAtt
 
   const handleChangePage = (_event: React.ChangeEvent<unknown>, newPage: number): void => {
     setPage(newPage);
+  };
+
+  const refreshUser = async () => {
+    if (checkSession) {
+      await checkSession();
+    }
   };
 
   const bulkUpdateUserQuestQuestionAttempt = async (updateUserQuestQuestionAttempt: UserQuestQuestionAttempt[]): Promise<void> => {
@@ -106,17 +115,20 @@ export function ImportCardUserAttempt( { userQuestQuestionAttempts, userQuestAtt
         }
         logger.error('Failed to expire quest:', error.response?.data);
       }
+    } finally {
+      setLoadingState(LoadingState.Idle);
     }
   }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     try {
-      const updateUserQuestQuestionAttempt = setSubmitted(userQuestQuestionAttempts, true);
+      const updateUserQuestQuestionAttempt = setScoreAchievedSubmittedLastAttemptedOn(userQuestQuestionAttempts);
       await bulkUpdateUserQuestQuestionAttempt(updateUserQuestQuestionAttempt);
       const updatedUserQuestAttempt = setAllQuestionsSubmitted(userQuestAttempts, true);
       await bulkUpdateUserQuestAttempt(updatedUserQuestAttempt);
       await setQuestToExpire(userQuestQuestionAttempts[0].question.from_quest);
+      await refreshUser(); // To update the user's level bar
       logger.debug('Bulk Update both UserQuestAttempt and UserQuestQuestionAttempt Success');
       router.push(`/dashboard/quest/${userQuestQuestionAttempts[0].question.from_quest.toString()}`);
     }

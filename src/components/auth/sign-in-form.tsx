@@ -31,22 +31,32 @@ export function SignInForm(): React.JSX.Element {
         have access to this site.
       </Alert>
 
-      <Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-        <Stack component="ul" direction="row" spacing={2} style={{ listStyleType: 'none', paddingLeft: 0, marginTop: 0, justifyContent: 'space-evenly', width: '100%' }}>
-          <li style={{ display: 'flex', alignItems: 'center' }}>
-            <CheckSquareOffsetIcon size={20} style={{ flexShrink: 0, marginRight: '8px' }} color={theme.palette.primary.main} />
-            <Typography variant="body1">Complete</Typography>
-          </li>
-          <li style={{ display: 'flex', alignItems: 'center' }}>
-            <RankingIcon size={20} style={{ flexShrink: 0, marginRight: '8px' }} color={theme.palette.primary.main} />
-            <Typography variant="body1">Compete</Typography>
-          </li>
-          <li style={{ display: 'flex', alignItems: 'center' }}>
-            <MedalIcon size={20} style={{ flexShrink: 0, marginRight: '8px' }} color={theme.palette.primary.main} />
-            <Typography variant="body1">Collect</Typography>
-          </li>
+      {/*<Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>*/}
+      <Stack spacing={3} px={3}>
+        <Stack spacing={1} direction="row">
+          <CheckSquareOffsetIcon size={20} color={theme.palette.primary.main} />
+          <Box>
+            <Typography variant="body2" fontWeight={600} gutterBottom>Complete</Typography>
+            <Typography variant="body2">Finish quests to earn points, level up, and unlock new challenges.</Typography>
+          </Box>
         </Stack>
-      </Box>
+        <Stack spacing={1} direction="row" >
+          <RankingIcon size={20} color={theme.palette.primary.main} />
+          <Box>
+            <Typography variant="body2" gutterBottom fontWeight={600}>Compete</Typography>
+            <Typography variant="body2">Challenge peers and climb the leaderboard to showcase your achievements.</Typography>
+          </Box>
+        </Stack>
+        <Stack spacing={1} direction="row">
+          <MedalIcon size={20} color={theme.palette.primary.main} />
+          <Box>
+            <Typography variant="body2" gutterBottom fontWeight={600}>Collect</Typography>
+            <Typography variant="body2">Earn exclusive badges by completing challenging quests and mastering courses.</Typography>
+          </Box>
+        </Stack>
+      </Stack>
+
+
 
 
     </Stack>
