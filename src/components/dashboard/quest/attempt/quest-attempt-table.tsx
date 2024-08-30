@@ -116,7 +116,9 @@ export function UserQuestAttemptTable({ questId = '0', rows = [], totalMaxScore 
                   </TableCell>
                   <TableCell sx={{ width: '15%'}}>
                     {row.all_questions_submitted ?
-                      <LinearProgressSlim value={(row.total_score_achieved / totalMaxScore) * 100} text={`${Math.round(row.total_score_achieved * 100) / 100} / ${totalMaxScore}`} />
+                      <LinearProgressSlim
+                        value={(row.total_score_achieved / totalMaxScore) * 100}
+                        text={`${(Math.round(row.total_score_achieved * 100) / 100).toString()} / ${totalMaxScore?.toString()}`} />
                        : "Not Available"}
                   </TableCell>
                   <TableCell>

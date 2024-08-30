@@ -60,15 +60,16 @@ export function ImportCardUserAttempt( { userQuestQuestionAttempts, userQuestAtt
     setPage(newPage);
   };
 
-  const refreshUser = async () => {
+  const refreshUser = async () : Promise<void> => {
     if (checkSession) {
       await checkSession();
     }
   };
 
-  const bulkUpdateUserQuestQuestionAttempt = async (updateUserQuestQuestionAttempt: UserQuestQuestionAttempt[]): Promise<void> => {
+  const bulkUpdateUserQuestQuestionAttempt = async (questionAttempts: UserQuestQuestionAttempt[]): Promise<void> => {
     try {
       setLoadingState(LoadingState.SettingAllAttemptsAsSubmitted);
+      const updateUserQuestQuestionAttempt = setScoreAchievedSubmittedLastAttemptedOn(questionAttempts);
       const response = await apiService.patch(`/api/UserQuestQuestionAttempt/bulk-update/`, updateUserQuestQuestionAttempt);
       if (response.status === 200) {
         logger.debug('Bulk Update UserQuestQuestionAttempt Success:', response.data);
@@ -123,10 +124,13 @@ export function ImportCardUserAttempt( { userQuestQuestionAttempts, userQuestAtt
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     try {
-      const updateUserQuestQuestionAttempt = setScoreAchievedSubmittedLastAttemptedOn(userQuestQuestionAttempts);
-      await bulkUpdateUserQuestQuestionAttempt(updateUserQuestQuestionAttempt);
+      // Update all questions to submitted and assign the score achieved for each question
+      await bulkUpdateUserQuestQuestionAttempt(userQuestQuestionAttempts);
+
+      // Update all quest attempts to submitted, let backend handle the calculation of the total_score_achieved
       const updatedUserQuestAttempt = setAllQuestionsSubmitted(userQuestAttempts, true);
       await bulkUpdateUserQuestAttempt(updatedUserQuestAttempt);
+
       await setQuestToExpire(userQuestQuestionAttempts[0].question.from_quest);
       await refreshUser(); // To update the user's level bar
       logger.debug('Bulk Update both UserQuestAttempt and UserQuestQuestionAttempt Success');

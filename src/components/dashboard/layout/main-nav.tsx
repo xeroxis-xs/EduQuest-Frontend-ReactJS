@@ -96,8 +96,8 @@ export function MainNav(): React.JSX.Element {
               <LinearProgressForLevel
                 sx={{ width: '200px' }}
                 value={eduquestUser.total_points % 100}
-                level={`Level ${Math.floor(eduquestUser.total_points / 100) + 1}`}
-                absValue={Math.round(eduquestUser.total_points * 100) / 100}
+                level={`Level ${(Math.floor(eduquestUser.total_points / 100) + 1).toString()}`}
+                absValue={eduquestUser.total_points}
               />
               : null}
 

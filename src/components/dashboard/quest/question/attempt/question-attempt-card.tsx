@@ -25,25 +25,23 @@ import {authClient} from "@/lib/auth/client";
 import Points from "../../../../../../public/assets/point.svg";
 import Stack from "@mui/material/Stack";
 import { useUser } from '@/hooks/use-user';
+import Alert from "@mui/material/Alert";
+import {useRouter} from "next/navigation";
 
 
 interface QuestionAttemptCardProps {
   data?: UserQuestQuestionAttempt[];
   onDataChange: (attemptId: number, answerId: number, isChecked: boolean) => void;
-  onSubmitResult: (status: { type: 'success' | 'error'; message: string }) => void;
-  onSaveResult: (status: { type: 'success' | 'error'; message: string }) => void;
+  // onSubmitResult: (status: { type: 'success' | 'error'; message: string }) => void;
+  // onSaveResult: (status: { type: 'success' | 'error'; message: string }) => void;
+  userQuestAttemptId: string;
+  questId: string;
 }
 
-
-export function setSubmitted(data: UserQuestQuestionAttempt[]) : UserQuestQuestionAttempt[] {
-  return data.map(attempt => ({
-    ...attempt,
-    submitted: true
-  }));
-}
 
 export function setScoreAchievedSubmittedLastAttemptedOn(data: UserQuestQuestionAttempt[]): UserQuestQuestionAttempt[] {
   const lastAttemptedOn = new Date().toISOString();
+
   return data.map(attempt => {
     const totalAnswers = attempt.question.answers.length;
     const scorePerAnswer = attempt.question.max_score / totalAnswers;
@@ -68,6 +66,7 @@ export function setScoreAchievedSubmittedLastAttemptedOn(data: UserQuestQuestion
   });
 }
 
+
 export function setLastAttemptedOn(data: UserQuestQuestionAttempt[]) : UserQuestQuestionAttempt[] {
   return data.map(attempt => ({
     ...attempt,
@@ -76,39 +75,52 @@ export function setLastAttemptedOn(data: UserQuestQuestionAttempt[]) : UserQuest
 }
 
 
-export function QuestionAttemptCard({ data = [], onDataChange, onSubmitResult, onSaveResult }: QuestionAttemptCardProps): React.JSX.Element {
+export function QuestionAttemptCard({ data = [], userQuestAttemptId, questId, onDataChange }: QuestionAttemptCardProps): React.JSX.Element {
   const { checkSession } = useUser();
   const [page, setPage] = React.useState(1);
   const [showExplanation, setShowExplanation] = React.useState<Record<number, boolean>>({});
   const rowsPerPage = 1;
   const pageCount = Math.ceil(data.length / rowsPerPage);
   const currentAttemptedQuestionsAndAnswers = data.slice((page - 1) * rowsPerPage, page * rowsPerPage);
+  const [status, setStatus] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const router = useRouter();
 
   const handleChangePage = (_event: React.ChangeEvent<unknown>, newPage: number): void => {
     setPage(newPage);
   };
 
-  const refreshUser = async () => {
+  const refreshUser = async (): Promise<void> => {
     if (checkSession) {
       await checkSession();
     }
   };
-
-  const handleCheckboxChange = (answerId: number, isChecked: boolean): void => {
-    const attemptId = currentAttemptedQuestionsAndAnswers[0].id;
-    onDataChange(attemptId, answerId, isChecked);
-  };
-
-  const handleSave = async (event: React.MouseEvent<HTMLButtonElement>): Promise<void> => {
-    event.preventDefault();
-    const updatedData = setLastAttemptedOn(data);
-    logger.debug("Save button clicked, updated data: ", updatedData);
-
+  const bulkUpdateUserQuestQuestionAttempt = async (updateUserQuestQuestionAttempt: UserQuestQuestionAttempt[]): Promise<void> => {
     try {
-      const response = await apiService.patch(`/api/UserQuestQuestionAttempt/bulk-update/`, updatedData);
+      const response = await apiService.patch(`/api/UserQuestQuestionAttempt/bulk-update/`, updateUserQuestQuestionAttempt);
       if (response.status === 200) {
-        logger.debug('Update Success:', response.data);
-        onSaveResult({ type: 'success', message: 'Save Successful' });
+        logger.debug('Bulk Update UserQuestQuestionAttempt Success:', response.data);
+      }
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 401) {
+          await authClient.signInWithMsal();
+        }
+        logger.error('Bulk Update UserQuestQuestionAttempt Failed:', error.response?.data);
+      }
+    }
+  }
+
+  const updateUserQuestAttempt = async (
+    updatedUserQuestAttempt: {
+      all_questions_submitted: boolean,
+      last_attempted_on: string
+    }
+  ): Promise<void> => {
+    try {
+      const response = await apiService.patch(`/api/UserQuestAttempt/${userQuestAttemptId}/`, updatedUserQuestAttempt);
+      if (response.status === 200) {
+
+        logger.debug('Set submit and last_attempted_date success for UserQuestAttempt:', response.data);
       }
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
@@ -116,33 +128,40 @@ export function QuestionAttemptCard({ data = [], onDataChange, onSubmitResult, o
           await authClient.signInWithMsal();
         }
       }
-      logger.error('Failed to save data', error);
-      onSaveResult({ type: 'error', message: 'Save Failed. Please try again.' });
+      logger.error('Failed to update last_attempted_date and submit', error);
     }
+  }
+
+  const handleSave = async (event: React.MouseEvent<HTMLButtonElement>): Promise<void> => {
+    event.preventDefault();
+    const updatedData = setLastAttemptedOn(data);
+    logger.debug("Save button clicked, updated questions: ", updatedData);
+    // Update UserQuestQuestionAttempt to set last_attempted_on to current datetime
+    await bulkUpdateUserQuestQuestionAttempt(updatedData);
+    // Update UserQuestAttempt to set 'submitted' to false and last_attempted_on to current datetime
+    const updatedUserQuestAttempt = {
+      all_questions_submitted: false,
+      last_attempted_on: new Date().toISOString()
+    }
+    await updateUserQuestAttempt(updatedUserQuestAttempt);
+    setStatus({ type: 'success', message: 'Save Successful.' });
   }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     const updatedData = setScoreAchievedSubmittedLastAttemptedOn(data);
-    logger.debug("Submit button clicked, updated data ", updatedData);
-
-    try {
-      const response = await apiService.patch(`/api/UserQuestQuestionAttempt/bulk-update/`, updatedData);
-      if (response.status === 200) {
-        logger.debug('Submit Success:', response.data);
-        onSubmitResult({ type: 'success', message: 'Submit Successful' });
-        await refreshUser();
-      }
+    logger.debug("Submit button clicked, graded attempts ", updatedData);
+    // Update UserQuestQuestionAttempt to set 'submitted' to true and last_attempted_on to current datetime
+    await bulkUpdateUserQuestQuestionAttempt(updatedData);
+    // Update UserQuestAttempt to set 'submitted' to true and last_attempted_on to current datetime
+    const updatedUserQuestAttempt = {
+      all_questions_submitted: true,
+      last_attempted_on: new Date().toISOString()
     }
-    catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-      }
-      logger.error('Failed to submit data', error);
-      onSubmitResult({ type: 'error', message: 'Submit Failed. Please try again.' });
-    }
+    await updateUserQuestAttempt(updatedUserQuestAttempt);
+    setStatus({ type: 'success', message: 'Submit Successful! Redirecting to Quest page...' });
+    await refreshUser();
+    router.push(`/dashboard/quest/${questId}`);
   };
 
   const toggleExplanation = (id: number): void => {
@@ -151,6 +170,13 @@ export function QuestionAttemptCard({ data = [], onDataChange, onSubmitResult, o
       [id]: !prevState[id]
     }));
   };
+
+  const handleCheckboxChange = (answerId: number, isChecked: boolean): void => {
+    const attemptId = currentAttemptedQuestionsAndAnswers[0].id;
+    onDataChange(attemptId, answerId, isChecked);
+  };
+
+
 
   return (
     <form onSubmit={handleSubmit}>
@@ -224,6 +250,11 @@ export function QuestionAttemptCard({ data = [], onDataChange, onSubmitResult, o
                   <Button endIcon={<PaperPlaneTiltIcon/>} type="submit" disabled={attemptedQuestionsAndAnswers.submitted} variant="contained">Submit All</Button>
                 </CardActions>
               </Card>
+              {status ?
+                <Alert severity={status.type} sx={{marginTop: 2}}>
+                  {status.message}
+                </Alert> : null
+              }
             </Grid>
           ))}
 

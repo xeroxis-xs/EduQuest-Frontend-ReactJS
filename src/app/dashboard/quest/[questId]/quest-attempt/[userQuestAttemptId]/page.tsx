@@ -9,89 +9,19 @@ import { AxiosError } from "axios";
 import { logger } from '@/lib/default-logger'
 import { authClient } from "@/lib/auth/client";
 import Stack from "@mui/material/Stack";
-import {useRouter} from "next/navigation";
 import {XCircle as XCircleIcon} from "@phosphor-icons/react/dist/ssr/XCircle";
 import type { UserQuestQuestionAttempt} from "@/types/user-quest-question-attempt";
 import { QuestionAttemptCard } from "@/components/dashboard/quest/question/attempt/question-attempt-card";
-import Alert from "@mui/material/Alert";
 
 
 export default function Page({ params }: { params: { userQuestAttemptId: string, questId: string } }) : React.JSX.Element {
-  const router = useRouter();
 
   const [attemptedQuestionsAndAnswers, setAttemptedQuestionsAndAnswers] = React.useState<UserQuestQuestionAttempt[]>();
-  const [submitStatus, setSubmitStatus] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
-  const [saveStatus, setSaveStatus] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [showForm, setShowForm] = React.useState(false);
 
   const toggleForm = (): void => {
     setShowForm(!showForm);
   };
-
-
-  const getAttemptedQuestionsAndAnswers = async (): Promise<void> => {
-    try {
-      const response: AxiosResponse<UserQuestQuestionAttempt[]> = await apiService.get<UserQuestQuestionAttempt[]>(`/api/UserQuestQuestionAttempt/by-user-quest-attempt/${params.userQuestAttemptId}`);
-      const data: UserQuestQuestionAttempt[] = response.data;
-      setAttemptedQuestionsAndAnswers(data);
-      logger.debug('UserQuestQuestionAttempt', data);
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-      }
-      logger.error('Failed to fetch data', error);
-    }
-  };
-
-  const updateUserQuestAttempt = async (updatedUserQuestAttempt: { all_questions_submitted:boolean, last_attempted_on:string}): Promise<void> => {
-    try {
-      const response = await apiService.patch(`/api/UserQuestAttempt/${params.userQuestAttemptId}/`, updatedUserQuestAttempt);
-      if (response.status === 200) {
-        logger.debug('Set submit and last_attempted_date success for UserQuestAttempt:', response.data);
-      }
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-      }
-      logger.error('Failed to update last_attempted_date and submit', error);
-    }
-  }
-
-  const handleSubmitResult = async (status: { type: 'success' | 'error'; message: string }) : Promise<void> => {
-    if (status.type === 'success') {
-      setSubmitStatus(status);
-      const updatedUserQuestAttempt = {
-        all_questions_submitted: true,
-        last_attempted_on: new Date().toISOString(),
-      }
-      // Update UserQuestAttempt to set 'submitted' to true and last_attempted_on to current datetime
-      await updateUserQuestAttempt(updatedUserQuestAttempt);
-      router.push(`/dashboard/quest/${params.questId}`);
-    }
-
-    else {
-      setSubmitStatus(status);
-    }
-  }
-
-  const handleSaveResult = async (status: { type: 'success' | 'error'; message: string }): Promise<void> => {
-    if (status.type === 'success') {
-      setSaveStatus(status);
-      const updatedUserQuestAttempt = {
-        all_questions_submitted: false,
-        last_attempted_on: new Date().toISOString(),
-      }
-      // Update UserQuestAttempt to set 'submitted' to false and last_attempted_on to current datetime
-      await updateUserQuestAttempt(updatedUserQuestAttempt);
-    }
-    else {
-      setSaveStatus(status);
-    }
-  }
 
   const handleDataChange = (attemptId: number, answerId: number, isChecked: boolean): void => {
     if (attemptedQuestionsAndAnswers) {
@@ -112,8 +42,28 @@ export default function Page({ params }: { params: { userQuestAttemptId: string,
       logger.debug('Updated data:', newData);
       setAttemptedQuestionsAndAnswers(newData);
     }
-
   };
+
+
+  const getAttemptedQuestionsAndAnswers = async (): Promise<void> => {
+    try {
+      const response: AxiosResponse<UserQuestQuestionAttempt[]> = await apiService.get<UserQuestQuestionAttempt[]>(`/api/UserQuestQuestionAttempt/by-user-quest-attempt/${params.userQuestAttemptId}`);
+      const data: UserQuestQuestionAttempt[] = response.data;
+      setAttemptedQuestionsAndAnswers(data);
+      logger.debug('UserQuestQuestionAttempt', data);
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        if (error.response?.status === 401) {
+          await authClient.signInWithMsal();
+        }
+      }
+      logger.error('Failed to fetch data', error);
+    }
+  };
+
+
+
+
 
 
   React.useEffect(() => {
@@ -146,19 +96,13 @@ export default function Page({ params }: { params: { userQuestAttemptId: string,
       <QuestionAttemptCard
         data={attemptedQuestionsAndAnswers}
         onDataChange={handleDataChange}
-        onSubmitResult={handleSubmitResult}
-        onSaveResult={handleSaveResult}
+        // onSubmitResult={handleSubmitResult}
+        // onSaveResult={handleSaveResult}
+        questId={params.questId}
+        userQuestAttemptId={params.userQuestAttemptId}
       />
 
-      {submitStatus ?
-        <Alert severity={submitStatus.type} sx={{marginTop: 2}}>
-          {submitStatus.message}
-        </Alert> : null}
 
-      {saveStatus ?
-        <Alert severity={saveStatus.type} sx={{marginTop: 2}}>
-          {saveStatus.message}
-        </Alert> : null}
     </Stack>
 
 
