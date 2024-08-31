@@ -7,7 +7,7 @@ export function LiveIndicator(): React.JSX.Element {
   const theme = useTheme();
 
   return (
-    <Box sx={{ display: 'flex', alignItems: 'center', mr: 2, mb: 2 }}>
+    <Box sx={{ display: 'flex', alignItems: 'center' }}>
       <Box
         sx={{
           width: 6,
