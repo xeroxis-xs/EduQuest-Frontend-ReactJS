@@ -25,7 +25,8 @@ import type { Course } from "@/types/course";
 import type { Quest } from "@/types/quest";
 import { useUser } from "@/hooks/use-user";
 import { MagicWand as MagicWandIcon } from '@phosphor-icons/react/dist/ssr/MagicWand';
-import {TextField} from "@mui/material";
+import { CaretRight as CaretRightIcon } from '@phosphor-icons/react/dist/ssr/CaretRight';
+import {TextField, Stack } from "@mui/material";
 import type {Image} from "@/types/image";
 import Chip from "@mui/material/Chip";
 import type { Document } from "@/types/document";
@@ -35,6 +36,8 @@ import type { EduquestUser } from "@/types/eduquest-user";
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
 import { LinearProgressWithLabel } from '@/components/dashboard/misc/linear-progress-with-label';
+import { paths } from '@/paths';
+import RouterLink from 'next/link';
 
 
 interface CourseFormProps {
@@ -86,18 +89,17 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
           await authClient.signInWithMsal();
         }
         else {
-          logger.error('Code: ', error.response?.status);
-          logger.error('Message: ', error.response?.data);
+          logger.error("Error getting images", error.response?.data);
         }
       }
       logger.error('Failed to fetch data', error);
     }
   };
 
-  const getCourses = async (): Promise<void> => {
+  const getMyCourses = async (): Promise<void> => {
     if (eduquestUser) {
       try {
-        const response: AxiosResponse<Course[]> = await apiService.get<Course[]>(`/api/Course/`);
+        const response: AxiosResponse<Course[]> = await apiService.get<Course[]>(`/api/Course/by-user/${eduquestUser?.id.toString()}/`);
         const data: Course[] = response.data;
         const filteredData = data.filter(course => course.code === `PRIVATE ${eduquestUser?.id.toString()}`);
         setCourses(filteredData);
@@ -108,8 +110,7 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
             await authClient.signInWithMsal();
           }
           else {
-            logger.error('Code: ', error.response?.status);
-            logger.error('Message: ', error.response?.data);
+            logger.error("Error getting courses", error.response?.data);
           }
         }
         logger.error('Failed to fetch data', error);
@@ -144,7 +145,7 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
             await authClient.signInWithMsal();
           }
         }
-        logger.error('Failed to fetch data', error);
+        logger.error("Error getting documents", error);
       }
     }
   }
@@ -218,8 +219,7 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
           await authClient.signInWithMsal();
         }
         else {
-          logger.error('Code: ', error.response?.status);
-          logger.error('Message: ', error.response?.data);
+          logger.error("Error creating quest: ", error.response?.data);
         }
       }
       setSubmitStatus({ type: 'error', message: 'Create Failed. Please try again.' });
@@ -263,8 +263,7 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
         if (error.response?.status === 401) {
           await authClient.signInWithMsal();
         } else {
-          logger.error('Code: ', error.response?.status);
-          logger.error('Message: ', error.response?.data);
+          logger.error("Error creating questions: ", error.response?.data);
         }
       }
       setSubmitStatus({type: 'error', message: 'Questions Create Failed. Please try again.'});
@@ -274,7 +273,7 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
       await getImages();
-      await getCourses();
+      await getMyCourses();
       await getMyDocuments();
     };
 
@@ -294,24 +293,25 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
             <Avatar
               variant="square"
               src="/assets/ChatGPT.svg"
-              sx={{ width: 42, height: 42 }}
+              sx={{width: 42, height: 42}}
             />
           }
         />
-        <Divider />
+        <Divider/>
         <CardContent>
           <Grid container spacing={3}>
             <Grid md={4} xs={12}>
               <FormControl fullWidth required>
                 <InputLabel>Quest Name</InputLabel>
-                <OutlinedInput defaultValue="My Private Quest" label="Quest Name" inputRef={questNameRef} />
+                <OutlinedInput defaultValue="My Private Quest" label="Quest Name" inputRef={questNameRef}/>
               </FormControl>
             </Grid>
             <Grid md={4} xs={12}>
               <FormControl fullWidth required>
                 <InputLabel>Quest Type</InputLabel>
                 <Select defaultValue="Private" label="Quest Type" inputRef={questTypeRef} disabled>
-                  <MenuItem value="Private"><Chip variant="outlined" label="Private" color="secondary" size="small"/></MenuItem>
+                  <MenuItem value="Private"><Chip variant="outlined" label="Private" color="secondary"
+                                                  size="small"/></MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -319,7 +319,8 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
               <FormControl fullWidth required>
                 <InputLabel>Quest Status</InputLabel>
                 <Select defaultValue="Active" label="Quest Status" inputRef={questStatusRef} disabled>
-                  <MenuItem value="Active"><Chip variant="outlined" label="Active" color="success" size="small"/></MenuItem>
+                  <MenuItem value="Active"><Chip variant="outlined" label="Active" color="success"
+                                                 size="small"/></MenuItem>
                 </Select>
               </FormControl>
             </Grid>
@@ -344,7 +345,7 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
                   label="Max Attempts"
                   type="number"
                   inputRef={questMaxAttemptsRef}
-                  inputProps={{ min: 1 }}
+                  inputProps={{min: 1}}
                 />
               </FormControl>
             </Grid>
@@ -356,14 +357,14 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
                   label="Number of Questions"
                   type="number"
                   inputRef={numQuestionsRef}
-                  inputProps={{ min: 1 }}
+                  inputProps={{min: 1}}
                 />
               </FormControl>
             </Grid>
             <Grid md={4} xs={12}>
               <FormControl fullWidth required>
                 <InputLabel>Difficulty</InputLabel>
-                <Select defaultValue="Easy" label="Difficulty" inputRef={difficultyRef} >
+                <Select defaultValue="Easy" label="Difficulty" inputRef={difficultyRef}>
                   <MenuItem value="Easy">Easy</MenuItem>
                   <MenuItem value="Intermediate">Intermediate</MenuItem>
                   <MenuItem value="Difficult">Difficult</MenuItem>
@@ -372,9 +373,9 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
             </Grid>
           </Grid>
 
-          <Typography sx={{my:3}} variant="h6">Document Source</Typography>
-          {documents ?
-            <Grid container spacing={3} >
+          <Typography sx={{my: 3}} variant="h6">Document Source</Typography>
+          {documents && documents.length > 0 ?
+            <Grid container spacing={3}>
               <Grid md={6} xs={12}>
                 <FormControl fullWidth required>
                   <InputLabel id="document-label">Document ID</InputLabel>
@@ -396,7 +397,7 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid md={6} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
+              <Grid md={6} xs={12} sx={{display: {xs: 'none', md: 'block'}}}/>
               <Grid md={3} xs={6}>
                 <Typography variant="overline" color="text.secondary">Filename</Typography>
                 <Typography variant="body2">{selectedDocument?.name || documents[0].name}</Typography>
@@ -407,7 +408,8 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
               </Grid>
               <Grid md={3} xs={6}>
                 <Typography variant="overline" color="text.secondary">Uploaded At</Typography>
-                <Typography variant="body2"> {new Date(selectedDocument?.uploaded_at || documents[0].uploaded_at).toLocaleDateString("en-SG", {
+                <Typography
+                  variant="body2"> {new Date(selectedDocument?.uploaded_at || documents[0].uploaded_at).toLocaleDateString("en-SG", {
                   day: "2-digit",
                   month: "short",
                   year: "numeric",
@@ -424,21 +426,38 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
                   </a>
                 </Typography>
               </Grid>
-            </Grid> : null}
+            </Grid>
+            :
+            <Stack spacing={2}>
+              <Typography variant="body2" color="text.secondary">No uploaded documents found. </Typography>
+              <Typography variant="body2" color="text.secondary">Please upload a document
+                first before proceeding.</Typography>
+            </Stack>
+
+
+          }
 
           {showProgress ?
-            <Box sx={{ width: '100%', mt: 5 }}>
-              <LinearProgressWithLabel value={progress} status={progressStatus} />
+            <Box sx={{width: '100%', mt: 5}}>
+              <LinearProgressWithLabel value={progress} status={progressStatus}/>
             </Box> : null}
         </CardContent>
 
-        <CardActions sx={{ justifyContent: 'flex-end' }}>
-          <Button startIcon={<MagicWandIcon fontSize="var(--icon-fontSize-md)"/>} type="submit" variant="contained">Generate</Button>
+        <CardActions sx={{justifyContent: 'flex-end'}}>
+          { documents && documents.length > 0 ?
+            <Button startIcon={<MagicWandIcon fontSize="var(--icon-fontSize-md)"/>} type="submit"
+                    variant="contained">Generate</Button>
+          :
+            <Button endIcon={<CaretRightIcon/>} component={RouterLink} href={paths.dashboard.generator.upload} variant="contained">
+              Upload Document
+            </Button>
+          }
+
         </CardActions>
 
       </Card>
       {submitStatus ?
-        <Alert severity={submitStatus.type} sx={{ marginTop: 2 }}>
+        <Alert severity={submitStatus.type} sx={{marginTop: 2}}>
           {submitStatus.message}
         </Alert> : null}
     </form>
