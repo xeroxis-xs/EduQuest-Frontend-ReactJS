@@ -141,33 +141,36 @@ export function ImportCardUserAttempt( { userQuestQuestionAttempts, userQuestAtt
     }
   }
 
-// Aggregate data to calculate the percentage of each selected answer
-  const aggregateData = userQuestQuestionAttempts.reduce<Record<string, Record<string, { count: number, total: number, isCorrect: boolean }>>>((acc, attempt) => {
+  // Aggregate data to calculate the percentage of each selected answer
+  const aggregateData = userQuestQuestionAttempts.reduce<Record<string, { questionNumber: number, answers: Record<string, { count: number, total: number, isCorrect: boolean }> }>>((acc, attempt) => {
+    if (!acc[attempt.question.text]) {
+      acc[attempt.question.text] = { questionNumber: attempt.question.number, answers: {} };
+    }
     attempt.selected_answers.forEach(answer => {
-      if (!acc[attempt.question.text]) {
-        acc[attempt.question.text] = {};
+      if (!acc[attempt.question.text].answers[answer.answer.text]) {
+        acc[attempt.question.text].answers[answer.answer.text] = { count: 0, total: 0, isCorrect: answer.answer.is_correct };
       }
-      if (!acc[attempt.question.text][answer.answer.text]) {
-        acc[attempt.question.text][answer.answer.text] = { count: 0, total: 0, isCorrect: answer.answer.is_correct };
-      }
-      acc[attempt.question.text][answer.answer.text].total += 1;
+      acc[attempt.question.text].answers[answer.answer.text].total += 1;
       if (answer.is_selected) {
-        acc[attempt.question.text][answer.answer.text].count += 1;
+        acc[attempt.question.text].answers[answer.answer.text].count += 1;
       }
     });
     return acc;
   }, {});
 
-  const aggregatedResults = Object.entries(aggregateData).map(([questionText, answers]) => ({
-    questionText,
-    answers: Object.entries(answers).map(([answerText, { count, total, isCorrect }]) => ({
-      answerText,
-      isCorrect,
-      count,
-      total,
-      percentage: ((count / total) * 100).toFixed(2)
+  const aggregatedResults = Object.entries(aggregateData)
+    .map(([questionText, { questionNumber, answers }]) => ({
+      questionText,
+      questionNumber,
+      answers: Object.entries(answers).map(([answerText, { count, total, isCorrect }]) => ({
+        answerText,
+        isCorrect,
+        count,
+        total,
+        percentage: ((count / total) * 100).toFixed(2)
+      }))
     }))
-  }));
+    .sort((a, b) => a.questionNumber - b.questionNumber);
 
   const pageCount = Math.ceil(aggregatedResults.length / rowsPerPage);
   const currentResults = aggregatedResults.slice((page - 1) * rowsPerPage, page * rowsPerPage);

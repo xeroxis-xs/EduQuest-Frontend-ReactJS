@@ -36,7 +36,7 @@ export function TotalCourse({ diff, trend, sx, value }: TotalCourseProps): React
                 <Typography color="text.secondary" variant="overline">
                   Course Enrolments
                 </Typography>
-                <Tooltip title="This represents the total number of new course enrolments." placement="right">
+                <Tooltip title="This represents the total number of course enrolments (excluding 'Private' courses)." placement="right">
                   <InfoIcon fontSize="var(--icon-fontSize-sm)" style={{ marginLeft: '8px', cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
                 </Tooltip>
               </Stack>
