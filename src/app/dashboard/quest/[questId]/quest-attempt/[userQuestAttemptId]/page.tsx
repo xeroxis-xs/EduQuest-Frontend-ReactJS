@@ -12,6 +12,7 @@ import Stack from "@mui/material/Stack";
 import {XCircle as XCircleIcon} from "@phosphor-icons/react/dist/ssr/XCircle";
 import type { UserQuestQuestionAttempt} from "@/types/user-quest-question-attempt";
 import { QuestionAttemptCard } from "@/components/dashboard/quest/question/attempt/question-attempt-card";
+import RouterLink from "next/link";
 
 
 export default function Page({ params }: { params: { userQuestAttemptId: string, questId: string } }) : React.JSX.Element {
@@ -81,16 +82,18 @@ export default function Page({ params }: { params: { userQuestAttemptId: string,
     <Stack spacing={3}>
       {attemptedQuestionsAndAnswers && attemptedQuestionsAndAnswers.length > 0 ?
         <Stack direction="row" spacing={3} sx={{justifyContent: 'space-between'}}>
-          <Button startIcon={<CaretLeftIcon fontSize="var(--icon-fontSize-md)"/>} href={`/dashboard/quest/${params.questId}`}>Return to Quest</Button>
+          <Button startIcon={<CaretLeftIcon fontSize="var(--icon-fontSize-md)"/>} component={RouterLink}
+                  href={`/dashboard/quest/${params.questId}`}>Return to Quest</Button>
           <Button
-            startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PenIcon fontSize="var(--icon-fontSize-md)" />}
+            startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)"/> :
+              <PenIcon fontSize="var(--icon-fontSize-md)"/>}
             variant={showForm ? 'text' : 'contained'}
             color={showForm ? 'error' : 'primary'}
             onClick={toggleForm}
           >
             {showForm ? 'Cancel' : 'Edit Question'}
           </Button>
-      </Stack> : null
+        </Stack> : null
       }
 
       <QuestionAttemptCard

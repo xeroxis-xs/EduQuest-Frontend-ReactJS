@@ -161,7 +161,7 @@ export default function Page(): React.JSX.Element {
 
   return (
     <Stack>
-      <Stack direction='row' justifyContent='space-between' pb={3}>
+      <Stack direction='row' spacing={3} pb={3} alignItems="center">
         <Typography variant="h4">Dashboard</Typography>
         <LiveIndicator />
       </Stack>

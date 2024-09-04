@@ -80,7 +80,7 @@ export default function Page(): React.JSX.Element {
         <SkeletonQuestCard />
       ) : (
         quests.length === 0 ? (
-          <Typography variant="body1">You have not generated any Quests yet.</Typography>
+          <Typography variant="body1">You have not generated any quest yet.</Typography>
         ) : (
           <QuestCard rows={quests} onQuestDeleteSuccess={getPrivateQuests} />
         )

@@ -338,7 +338,12 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
               </Grid>
 
               <Grid md={6} xs={12}>
-                <Typography variant="overline" color="text.secondary">Maximum Points</Typography>
+                <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
+                  <Typography variant="overline" color="text.secondary">Maximum Points</Typography>
+                  <Tooltip title="Points earned from 'Private' quest will not be credited to your account." placement="right">
+                    <InfoIcon style={{ cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
+                  </Tooltip>
+                </Stack>
                 <Stack direction="row" spacing='6px' sx={{ alignItems: 'center' }}>
                   <Typography variant="body2">{quest.total_max_score}</Typography>
                   <Points height={18}/>

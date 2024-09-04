@@ -14,7 +14,7 @@ export function Footer(): React.JSX.Element {
         pt: 3,
         pb: 4,
         px: 2,
-        mt: 'auto',
+        mt: 40,
         backgroundColor: '#f8f9fa',
         borderTop: '1px solid #e7e7e7',
         textAlign: 'center',

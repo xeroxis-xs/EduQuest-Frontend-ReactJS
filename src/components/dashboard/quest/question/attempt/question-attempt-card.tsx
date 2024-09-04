@@ -188,7 +188,7 @@ export function QuestionAttemptCard({ data = [], userQuestAttemptId, questId, on
 
           {currentAttemptedQuestionsAndAnswers.map((attemptedQuestionsAndAnswers) => (
             <Grid key={attemptedQuestionsAndAnswers.id} xs={12} >
-              <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <Card >
                 <CardHeader
                   title={`Question ${attemptedQuestionsAndAnswers.question.number.toString()}`}
                   subheader={

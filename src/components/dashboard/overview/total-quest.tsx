@@ -37,7 +37,7 @@ export function TotalQuest({ diff, trend, sx, value }: TotalQuestProps): React.J
                 <Typography color="text.secondary" variant="overline">
                   Quest Attempts
                 </Typography>
-                <Tooltip title="This represents the total number of quest attempts by users." placement="right">
+                <Tooltip title="This represents the total number of quest attempts by users (excluding 'Private' quests)." placement="right">
                   <InfoIcon fontSize="var(--icon-fontSize-sm)" style={{ marginLeft: '8px', cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
                 </Tooltip>
               </Stack>
