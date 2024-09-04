@@ -129,6 +129,7 @@ export function CourseNewForm({ onFormSubmitSuccess }: CourseFormProps): React.J
     const newCourse = {
       code: courseCodeRef.current?.value,
       name: courseNameRef.current?.value,
+      group: courseGroupRef.current?.value,
       description: courseDescriptionRef.current?.value,
       status: courseStatusRef.current?.value,
       type: courseTypeRef.current?.value,
