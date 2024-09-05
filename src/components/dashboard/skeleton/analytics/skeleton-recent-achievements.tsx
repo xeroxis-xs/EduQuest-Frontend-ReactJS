@@ -7,7 +7,6 @@ import CardHeader from "@mui/material/CardHeader";
 import Stack from "@mui/material/Stack";
 import Tooltip from "@mui/material/Tooltip";
 import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
-import Divider from "@mui/material/Divider";
 import {Typography} from "@mui/material";
 import {TrendUp as TrendUpIcon} from "@phosphor-icons/react/dist/ssr/TrendUp";
 
@@ -21,11 +20,10 @@ export function SkeletonRecentAchievements(): React.JSX.Element {
             <TrendUpIcon fontSize="var(--icon-fontSize-md)" color="var(--mui-palette-primary-main)" />          }
           sx={{ pr: '10px' }}
         />
-        <Tooltip title="The most recent achievements made by users." placement="bottom">
+        <Tooltip title="The most recent achievements made by users." placement="top">
           <InfoIcon fontSize="var(--icon-fontSize-sm)" style={{ marginLeft: '0px', cursor: 'pointer', color: "var(--mui-palette-neutral-500)", marginTop: '16px' }} />
         </Tooltip>
       </Stack>
-      <Divider />
       <CardContent sx={{ height: '100%'}}>
         {Array.from({ length: 5 }).map((_, index) => (
           <Grid container spacing={2} key={index}>

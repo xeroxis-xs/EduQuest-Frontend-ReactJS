@@ -27,8 +27,8 @@ export function TotalCourse({ diff, trend, sx, value }: TotalCourseProps): React
     <Card sx={sx}>
       <CardContent sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%', py: '24px' }}>
         <Stack spacing={3}>
-          <Stack direction="row" sx={{ alignItems: 'center' }} spacing={3}>
-            <Avatar sx={{ backgroundColor: 'white', height: '56px', width: '56px', boxShadow: '0 0 14px 0 rgba(0, 0, 0, 0.1), 0 0 0 0px rgba(0, 0, 0, 0.08)' }}>
+          <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
+            <Avatar sx={{ backgroundColor: 'white', height: '56px', width: '56px' }}>
               <BookIcon fontSize="var(--icon-fontSize-lg)" color="var(--mui-palette-primary-main)" />
             </Avatar>
             <Stack spacing={1}>
@@ -36,7 +36,7 @@ export function TotalCourse({ diff, trend, sx, value }: TotalCourseProps): React
                 <Typography color="text.secondary" variant="overline">
                   Course Enrolments
                 </Typography>
-                <Tooltip title="This represents the total number of course enrolments (excluding 'Private' courses)." placement="right">
+                <Tooltip title="This represents the total number of course enrolments (excluding 'Private' courses)." placement="top">
                   <InfoIcon fontSize="var(--icon-fontSize-sm)" style={{ marginLeft: '8px', cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
                 </Tooltip>
               </Stack>

@@ -8,8 +8,6 @@ import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 import Divider from '@mui/material/Divider';
 import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import OutlinedInput from '@mui/material/OutlinedInput';
 import Grid from '@mui/material/Unstable_Grid2';
 import apiService from "@/api/api-service";
 import {authClient} from "@/lib/auth/client";
@@ -27,6 +25,8 @@ import { FilePlus as FilePlusIcon } from '@phosphor-icons/react/dist/ssr/FilePlu
 import {CardMedia, TextField} from "@mui/material";
 import type {Image} from "@/types/image";
 import Chip from "@mui/material/Chip";
+import FormLabel from "@mui/material/FormLabel";
+import {useTheme} from "@mui/material/styles";
 
 interface CourseFormProps {
   onFormSubmitSuccess: () => void;
@@ -35,6 +35,7 @@ interface CourseFormProps {
 
 export function QuestNewForm({onFormSubmitSuccess, courseId}: CourseFormProps): React.JSX.Element {
   const { eduquestUser} = useUser();
+  const theme = useTheme();
   const questTypeRef = React.useRef<HTMLInputElement>(null);
   const questNameRef = React.useRef<HTMLInputElement>(null);
   const questExpirationDateRef = React.useRef<HTMLInputElement>(null);
@@ -196,25 +197,30 @@ export function QuestNewForm({onFormSubmitSuccess, courseId}: CourseFormProps): 
           <Grid container spacing={3}>
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>Quest Name</InputLabel>
-                <OutlinedInput defaultValue="" label="Quest Name" name="name" inputRef={questNameRef} />
+                <FormLabel htmlFor="quest name">Quest Name</FormLabel>
+                <TextField
+                  inputRef={questNameRef}
+                  placeholder="The name of the quest"
+                  variant='outlined'
+                  size='small'
+                />
               </FormControl>
             </Grid>
             <Grid md={6} xs={12}>
               <FormControl fullWidth>
-                <InputLabel shrink>Quest Expiry Date</InputLabel>
-                <OutlinedInput
-                  label="Quest Expiry Date"
+                <FormLabel htmlFor="quest expiry date">Quest Expiry Date</FormLabel>
+                <TextField
                   inputRef={questExpirationDateRef}
-                  name="Quest Expiry Date"
                   type="datetime-local"
+                  variant='outlined'
+                  size='small'
                 />
               </FormControl>
             </Grid>
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>Quest Type</InputLabel>
-                <Select defaultValue="Eduquest MCQ" label="Quest Type" inputRef={questTypeRef} name="type">
+                <FormLabel htmlFor="quest type">Quest Type</FormLabel>
+                <Select defaultValue="Eduquest MCQ" label="Quest Type" inputRef={questTypeRef} name="type" size="small">
                   <MenuItem value="Eduquest MCQ"><Chip variant="outlined" label="Eduquest MCQ" color="primary" size="small"/></MenuItem>
                   <MenuItem value="Private"><Chip variant="outlined" label="Private" color="secondary" size="small"/></MenuItem>
                   <MenuItem value="Kahoot!"><Chip variant="outlined" label="Kahoot!" color="violet" size="small"/></MenuItem>
@@ -224,8 +230,8 @@ export function QuestNewForm({onFormSubmitSuccess, courseId}: CourseFormProps): 
             </Grid>
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>Quest Status</InputLabel>
-                <Select defaultValue="Active" label="Quest Status" inputRef={questStatusRef} name="status">
+                <FormLabel htmlFor="quest status">Quest Status</FormLabel>
+                <Select defaultValue="Active" label="Quest Status" inputRef={questStatusRef} name="status" size="small">
                   <MenuItem value="Active"><Chip variant="outlined" label="Active" color="success" size="small"/></MenuItem>
                   <MenuItem value="Expired"><Chip variant="outlined" label="Expired" color="secondary" size="small"/></MenuItem>
                 </Select>
@@ -233,14 +239,14 @@ export function QuestNewForm({onFormSubmitSuccess, courseId}: CourseFormProps): 
             </Grid>
             <Grid xs={12}>
               <FormControl fullWidth required>
+                <FormLabel htmlFor="quest description">Quest Description</FormLabel>
                 <TextField
-                  defaultValue=""
-                  label="Quest Description"
                   inputRef={questDescriptionRef}
-                  name="description"
+                  placeholder="The description of the quest"
+                  variant='outlined'
                   multiline
-                  required
-                  rows={4}
+                  size="medium"
+                  rows={3}
                 />
               </FormControl>
             </Grid>
@@ -249,42 +255,46 @@ export function QuestNewForm({onFormSubmitSuccess, courseId}: CourseFormProps): 
           <Typography sx={{my:3}} variant="h6">Thumbnail</Typography>
           {images ?
             <Grid container spacing={3} >
+              <Grid container md={6} xs={12} alignItems="flex-start">
+                <Grid xs={12}>
+                  <FormControl required >
+                    <FormLabel htmlFor="quest image">Thumbnail ID</FormLabel>
+                    <Select
+                      defaultValue={images[0]?.id}
+                      onChange={handleImageChange}
+                      inputRef={questImageIdRef}
+                      variant="outlined"
+                      type="number"
+                      label="Thumbnail ID"
+                      size="small"
+                    >
+                      {images.map((option) => (
+                        <MenuItem key={option.id} value={option.id}>
+                          {option.id} - {option.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <Typography variant="overline" color="text.secondary">Thumbnail Name</Typography>
+                  <Typography variant="body2">{selectedImage?.name || images[0].name}</Typography>
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <Typography variant="overline" color="text.secondary">Thumbnail Filename</Typography>
+                  <Typography variant="body2">{selectedImage?.filename || images[0].filename}</Typography>
+                </Grid>
+              </Grid>
               <Grid md={6} xs={12}>
-                <FormControl fullWidth required>
-                  <InputLabel>Thumbnail ID</InputLabel>
-                  <Select
-                    defaultValue={images[0]?.id}
-                    onChange={handleImageChange}
-                    inputRef={questImageIdRef}
-                    variant="outlined"
-                    type="number"
-                    label="Thumbnail ID"
-                  >
-                    {images.map((option) => (
-                      <MenuItem key={option.id} value={option.id}>
-                        {option.id} - {option.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid md={6} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
-              <Grid md={3} xs={6}>
-                <Typography variant="overline" color="text.secondary">Thumbnail Name</Typography>
-                <Typography variant="body2">{selectedImage?.name || images[0].name}</Typography>
-              </Grid>
-              <Grid md={3} xs={6}>
-                <Typography variant="overline" color="text.secondary">Thumbnail Filename</Typography>
-                <Typography variant="body2">{selectedImage?.filename || images[0].filename}</Typography>
-              </Grid>
-              <Grid xs={12}>
-                <Typography variant="overline" color="text.secondary">Thumbnail Preview</Typography>
-                <CardMedia
-                  component="img"
-                  alt={selectedImage?.name || images[0].name}
-                  image={`/assets/${selectedImage?.filename || images[0].filename}`}
-                  sx={{ height: 160, objectFit: 'contain', p: 4, mt:1, backgroundColor: '#fafafa' }}
-                />
+                <Grid xs={12}>
+                  <Typography variant="overline" color="text.secondary">Thumbnail Preview</Typography>
+                  <CardMedia
+                    component="img"
+                    alt={selectedImage?.name || images[0].name}
+                    image={`/assets/${selectedImage?.filename || images[0].filename}`}
+                    sx={{ backgroundColor: theme.palette.background.level1, border: `1px solid ${theme.palette.neutral[200]}`, borderRadius: '8px' }}
+                  />
+                </Grid>
               </Grid>
             </Grid> : null}
           <Divider sx={{my:3}}/>
@@ -293,67 +303,72 @@ export function QuestNewForm({onFormSubmitSuccess, courseId}: CourseFormProps): 
 
           {courses ?
             <Grid container spacing={3} >
+              <Grid container md={6} xs={12} alignItems="flex-start">
+                <Grid xs={12}>
+                  <FormControl required>
+                    <FormLabel htmlFor="course id">Course ID</FormLabel>
+                    <Select defaultValue={courses[0]?.id} onChange={handleCourseChange} inputRef={questCourseIdRef}
+                            label="Course ID" variant="outlined" type="number" disabled={Boolean(courseId)} size="small">
+                      {courses.map((option) => (
+                        <MenuItem key={option.id} value={option.id}>
+                          {option.id} - [{option.group}] {option.code} {option.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <Typography variant="overline" color="text.secondary">Course Code</Typography>
+                  <Typography variant="body2">{selectedCourse?.code || courses[0]?.code}</Typography>
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <Typography variant="overline" color="text.secondary">Course Name</Typography>
+                  <Typography variant="body2">{selectedCourse?.name || courses[0]?.name }</Typography>
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <Typography variant="overline" color="text.secondary">Course Group</Typography>
+                  <Typography variant="body2">{selectedCourse?.group || courses[0]?.group}</Typography>
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <Typography variant="overline" color="text.secondary">Course Type</Typography>
+                  <Typography variant="body2">{selectedCourse?.type || courses[0]?.type }</Typography>
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <Typography variant="overline" color="text.secondary">Course Status</Typography>
+                  <Typography variant="body2">{selectedCourse?.status || courses[0]?.status}</Typography>
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <Typography variant="overline" color="text.secondary">Course Year / Term</Typography>
+                  <Typography variant="body2">
+                    AY {selectedCourse?.term?.academic_year.start_year || courses[0]?.term?.academic_year.start_year}-{selectedCourse?.term?.academic_year.end_year || courses[0].term?.academic_year.end_year} / {selectedCourse?.term?.name || courses[0].term.name}
+                  </Typography>
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <Typography variant="overline" color="text.secondary">Course Duration</Typography>
+                  <Typography variant="body2">
+                    From {selectedCourse?.term?.start_date || courses[0]?.term?.start_date} to {selectedCourse?.term?.end_date || courses[0].term?.end_date}
+                  </Typography>
+                </Grid>
+
+                <Grid xs={12}>
+                  <Typography variant="overline" color="text.secondary">Course Description</Typography>
+                  <Typography variant="body2">{selectedCourse?.description || courses[0]?.description}</Typography>
+                </Grid>
+              </Grid>
+
               <Grid md={6} xs={12}>
-                <FormControl fullWidth required>
-                  <InputLabel>Course ID</InputLabel>
-                  <Select defaultValue={courses[0]?.id} onChange={handleCourseChange} inputRef={questCourseIdRef}
-                          label="Course ID" variant="outlined" type="number" disabled={Boolean(courseId)}>
-                    {courses.map((option) => (
-                      <MenuItem key={option.id} value={option.id}>
-                        {option.id} - {option.code} {option.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid md={6} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
-              <Grid md={3} xs={6}>
-                <Typography variant="overline" color="text.secondary">Course Code</Typography>
-                <Typography variant="body2">{selectedCourse?.code || courses[0]?.code}</Typography>
-              </Grid>
-              <Grid md={3} xs={6}>
-                <Typography variant="overline" color="text.secondary">Course Name</Typography>
-                <Typography variant="body2">{selectedCourse?.name || courses[0]?.name }</Typography>
-              </Grid>
-              <Grid md={3} xs={6}>
-                <Typography variant="overline" color="text.secondary">Course Group</Typography>
-                <Typography variant="body2">{selectedCourse?.group || courses[0]?.group}</Typography>
-              </Grid>
-              <Grid md={3} xs={6}>
-                <Typography variant="overline" color="text.secondary">Course Type</Typography>
-                <Typography variant="body2">{selectedCourse?.type || courses[0]?.type }</Typography>
-              </Grid>
-              <Grid md={3} xs={6}>
-                <Typography variant="overline" color="text.secondary">Course Status</Typography>
-                <Typography variant="body2">{selectedCourse?.status || courses[0]?.status}</Typography>
-              </Grid>
-              <Grid md={3} xs={6}>
-                <Typography variant="overline" color="text.secondary">Course Year / Term</Typography>
-                <Typography variant="body2">
-                  AY {selectedCourse?.term?.academic_year.start_year || courses[0]?.term?.academic_year.start_year}-{selectedCourse?.term?.academic_year.end_year || courses[0].term?.academic_year.end_year} / {selectedCourse?.term?.name || courses[0].term.name}
-                </Typography>
-              </Grid>
-              <Grid md={3} xs={6}>
-                <Typography variant="overline" color="text.secondary">Course Duration</Typography>
-                <Typography variant="body2">
-                  From {selectedCourse?.term?.start_date || courses[0]?.term?.start_date} to {selectedCourse?.term?.end_date || courses[0].term?.end_date}
-                </Typography>
-              </Grid>
-
-              <Grid xs={12}>
-                <Typography variant="overline" color="text.secondary">Course Description</Typography>
-                <Typography variant="body2">{selectedCourse?.description || courses[0]?.description}</Typography>
-              </Grid>
-
-              <Grid xs={12}>
                 <Typography variant="overline" color="text.secondary">Course Thumbnail</Typography>
                 <CardMedia
                   component="img"
                   alt={selectedCourse?.image.name || courses[0]?.image.name}
                   image={`/assets/${selectedCourse?.image.filename || courses[0]?.image.filename}`}
-                  sx={{ height: 160, objectFit: 'contain', p: 4, mt:1, backgroundColor: '#fafafa' }}
+                  sx={{ height: 160, objectFit: 'contain', p: 4, mt:1, backgroundColor: theme.palette.background.level1, border: `1px solid ${theme.palette.neutral[200]}`, borderRadius: '8px' }}
                 />
               </Grid>
+
+
+
+
 
             </Grid> : null}
         </CardContent>

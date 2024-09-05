@@ -5,7 +5,6 @@ import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 import CardActions from '@mui/material/CardActions';
 import Skeleton from '@mui/material/Skeleton';
-import Divider from '@mui/material/Divider';
 import Grid from "@mui/material/Unstable_Grid2";
 import Typography from "@mui/material/Typography";
 
@@ -22,7 +21,7 @@ export function SkeletonCourseCard(): React.JSX.Element {
               <CardHeader
                 title={<Skeleton width="60%" />} sx={{my: 1}}
               />
-              <Skeleton variant="rectangular" height={160} sx={{ backgroundColor: '#fafafa' }} />
+              <Skeleton variant="rectangular" height={160} />
               <CardContent sx={{ flex: 1 }}>
                 <Typography sx={{ mb: 1.5 }} color="text.secondary">
                   <Skeleton width="20%" />
@@ -44,7 +43,6 @@ export function SkeletonCourseCard(): React.JSX.Element {
                 </Typography>
               </CardContent>
               <Box>
-                <Divider />
                 <CardActions sx={{ justifyContent: 'space-between' }}>
                   <Skeleton width="20%" sx={{my: 1}} />
                   <Skeleton width="20%" />

@@ -14,8 +14,8 @@ export function SkeletonTotalQuest(): React.JSX.Element {
     <Card>
       <CardContent sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%', py: '24px' }}>
         <Stack spacing={3}>
-          <Stack direction="row" sx={{ alignItems: 'center' }} spacing={3}>
-            <Avatar sx={{ backgroundColor: 'white', height: '56px', width: '56px', boxShadow: '0 0 14px 0 rgba(0, 0, 0, 0.1), 0 0 0 0px rgba(0, 0, 0, 0.08)' }}>
+          <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
+            <Avatar sx={{ backgroundColor: 'white', height: '56px', width: '56px' }}>
               <SwordIcon fontSize="var(--icon-fontSize-lg)" color="var(--mui-palette-primary-main)" />
             </Avatar>
             <Stack spacing={1}>

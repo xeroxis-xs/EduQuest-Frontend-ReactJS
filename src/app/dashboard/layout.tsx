@@ -37,7 +37,7 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
       />
       <Box
         sx={{
-          bgcolor: 'var(--mui-palette-background-default)',
+          bgcolor: 'var(--mui-palette-background-level1)',
           display: 'flex',
           flexDirection: 'column',
           flex: '1 0 auto',
@@ -53,7 +53,7 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
           </main>
         </Box>
       </Box>
-      <Box sx={{ pl: { lg: 'var(--SideNav-width)' } }}>
+      <Box sx={{ pl: { lg: 'var(--SideNav-width)' }, bgcolor: 'var(--mui-palette-background-level1)' }}>
         <Footer />
       </Box>
     </AuthGuard>

@@ -4,7 +4,6 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
-import Divider from '@mui/material/Divider';
 import type { SxProps } from '@mui/material/styles';
 import { Typography, Tooltip, Stack } from '@mui/material';
 import { TrendUp as TrendUpIcon } from '@phosphor-icons/react/dist/ssr/TrendUp';
@@ -72,11 +71,10 @@ export function RecentAchievements({ recentBadges = [], sx }: RecentAchievements
           }
           sx={{ pr: '10px' }}
         />
-        <Tooltip title="The most recent achievements made by users." placement="bottom">
+        <Tooltip title="The most recent achievements made by users." placement="top">
           <InfoIcon fontSize="var(--icon-fontSize-sm)" style={{ marginLeft: '0px', cursor: 'pointer', color: "var(--mui-palette-neutral-500)", marginTop: '16px' }} />
         </Tooltip>
       </Stack>
-      <Divider />
       <CardContent>
         {recentBadges.length > 0 ? (
           recentBadges.map((recentBadge) => (

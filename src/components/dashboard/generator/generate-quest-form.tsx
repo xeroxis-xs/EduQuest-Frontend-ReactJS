@@ -8,8 +8,6 @@ import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 import Divider from '@mui/material/Divider';
 import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import OutlinedInput from '@mui/material/OutlinedInput';
 import Grid from '@mui/material/Unstable_Grid2';
 import apiService from "@/api/api-service";
 import microService from "@/api/micro-service";
@@ -38,6 +36,7 @@ import Avatar from '@mui/material/Avatar';
 import { LinearProgressWithLabel } from '@/components/dashboard/misc/linear-progress-with-label';
 import { paths } from '@/paths';
 import RouterLink from 'next/link';
+import FormLabel from "@mui/material/FormLabel";
 
 
 interface CourseFormProps {
@@ -287,7 +286,16 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
     <form onSubmit={handleSubmit}>
       <Card>
         <CardHeader
-          subheader="Generate Quest from the uploaded document through GPT model: GPT 3.5 Turbo 16K"
+          subheader={
+            <Box display="flex" alignItems="center">
+              <Typography variant="body2" color="text.secondary">
+                Generate quest from the uploaded document through LLM. Model used:
+              </Typography>
+              <Typography variant="body2" color="text.secondary" fontWeight={600} ml={1}>
+               GPT 3.5 Turbo 16K
+              </Typography>
+            </Box>
+          }
           title="Generate Quest"
           avatar={
             <Avatar
@@ -302,23 +310,30 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
           <Grid container spacing={3}>
             <Grid md={4} xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>Quest Name</InputLabel>
-                <OutlinedInput defaultValue="My Private Quest" label="Quest Name" inputRef={questNameRef}/>
+                <FormLabel htmlFor="quest name">Quest Name</FormLabel>
+                <TextField
+                  defaultValue="My Private Quest"
+                  inputRef={questNameRef}
+                  placeholder="The name of your quest"
+                  variant='outlined'
+                  size='small'
+                />
               </FormControl>
             </Grid>
             <Grid md={4} xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>Quest Type</InputLabel>
-                <Select defaultValue="Private" label="Quest Type" inputRef={questTypeRef} disabled>
-                  <MenuItem value="Private"><Chip variant="outlined" label="Private" color="secondary"
-                                                  size="small"/></MenuItem>
+                <FormLabel htmlFor="quest type">Quest Type</FormLabel>
+                <Select defaultValue="Private" label="Quest Type" inputRef={questTypeRef} disabled size="small">
+                  <MenuItem value="Private">
+                    <Chip variant="outlined" label="Private" color="secondary" size="small"/>
+                  </MenuItem>
                 </Select>
               </FormControl>
             </Grid>
             <Grid md={4} xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>Quest Status</InputLabel>
-                <Select defaultValue="Active" label="Quest Status" inputRef={questStatusRef} disabled>
+                <FormLabel htmlFor="quest status">Quest Status</FormLabel>
+                <Select defaultValue="Active" label="Quest Status" inputRef={questStatusRef} disabled size="small">
                   <MenuItem value="Active"><Chip variant="outlined" label="Active" color="success"
                                                  size="small"/></MenuItem>
                 </Select>
@@ -326,45 +341,47 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
             </Grid>
             <Grid xs={12}>
               <FormControl fullWidth required>
+                <FormLabel htmlFor="quest description">Quest Description</FormLabel>
                 <TextField
                   defaultValue="Private quest for my own learning."
-                  label="Quest Description"
                   inputRef={questDescriptionRef}
-                  name="description"
+                  placeholder="The description of your quest"
+                  variant='outlined'
                   multiline
-                  required
-                  rows={4}
+                  rows={3}
                 />
               </FormControl>
             </Grid>
             <Grid md={4} xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>Max Attempts</InputLabel>
-                <OutlinedInput
+                <FormLabel htmlFor="max attempts">Max Attempts</FormLabel>
+                <TextField
                   defaultValue="1"
-                  label="Max Attempts"
-                  type="number"
                   inputRef={questMaxAttemptsRef}
-                  inputProps={{min: 1}}
-                />
-              </FormControl>
-            </Grid>
-            <Grid md={4} xs={12}>
-              <FormControl fullWidth required>
-                <InputLabel>Number of Questions</InputLabel>
-                <OutlinedInput
-                  defaultValue="3"
-                  label="Number of Questions"
                   type="number"
-                  inputRef={numQuestionsRef}
                   inputProps={{min: 1}}
+                  variant='outlined'
+                  size='small'
                 />
               </FormControl>
             </Grid>
             <Grid md={4} xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>Difficulty</InputLabel>
-                <Select defaultValue="Easy" label="Difficulty" inputRef={difficultyRef}>
+                <FormLabel htmlFor="num questions">Number of Questions</FormLabel>
+                <TextField
+                  defaultValue="3"
+                  inputRef={numQuestionsRef}
+                  type="number"
+                  inputProps={{min: 1}}
+                  variant='outlined'
+                  size='small'
+                />
+              </FormControl>
+            </Grid>
+            <Grid md={4} xs={12}>
+              <FormControl fullWidth required>
+                <FormLabel htmlFor="difficulty">Difficulty</FormLabel>
+                <Select defaultValue="Easy" label="Difficulty" inputRef={difficultyRef} size="small">
                   <MenuItem value="Easy">Easy</MenuItem>
                   <MenuItem value="Intermediate">Intermediate</MenuItem>
                   <MenuItem value="Difficult">Difficult</MenuItem>
@@ -373,21 +390,21 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
             </Grid>
           </Grid>
 
-          <Typography sx={{my: 3}} variant="h6">Document Source</Typography>
+          <Typography sx={{mt: 4}} variant="h6">Document Source</Typography>
+          <Typography sx={{mb: 3}} variant="body2" color="text.secondary">Select a document to generate questions from:</Typography>
           {documents && documents.length > 0 ?
             <Grid container spacing={3}>
-              <Grid md={6} xs={12}>
+              <Grid md={4} xs={12}>
                 <FormControl fullWidth required>
-                  <InputLabel id="document-label">Document ID</InputLabel>
+                  <FormLabel htmlFor="document">Document</FormLabel>
                   <Select
-                    labelId="document-label"
                     id="document"
                     defaultValue={documents[0]?.id}
                     onChange={handleDocumentChange}
                     inputRef={questCourseIdRef}
                     variant="outlined"
                     type="number"
-                    label="Document ID"
+                    size="small"
                   >
                     {documents.map((option) => (
                       <MenuItem key={option.id} value={option.id}>
@@ -397,7 +414,7 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid md={6} xs={12} sx={{display: {xs: 'none', md: 'block'}}}/>
+              <Grid md={8} xs={12} sx={{display: {xs: 'none', md: 'block'}}}/>
               <Grid md={3} xs={6}>
                 <Typography variant="overline" color="text.secondary">Filename</Typography>
                 <Typography variant="body2">{selectedDocument?.name || documents[0].name}</Typography>

@@ -32,3 +32,21 @@ html {
 body {
   height: 100%;
 }
+
+
+
+
+
+.card:hover .badge {
+  animation:jump 1.75s ease-in-out infinite; /* Spin and jump on card hover */
+  transform-origin: center;
+}
+
+@keyframes jump {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px); /* Higher jump */
+  }
+}

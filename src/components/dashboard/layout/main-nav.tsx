@@ -14,6 +14,9 @@ import {logger} from '@/lib/default-logger';
 import {MobileNav} from './mobile-nav';
 import {UserPopover} from './user-popover';
 import { LinearProgressForLevel, } from "@/components/dashboard/misc/linear-progress-with-label";
+import {User as UserIcon} from "@phosphor-icons/react/dist/ssr/User";
+import {AxiosError} from "axios";
+import {authClient} from "@/lib/auth/client";
 
 export function MainNav(): React.JSX.Element {
   const [openNav, setOpenNav] = React.useState<boolean>(false);
@@ -23,36 +26,8 @@ export function MainNav(): React.JSX.Element {
   const [userAvatarProps, setUserAvatarProps] = React.useState<UserAvatarProps>({
     name: '?',
   });
-  const { user, eduquestUser } = useUser();
+  const { eduquestUser } = useUser();
 
-
-  React.useEffect(() => {
-    if (user) {
-      type AvatarResponse = Blob | string;
-
-      void getUserPhotoAvatar().then((response: AvatarResponse) => {
-        logger.debug("getUserPhotoAvatar", response);
-        if (response instanceof Blob) {
-          const url = URL.createObjectURL(response);
-          setUserPhoto(url);
-        } else {
-            setUserPhoto(response);
-            setShowUserInitials(false);
-        }
-      });
-      setShowUserInitials(false);
-      setUserAvatarProps({
-        name: formatName(user.name),
-        bgColor: 'var(--mui-palette-neutral-900)',
-        textColor: "white",
-      });
-      // console.log(user);
-    }
-  }, []) //intentionally left the dependency blank.
-
-  function onImgError() : void  {
-    setShowUserInitials(true);
-  }
 
   function formatName(name: string | undefined): string {
     if (!name) return '';
@@ -60,6 +35,52 @@ export function MainNav(): React.JSX.Element {
     // Remove the starting and ending #
     return name.replace(/^#|#$/g, '')
   }
+
+  const setUserPhotoAvatar = async (): Promise<void> => {
+    if (eduquestUser) {
+      try {
+        const response = await getUserPhotoAvatar();
+        logger.debug("User Avatar: ", response);
+        if (response === '') {
+          setShowUserInitials(true);
+          setUserAvatarProps({
+            name: formatName(eduquestUser.nickname),
+            bgColor: 'var(--mui-palette-neutral-900)',
+            textColor: "white",
+          });
+        } else {
+          setUserPhoto(response);
+          setShowUserInitials(false);
+        }
+      } catch (error) {
+        if (error instanceof AxiosError) {
+          if (error.response?.status === 401) {
+            await authClient.signInWithMsal();
+          }
+        } else {
+          logger.error('Error fetching user photo: ', error)
+        }
+      }
+    }
+  };
+
+  React.useEffect(() => {
+    const fetchData = async (): Promise<void> => {
+      await setUserPhotoAvatar();
+    }
+    fetchData().catch((error: unknown) => {
+      logger.error('Failed to fetch data', error);
+    });
+  }, [eduquestUser]);
+
+  React.useEffect(() => {
+    const fetchData = async (): Promise<void> => {
+      await setUserPhotoAvatar();
+    }
+    fetchData().catch((error: unknown) => {
+      logger.error('Failed to fetch data', error);
+    });
+  }, [])
 
   return (
     <React.Fragment>
@@ -112,14 +133,13 @@ export function MainNav(): React.JSX.Element {
                 >
                   <UserAvatar {...userAvatarProps}/>
                 </Box>
-                 : userPhoto &&
+                 : userPhoto ?
                 <Avatar
                   onClick={userPopover.handleOpen}
-                  onError={onImgError}
                   ref={userPopover.anchorRef}
-                  src={userPhoto ?? ''}
+                  src={userPhoto}
                   sx={{ cursor: 'pointer' }}
-                />
+                /> : <UserIcon size={48} color="var(--mui-palette-primary-main)" />
             }
 
           </Stack>

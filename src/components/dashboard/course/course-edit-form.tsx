@@ -8,8 +8,6 @@ import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 import Divider from '@mui/material/Divider';
 import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import OutlinedInput from '@mui/material/OutlinedInput';
 import Grid from '@mui/material/Unstable_Grid2';
 import type { Course } from "@/types/course";
 import type {Term} from "@/types/term";
@@ -32,6 +30,8 @@ import {useUser} from "@/hooks/use-user";
 import {paths} from "@/paths";
 import {useRouter} from "next/navigation";
 import Stack from "@mui/material/Stack";
+import FormLabel from "@mui/material/FormLabel";
+import {useTheme} from "@mui/material/styles";
 
 
 interface CourseFormProps {
@@ -44,6 +44,7 @@ interface CourseFormProps {
 export function CourseEditForm({ setSubmitStatus, course, toggleForm, onUpdateSuccess }: CourseFormProps): React.JSX.Element {
   const router = useRouter();
   const { eduquestUser } = useUser();
+  const theme = useTheme();
   const courseCodeRef = React.useRef<HTMLInputElement>(null);
   const courseGroupRef = React.useRef<HTMLInputElement>(null);
   const courseNameRef = React.useRef<HTMLInputElement>(null);
@@ -196,26 +197,44 @@ export function CourseEditForm({ setSubmitStatus, course, toggleForm, onUpdateSu
           <Grid container spacing={3}>
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>Code</InputLabel>
-                <OutlinedInput defaultValue={course.code} label="Code" inputRef={courseCodeRef} name="code"/>
+                <FormLabel htmlFor="course code">Course Code</FormLabel>
+                <TextField
+                  defaultValue={course.code}
+                  placeholder="The code of the course"
+                  variant='outlined'
+                  size='small'
+                  inputRef={courseCodeRef}
+                />
               </FormControl>
             </Grid>
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>Name</InputLabel>
-                <OutlinedInput defaultValue={course.name} label="Name" inputRef={courseNameRef} name="name"/>
+                <FormLabel htmlFor="course name">Course Name</FormLabel>
+                <TextField
+                  defaultValue={course.name}
+                  placeholder="The name of the course"
+                  variant='outlined'
+                  size='small'
+                  inputRef={courseNameRef}
+                />
               </FormControl>
             </Grid>
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>Group</InputLabel>
-                <OutlinedInput defaultValue={course.group} label="Group" inputRef={courseGroupRef} name="group"/>
+                <FormLabel htmlFor="course group">Course Group</FormLabel>
+                <TextField
+                  defaultValue={course.group}
+                  placeholder="The student group / session of the course"
+                  variant='outlined'
+                  size='small'
+                  inputRef={courseGroupRef}
+                />
               </FormControl>
             </Grid>
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>Type</InputLabel>
-                <Select defaultValue={course.type} label="Type" inputRef={courseTypeRef} name="type">
+                <FormLabel htmlFor="course type">Course Type</FormLabel>
+                <Select defaultValue={course.type} label="Type" inputRef={courseTypeRef} name="type" size="small">
                   <MenuItem value="Public"><Chip variant="outlined" label="Public" color="primary" size="small"/></MenuItem>
                   <MenuItem value="Private"><Chip variant="outlined" label="Private" color="secondary" size="small"/></MenuItem>
                 </Select>
@@ -223,8 +242,8 @@ export function CourseEditForm({ setSubmitStatus, course, toggleForm, onUpdateSu
             </Grid>
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>Status</InputLabel>
-                <Select defaultValue={course.status} label="Status" inputRef={courseStatusRef} name="status">
+                <FormLabel htmlFor="course status">Course Status</FormLabel>
+                <Select defaultValue={course.status} label="Status" inputRef={courseStatusRef} name="status" size="small">
                   <MenuItem value="Active"><Chip variant="outlined" label="Active" color="success" size="small"/></MenuItem>
                   <MenuItem value="Expired"><Chip variant="outlined" label="Expired" color="secondary" size="small"/></MenuItem>
                 </Select>
@@ -232,14 +251,15 @@ export function CourseEditForm({ setSubmitStatus, course, toggleForm, onUpdateSu
             </Grid>
             <Grid xs={12}>
               <FormControl fullWidth required>
+                <FormLabel htmlFor="course description">Course Description</FormLabel>
                 <TextField
-                  defaultValue={course.description}
-                  label="Description"
                   inputRef={courseDescriptionRef}
-                  name="description"
+                  defaultValue={course.description}
+                  placeholder="The description of the course"
+                  variant='outlined'
                   multiline
-                  required
-                  rows={4}
+                  size="medium"
+                  rows={3}
                 />
               </FormControl>
             </Grid>
@@ -254,10 +274,10 @@ export function CourseEditForm({ setSubmitStatus, course, toggleForm, onUpdateSu
             <Grid container spacing={3}>
 
             <Grid md={6} xs={12}>
-              <FormControl fullWidth required>
-                <InputLabel>Term ID</InputLabel>
+              <FormControl required>
+                <FormLabel htmlFor="term id">Term ID</FormLabel>
                 <Select defaultValue={course.term.id} onChange={handleTermChange} inputRef={courseTermIdRef}
-                        label="Term ID" variant="outlined" type="number">
+                        label="Term ID" variant="outlined" type="number" size="small">
                   {terms.map((option) => (
                     <MenuItem key={option.id} value={option.id}>
                       {option.id} - AY{option.academic_year.start_year}-{option.academic_year.end_year} {option.name}
@@ -298,35 +318,41 @@ export function CourseEditForm({ setSubmitStatus, course, toggleForm, onUpdateSu
           {loadingImages ? <Skeleton variant="rectangular" height={100}  />
             : images ?
             <Grid container spacing={3} >
+              <Grid container md={6} xs={12} alignItems="flex-start">
+                <Grid xs={12}>
+
+                  <FormControl required>
+                    <FormLabel htmlFor="image id">Thumbnail ID</FormLabel>
+                    <Select defaultValue={course.image.id} onChange={handleImageChange} inputRef={courseImageIdRef}
+                            label="Thumbnail ID" variant="outlined" type="number" size="small">
+                      {images.map((option) => (
+                        <MenuItem key={option.id} value={option.id}>
+                          {option.id} - {option.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <Typography variant="overline" color="text.secondary">Thumbnail Name</Typography>
+                  <Typography variant="body2">{selectedImage?.name || course.image.name}</Typography>
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <Typography variant="overline" color="text.secondary">Thumbnail Filename</Typography>
+                  <Typography variant="body2" sx={{ wordBreak: 'break-all' }}>
+                    {selectedImage?.filename || course.image.filename}
+                  </Typography>
+                </Grid>
+              </Grid>
+
               <Grid md={6} xs={12}>
-                <FormControl fullWidth required>
-                  <InputLabel>Thumbnail ID</InputLabel>
-                  <Select defaultValue={course.image.id} onChange={handleImageChange} inputRef={courseImageIdRef}
-                          label="Thumbnail ID" variant="outlined" type="number">
-                    {images.map((option) => (
-                      <MenuItem key={option.id} value={option.id}>
-                        {option.id} - {option.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid md={6} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
-              <Grid md={3} xs={6}>
-                <Typography variant="overline" color="text.secondary">Thumbnail Name</Typography>
-                <Typography variant="body2">{selectedImage?.name || course.image.name}</Typography>
-              </Grid>
-              <Grid md={3} xs={6}>
-                <Typography variant="overline" color="text.secondary">Thumbnail Filename</Typography>
-                <Typography variant="body2">{selectedImage?.filename || course.image.filename}</Typography>
-              </Grid>
-              <Grid xs={12}>
                 <Typography variant="overline" color="text.secondary">Thumbnail Preview</Typography>
                 <CardMedia
                   component="img"
                   alt={selectedImage?.name || images[0].name}
                   image={`/assets/${selectedImage?.filename || course.image.filename}`}
-                  sx={{ height: 160, objectFit: 'contain', p: 4, mt:1, backgroundColor: '#fafafa' }}
+                  sx={{ backgroundColor: theme.palette.background.level1, border: `1px solid ${theme.palette.neutral[200]}`, borderRadius: '8px' }}
+
                 />
               </Grid>
             </Grid> : null}

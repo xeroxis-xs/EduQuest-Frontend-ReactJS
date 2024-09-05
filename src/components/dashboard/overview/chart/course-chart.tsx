@@ -73,7 +73,6 @@ function useChartOptions(label: string): ApexOptions {
       axisTicks: {show: false}
     },
     dataLabels: {
-      textAnchor: 'middle',
       enabled: true,
       formatter: (val: number) => `${val.toFixed(0)}%`,
       style: {
@@ -85,6 +84,9 @@ function useChartOptions(label: string): ApexOptions {
     },
     tooltip: {
       enabled: true,
+      x: {
+        show: false
+      },
     },
     grid: {
       show: false,

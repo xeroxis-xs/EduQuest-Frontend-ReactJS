@@ -21,6 +21,8 @@ import FormControl from "@mui/material/FormControl";
 import {useUser} from "@/hooks/use-user";
 import RouterLink from "next/link";
 import {paths} from "@/paths";
+import Grid from '@mui/material/Unstable_Grid2';
+
 
 export default function Page(): React.JSX.Element {
   const [quests, setQuests] = React.useState<Quest[]>([]);
@@ -41,7 +43,7 @@ export default function Page(): React.JSX.Element {
       const data: Quest[] = response.data;
       const filteredData = data.filter((quest) => quest.type !== 'Private');
       setQuests(filteredData);
-      const uniqueCourseIds = Array.from(new Set(filteredData.map(quest => `${quest.from_course.id.toString()} - ${quest.from_course.code} ${quest.from_course.name}`)));
+      const uniqueCourseIds = Array.from(new Set(filteredData.map(quest => `${quest.from_course.id.toString()} - [${quest.from_course.group}] ${quest.from_course.code} ${quest.from_course.name}`)));
       setCourseIds(uniqueCourseIds)
       logger.debug('Filtered Quests', filteredData);
     } catch (error: unknown) {
@@ -72,52 +74,63 @@ export default function Page(): React.JSX.Element {
 
 
   const filteredQuests = selectedCourseId
-    ? quests.filter(quest => `${quest.from_course.id.toString()} - ${quest.from_course.code} ${quest.from_course.name}` === selectedCourseId)
+    ? quests.filter(quest => `${quest.from_course.id.toString()} - [${quest.from_course.group}] ${quest.from_course.code} ${quest.from_course.name}` === selectedCourseId)
     : quests;
 
 
   return (
     <Stack spacing={3}>
-      <Stack direction="row" spacing={1} sx={{justifyContent: 'space-between'}}>
-        <Typography variant="h4">All Quests</Typography>
 
-        <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
-          <FunnelIcon height={20} width={20}/>
-          <FormControl size="small">
-            <Select
-              value={selectedCourseId || ''}
-              onChange={handleCourseChange}
-              displayEmpty
-              sx={{minWidth: 200}}
-            >
-              <MenuItem value="">
-                <em>All Courses</em>
-              </MenuItem>
-              {courseIds.map(courseId => (
-                <MenuItem key={courseId} value={courseId}>
-                  {courseId}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          {eduquestUser?.is_staff ?
-            <Stack direction='row' spacing={1}>
-              <Button startIcon={<UploadIcon/>} variant="contained" color="primary" component={RouterLink} href={paths.dashboard.import}>
-                Import
-              </Button>
-              <Button
-                startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PlusIcon fontSize="var(--icon-fontSize-md)" />}
-                variant={showForm ? 'text' : 'contained'}
-                color={showForm ? 'error' : 'primary'}
-                onClick={toggleForm}
-              >
-                {showForm ? 'Cancel' : 'Create'}
-              </Button>
-            </Stack>
-            : null}
-        </Stack>
-      </Stack>
+      <Grid container spacing={1} sx={{ justifyContent: 'space-between' }}>
+        <Grid md={6} xs={12}>
+          <Typography variant="h4">All Quests</Typography>
+          <Typography variant="body2" color="text.secondary">You can view all quests here.</Typography>
+        </Grid>
+        <Grid md={6} xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+          <Stack direction="column" spacing={2} alignItems="center">
+            {eduquestUser?.is_staff ? (
+              <Stack direction="row" spacing={1}>
+                <Button startIcon={<UploadIcon />} variant="contained" color="primary" component={RouterLink} href={paths.dashboard.import}>
+                  Import
+                </Button>
+                <Button
+                  startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PlusIcon fontSize="var(--icon-fontSize-md)" />}
+                  variant={showForm ? 'text' : 'contained'}
+                  color={showForm ? 'error' : 'primary'}
+                  onClick={toggleForm}
+                >
+                  {showForm ? 'Cancel' : 'Create'}
+                </Button>
+              </Stack>
+            ) : null}
+          </Stack>
+        </Grid>
+      </Grid>
+
       {showForm ? <QuestNewForm onFormSubmitSuccess={getQuests} courseId={null}/> : null} {/* Conditional rendering */}
+
+      <Stack direction="row" spacing={2} alignItems="center" justifyContent="flex-end">
+        <FunnelIcon height={20} width={20} />
+        <FormControl size="small">
+          <Select
+            value={selectedCourseId || ''}
+            onChange={handleCourseChange}
+            displayEmpty
+            sx={{ minWidth: 200 }}
+            size="small"
+          >
+            <MenuItem value="">
+              <em>All Courses</em>
+            </MenuItem>
+            {courseIds.map(courseId => (
+              <MenuItem key={courseId} value={courseId}>
+                {courseId}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Stack>
+
       {loading ? (
         <SkeletonQuestCard />
       ) : (

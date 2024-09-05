@@ -66,21 +66,23 @@ function useChartOptions(labels: string[], data: number[], badgeDetails: Record<
     },
     plotOptions: {
       bar: {
-        horizontal: false,
-        borderRadius: 0,
+        horizontal: true,
+        borderRadius: 10,
         borderRadiusApplication: 'end',
-        barHeight: '100%',
+        barHeight: '35%',
+        // columnWidth: '50%',
         colors: {
           backgroundBarColors: ['transparent'],
           backgroundBarRadius: 0,
         },
+
       },
     },
     xaxis: {
       categories: labels,
       max: maxValue,
       labels: {
-        show: true,
+        show: false,
         rotate: 0,
         rotateAlways: false,
         trim: true,
@@ -92,7 +94,7 @@ function useChartOptions(labels: string[], data: number[], badgeDetails: Record<
       axisTicks: { show: false }
     },
     yaxis: {
-      show: false,
+      show: true,
       axisBorder: { show: false },
       axisTicks: { show: false }
     },

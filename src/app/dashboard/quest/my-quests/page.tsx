@@ -30,7 +30,7 @@ export default function Page(): React.JSX.Element {
         const response: AxiosResponse<Quest[]> = await apiService.get<Quest[]>(`/api/Quest/by-enrolled-user/${eduquestUser?.id.toString()}`);
         const data: Quest[] = response.data;
         setQuests(data);
-        const uniqueCourseIds = Array.from(new Set(data.map(quest => `${quest.from_course.id.toString()} - ${quest.from_course.code} ${quest.from_course.name}`)));
+        const uniqueCourseIds = Array.from(new Set(data.map(quest => `${quest.from_course.id.toString()} - [${quest.from_course.group}] ${quest.from_course.code} ${quest.from_course.name}`)));
         setCourseIds(uniqueCourseIds)
         logger.debug('My Quests', data);
       } catch (error: unknown) {
@@ -62,7 +62,7 @@ export default function Page(): React.JSX.Element {
 
 
   const filteredQuests = selectedCourseId
-    ? quests.filter(quest => `${quest.from_course.id.toString()} - ${quest.from_course.code} ${quest.from_course.name}` === selectedCourseId)
+    ? quests.filter(quest => `${quest.from_course.id.toString()} - [${quest.from_course.group}] ${quest.from_course.code} ${quest.from_course.name}` === selectedCourseId)
     : quests;
 
   return (

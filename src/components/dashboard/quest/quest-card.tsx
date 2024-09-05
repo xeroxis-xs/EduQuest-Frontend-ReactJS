@@ -64,12 +64,11 @@ export function QuestCard({ rows = [], onQuestDeleteSuccess }: QuestCardProps): 
         <Grid key={quest.id} lg={4} md={6} xs={12} >
           <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <CardActionArea sx={{ height: '100%', borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }} href={`/dashboard/quest/${quest.id.toString()}`} component={RouterLink}>
-            <CardHeader title={quest.name} subheader={`${quest.from_course.code} ${quest.from_course.name}`}/>
+            <CardHeader title={quest.name} subheader={`[${quest.from_course.group}] ${quest.from_course.code} ${quest.from_course.name}`}/>
               <CardMedia
                 component="img"
                 alt="Multiple Choice"
                 image={`/assets/${quest.image.filename}`}
-                sx={{ height: 160, objectFit: 'contain', p: 4, mt:1, backgroundColor: '#fafafa' }}
               />
               <CardContent>
 

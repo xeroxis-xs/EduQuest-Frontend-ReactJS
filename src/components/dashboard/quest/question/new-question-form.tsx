@@ -23,6 +23,8 @@ import apiService from "@/api/api-service";
 import {AxiosError} from "axios";
 import {authClient} from "@/lib/auth/client";
 import {QuestionNewDialog} from "@/components/dashboard/dialog/question-new-dialog";
+import FormLabel from "@mui/material/FormLabel";
+import FormControl from "@mui/material/FormControl";
 
 interface Answer {
   text: string;
@@ -158,41 +160,44 @@ export function NewQuestionForm({ questId, onCreateSuccess, onCancelCreate }: Ne
           <CardContent>
             <Grid container spacing={3}>
               <Grid md={10} xs={8}>
-                <TextField
-                  fullWidth
-                  label="Question Text"
-                  size="small"
-                  value={question.text}
-                  onChange={(e) => { handleQuestionChange(qIndex, 'text', e.target.value); }}
-                  sx={{ mb: 2 }}
-                />
+                <FormControl fullWidth required>
+                  <FormLabel htmlFor="question text">Question Text</FormLabel>
+                  <TextField
+                    placeholder="Enter question text here"
+                    size="small"
+                    value={question.text}
+                    onChange={(e) => { handleQuestionChange(qIndex, 'text', e.target.value); }}
+                    sx={{ mb: 2 }}
+                  />
+                </FormControl>
               </Grid>
               <Grid md={2} xs={4}>
-                <TextField
-                  fullWidth
-                  label="Score"
-                  type="number"
-                  defaultValue={question.max_score}
-                  size="small"
-                  onChange={(e) => { handleQuestionChange(qIndex, 'max_score', parseInt(e.target.value)); }}
-                  sx={{ mb: 2 }}
-                  inputProps={{ min: 1 }}
-                />
+                <FormControl fullWidth required>
+                  <FormLabel htmlFor="question text">Points</FormLabel>
+                  <TextField
+                    type="number"
+                    defaultValue={question.max_score}
+                    size="small"
+                    onChange={(e) => { handleQuestionChange(qIndex, 'max_score', parseInt(e.target.value)); }}
+                    sx={{ mb: 2 }}
+                    inputProps={{ min: 1 }}
+                  />
+                </FormControl>
               </Grid>
             </Grid>
             <Grid container spacing={3}>
               {question.answers.map((answer, aIndex) => (
                 <Grid md={6} xs={12} key={aIndex}>
-                  <Box sx={{ display: 'flex', alignItems: 'center'}}>
-
-                    <TextField
-                      fullWidth
-                      size="small"
-                      label={`Answer ${String(aIndex + 1)}`}
-                      value={answer.text}
-                      onChange={(e) => { handleAnswerChange(qIndex, aIndex, 'text', e.target.value); }}
-                      sx={{ mr: 2 }}
-                    />
+                  <Box sx={{ display: 'flex', alignItems: 'flex-end'}}>
+                    <FormControl fullWidth>
+                      <FormLabel htmlFor="question text">{`Answer ${String(aIndex + 1)}`}</FormLabel>
+                      <TextField
+                        size="small"
+                        value={answer.text}
+                        onChange={(e) => { handleAnswerChange(qIndex, aIndex, 'text', e.target.value); }}
+                        sx={{ mr: 2 }}
+                      />
+                    </FormControl>
                     <FormControlLabel
                       control={
                         <Checkbox
@@ -213,7 +218,7 @@ export function NewQuestionForm({ questId, onCreateSuccess, onCancelCreate }: Ne
                   </Box>
                 </Grid>
               ))}
-              <Grid md={6} xs={12}>
+              <Grid md={6} xs={12} alignItems="flex-end" display="flex">
                 <Button startIcon={<PlusIcon/>} onClick={() => { addAnswer(qIndex); }}>Add additional Answer</Button>
               </Grid>
             </Grid>

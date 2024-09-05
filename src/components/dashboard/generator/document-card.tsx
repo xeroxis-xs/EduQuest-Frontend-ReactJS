@@ -10,6 +10,7 @@ import CardActions from "@mui/material/CardActions";
 import Button from "@mui/material/Button";
 import {CardMedia, Alert} from "@mui/material";
 import { Trash as TrashIcon } from "@phosphor-icons/react/dist/ssr/Trash";
+import { MagicWand as MagicWandIcon } from "@phosphor-icons/react/dist/ssr/MagicWand";
 import apiService from "@/api/api-service";
 import {logger} from "@/lib/default-logger";
 import {AxiosError} from "axios";
@@ -21,6 +22,8 @@ import {CloudArrowUp as CloudArrowUpIcon} from "@phosphor-icons/react/dist/ssr/C
 import { FileDashed as FileDashedIcon } from "@phosphor-icons/react/dist/ssr/FileDashed";
 import FormControl from "@mui/material/FormControl";
 import {styled} from "@mui/material/styles";
+import RouterLink from "next/link";
+import { paths } from '@/paths';
 
 
 const VisuallyHiddenInput = styled('input')({
@@ -139,7 +142,6 @@ export function DocumentCard({ documents = [], handleDeleteSuccess, handleSubmit
                   component="img"
                   alt={document.name}
                   image={`/assets/${document.file?.split('.').pop() ?? 'default'}.svg`}
-                  sx={{ height: 160, objectFit: 'contain', p: 4, backgroundColor: '#fafafa' }}
                 />
                 <CardContent sx={{ flex: 1 }}>
                   <Typography variant="overline" color="text.secondary">
@@ -170,12 +172,20 @@ export function DocumentCard({ documents = [], handleDeleteSuccess, handleSubmit
                 </CardContent>
               </CardActionArea>
               <Box>
-                <CardActions sx={{ justifyContent: 'flex-end'}}>
+                <CardActions sx={{ justifyContent: 'space-between'}}>
                   <Button
                     startIcon={<TrashIcon />}
                     color="error"
                     onClick={handleDelete(document.id)}>
                     Delete
+                  </Button>
+                  <Button
+                    component={RouterLink}
+                    href={paths.dashboard.generator.quest}
+                    startIcon={<MagicWandIcon />}
+                    variant='contained'
+                    >
+                    Generate
                   </Button>
                 </CardActions>
               </Box>

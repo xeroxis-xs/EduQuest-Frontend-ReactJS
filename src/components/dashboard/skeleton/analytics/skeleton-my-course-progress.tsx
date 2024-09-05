@@ -27,7 +27,7 @@ export function SkeletonMyCourseProgress(): React.JSX.Element {
           }
           sx={{ pr: '10px'}}
         />
-        <Tooltip title="The progress of the course that you have enrolled." placement="bottom" >
+        <Tooltip title="The progress of the course that you have enrolled." placement="top" >
           <InfoIcon fontSize="var(--icon-fontSize-sm)" style={{ marginLeft: '0px', cursor: 'pointer', color: 'var(--mui-palette-neutral-500)', marginTop: '16px'}} />
         </Tooltip>
       </Stack>

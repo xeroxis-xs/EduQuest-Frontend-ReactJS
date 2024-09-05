@@ -5,7 +5,6 @@ import CardHeader from "@mui/material/CardHeader";
 import Stack from "@mui/material/Stack";
 import Tooltip from "@mui/material/Tooltip";
 import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
-import Divider from "@mui/material/Divider";
 import {Book as BookIcon} from "@phosphor-icons/react/dist/ssr/Book";
 import Grid from "@mui/material/Unstable_Grid2";
 import Typography from "@mui/material/Typography";
@@ -22,11 +21,10 @@ export function SkeletonMyBadgeProgress(): React.JSX.Element {
           }
           sx={{ pr: '10px'}}
         />
-        <Tooltip title="The progress of the course that you have enrolled." placement="bottom" >
+        <Tooltip title="The progress of the course that you have enrolled." placement="top" >
           <InfoIcon fontSize="var(--icon-fontSize-sm)" style={{ marginLeft: '0px', cursor: 'pointer', color: 'var(--mui-palette-neutral-500)', marginTop: '16px'}} />
         </Tooltip>
       </Stack>
-      <Divider />
       <CardContent sx={{ height: "100%"}}>
         <Stack
           direction="column"

@@ -8,8 +8,7 @@ import CardContent from '@mui/material/CardContent';
 import CardHeader from '@mui/material/CardHeader';
 import Divider from '@mui/material/Divider';
 import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import OutlinedInput from '@mui/material/OutlinedInput';
+import FormLabel from '@mui/material/FormLabel';
 import Grid from '@mui/material/Unstable_Grid2';
 import type { Course } from "@/types/course";
 import apiService from "@/api/api-service";
@@ -27,12 +26,14 @@ import type {Image} from "@/types/image";
 import {CardMedia, TextField} from "@mui/material";
 import Chip from "@mui/material/Chip";
 import Skeleton from "@mui/material/Skeleton";
+import {useTheme} from "@mui/material/styles";
 
 interface CourseFormProps {
   onFormSubmitSuccess: () => void;
 }
 
 export function CourseNewForm({ onFormSubmitSuccess }: CourseFormProps): React.JSX.Element {
+  const theme = useTheme();
   const courseCodeRef = React.useRef<HTMLInputElement>(null);
   const courseNameRef = React.useRef<HTMLInputElement>(null);
   const courseGroupRef = React.useRef<HTMLInputElement>(null);
@@ -184,27 +185,42 @@ export function CourseNewForm({ onFormSubmitSuccess }: CourseFormProps): React.J
           <Grid container spacing={3}>
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>Course Name</InputLabel>
-                <OutlinedInput defaultValue="" label="Name" name="name" inputRef={courseNameRef} />
+                <FormLabel htmlFor="course name">Course Name</FormLabel>
+                <TextField
+                  inputRef={courseNameRef}
+                  placeholder="The title of the course"
+                  variant='outlined'
+                  size='small'
+                />
               </FormControl>
             </Grid>
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>Course Code</InputLabel>
-                <OutlinedInput defaultValue="" label="Code" name="code" inputRef={courseCodeRef} />
+                <FormLabel htmlFor="course code">Course Code</FormLabel>
+                <TextField
+                  inputRef={courseCodeRef}
+                  placeholder="The code of the course"
+                  variant='outlined'
+                  size='small'
+                />
               </FormControl>
             </Grid>
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>Course Group</InputLabel>
-                <OutlinedInput defaultValue="" label="Group" name="group" inputRef={courseGroupRef} />
+                <FormLabel htmlFor="course group">Course Group</FormLabel>
+                <TextField
+                  inputRef={courseGroupRef}
+                  placeholder="The student group / session of the course"
+                  variant='outlined'
+                  size='small'
+                />
               </FormControl>
             </Grid>
 
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>Course Type</InputLabel>
-                <Select defaultValue="Public" label="Quest Type" inputRef={courseTypeRef} name="type">
+                <FormLabel htmlFor="course type">Course Type</FormLabel>
+                <Select defaultValue="Public" size='small' label="Course Type" inputRef={courseTypeRef} name="type">
                   <MenuItem value="Public"><Chip variant="outlined" label="Public" color="primary" size="small"/></MenuItem>
                   <MenuItem value="Private"><Chip variant="outlined" label="Private" color="secondary" size="small"/></MenuItem>
                 </Select>
@@ -212,8 +228,8 @@ export function CourseNewForm({ onFormSubmitSuccess }: CourseFormProps): React.J
             </Grid>
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>Course Status</InputLabel>
-                <Select defaultValue="Active" label="Quest Status" inputRef={courseStatusRef} name="type">
+                <FormLabel htmlFor="course status">Course Status</FormLabel>
+                <Select defaultValue="Active" size='small' label="Course Status" inputRef={courseStatusRef} name="type">
                   <MenuItem value="Active"><Chip variant="outlined" label="Active" color="success" size="small"/></MenuItem>
                   <MenuItem value="Expired"><Chip variant="outlined" label="Expired" color="secondary" size="small"/></MenuItem>
                 </Select>
@@ -221,15 +237,14 @@ export function CourseNewForm({ onFormSubmitSuccess }: CourseFormProps): React.J
             </Grid>
             <Grid xs={12}>
               <FormControl fullWidth required>
-                <InputLabel>Course Description</InputLabel>
+                <FormLabel htmlFor="course description">Course Description</FormLabel>
                 <TextField
-
-                  label="Course Description"
                   inputRef={courseDescriptionRef}
-                  name="Course Description"
+                  placeholder="The description of the course"
+                  variant='outlined'
                   multiline
-                  required
-                  rows={4}
+                  size="medium"
+                  rows={3}
                 />
               </FormControl>
             </Grid>
@@ -243,35 +258,37 @@ export function CourseNewForm({ onFormSubmitSuccess }: CourseFormProps): React.J
           {isImagesLoading ? <Skeleton variant="rectangular" height={50}/>
             : images ?
             <Grid container spacing={3} >
+              <Grid container md={6} xs={12} alignItems="flex-start">
+                <Grid xs={12}>
+                  <FormControl required>
+                    <FormLabel htmlFor="thumbnail id">Thumbnail ID</FormLabel>
+                    <Select defaultValue={images[0]?.id} onChange={handleImageChange} inputRef={courseImageIdRef}
+                            label="Thumbnail ID" variant="outlined" type="number" size="small">
+                      {images.map((option) => (
+                        <MenuItem key={option.id} value={option.id}>
+                          {option.id} - {option.name}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <Typography variant="overline" color="text.secondary">Thumbnail Name</Typography>
+                  <Typography variant="body2">{selectedImage?.name || images[0].name}</Typography>
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <Typography variant="overline" color="text.secondary">Thumbnail Filename</Typography>
+                  <Typography variant="body2">{selectedImage?.filename || images[0].filename}</Typography>
+                </Grid>
+              </Grid>
+
               <Grid md={6} xs={12}>
-                <FormControl fullWidth required>
-                  <InputLabel>Thumbnail ID</InputLabel>
-                  <Select defaultValue={images[0]?.id} onChange={handleImageChange} inputRef={courseImageIdRef}
-                          label="Thumbnail ID" variant="outlined" type="number">
-                    {images.map((option) => (
-                      <MenuItem key={option.id} value={option.id}>
-                        {option.id} - {option.name}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid md={6} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
-              <Grid md={3} xs={6}>
-                <Typography variant="overline" color="text.secondary">Thumbnail Name</Typography>
-                <Typography variant="body2">{selectedImage?.name || images[0].name}</Typography>
-              </Grid>
-              <Grid md={3} xs={6}>
-                <Typography variant="overline" color="text.secondary">Thumbnail Filename</Typography>
-                <Typography variant="body2">{selectedImage?.filename || images[0].filename}</Typography>
-              </Grid>
-              <Grid xs={12}>
                 <Typography variant="overline" color="text.secondary">Thumbnail Preview</Typography>
                 <CardMedia
                   component="img"
                   alt={selectedImage?.name || images[0].name}
                   image={`/assets/${selectedImage?.filename || images[0].filename}`}
-                  sx={{ height: 160, objectFit: 'contain', p: 4, mt:1, backgroundColor: '#fafafa' }}
+                  sx={{ backgroundColor: theme.palette.background.level1, border: `1px solid ${theme.palette.neutral[200]}`, borderRadius: '8px' }}
                 />
               </Grid>
             </Grid> : null}
@@ -283,9 +300,17 @@ export function CourseNewForm({ onFormSubmitSuccess }: CourseFormProps): React.J
           : terms ?
             <Grid container spacing={3} >
               <Grid md={6} xs={12}>
-                <FormControl fullWidth required>
-                  <InputLabel>Term ID</InputLabel>
-                  <Select defaultValue={terms[0].id} onChange={handleTermChange} inputRef={courseTermIdRef} label="Term ID" variant="outlined" type="number">
+                <FormControl required>
+                  <FormLabel htmlFor="term id">Term ID</FormLabel>
+                  <Select
+                    defaultValue={terms[0].id}
+                    onChange={handleTermChange}
+                    inputRef={courseTermIdRef}
+                    label="Term ID"
+                    variant="outlined"
+                    type="number"
+                    size="small"
+                  >
                     {terms.map((option) => (
                       <MenuItem key={option.id} value={option.id}>
                         {option.id} - AY{option.academic_year.start_year}-{option.academic_year.end_year} {option.name}
@@ -295,27 +320,27 @@ export function CourseNewForm({ onFormSubmitSuccess }: CourseFormProps): React.J
                 </FormControl>
               </Grid>
               <Grid md={6} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
-              <Grid md={4} xs={12}>
+              <Grid md={3} xs={6}>
                 <Typography variant="overline" color="text.secondary">Term Name</Typography>
                 <Typography variant="body2">{selectedTerm?.name || terms?.[0]?.name}</Typography>
               </Grid>
-              <Grid md={4} xs={12}>
+              <Grid md={3} xs={6}>
                 <Typography variant="overline" color="text.secondary">Term Start Date</Typography>
                 <Typography variant="body2">{selectedTerm?.start_date ?? null}</Typography>
               </Grid>
-              <Grid md={4} xs={12}>
+              <Grid md={3} xs={6}>
                 <Typography variant="overline" color="text.secondary">Term End Date</Typography>
                 <Typography variant="body2">{selectedTerm?.end_date ?? null}</Typography>
               </Grid>
-              <Grid md={4} xs={12}>
+              <Grid md={3} xs={6}>
                 <Typography variant="overline" color="text.secondary">Academic Year ID</Typography>
                 <Typography variant="body2">{selectedTerm?.academic_year.id || terms?.[0]?.academic_year.id}</Typography>
               </Grid>
-              <Grid md={4} xs={12}>
+              <Grid md={3} xs={6}>
                 <Typography variant="overline" color="text.secondary">Start Year</Typography>
                 <Typography variant="body2">{selectedTerm?.academic_year.start_year ?? null}</Typography>
               </Grid>
-              <Grid md={4} xs={12}>
+              <Grid md={3} xs={6}>
                 <Typography variant="overline" color="text.secondary">End Year</Typography>
                 <Typography variant="body2">{selectedTerm?.academic_year.end_year ?? null}</Typography>
               </Grid>

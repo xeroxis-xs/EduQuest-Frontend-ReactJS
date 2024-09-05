@@ -229,82 +229,93 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
                 </Stack> : null
             }
           />
-          <CardMedia
-            component="img"
-            alt="cloud computing"
-            image={`/assets/${course.image.filename}`}
-            sx={{ height: 160, objectFit: 'contain', p: 4, mt:1, backgroundColor: '#fafafa' }}
-          />
+
           <CardContent sx={{pb: '16px'}}>
             <Grid container spacing={3}>
-              <Grid md={6} xs={12}>
-                <Typography variant="overline" color="text.secondary">Code</Typography>
-                <Typography variant="body2">{course.code}</Typography>
+              <Grid md={3} xs={12} display="flex" justifyContent="center" alignItems="center">
+                <CardMedia
+                  component="img"
+                  alt="cloud computing"
+                  image={`/assets/${course.image.filename}`}
+                />
               </Grid>
-              <Grid md={6} xs={12}>
-                <Typography variant="overline" color="text.secondary">Name</Typography>
-                <Typography variant="body2">{course.name}</Typography>
-              </Grid>
-              <Grid md={6} xs={12}>
-                <Typography variant="overline" color="text.secondary">Group</Typography>
-                <Typography variant="body2">{course.group}</Typography>
-              </Grid>
-              <Grid md={6} xs={12}>
-                <Typography variant="overline" color="text.secondary" display="block">Type</Typography>
-                <Chip label={course.type} color={
-                  course.type === 'Private' ? 'secondary' :
-                    course.type === 'Public' ? 'primary' :
-                      course.type === 'Others' ? 'error' : 'default'
+
+              <Grid container md={9} xs={12} >
+                <Grid md={6} xs={12}>
+                  <Typography variant="overline" color="text.secondary">Code</Typography>
+                  <Typography variant="body2">{course.code}</Typography>
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <Typography variant="overline" color="text.secondary">Name</Typography>
+                  <Typography variant="body2">{course.name}</Typography>
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <Typography variant="overline" color="text.secondary">Group</Typography>
+                  <Typography variant="body2">{course.group}</Typography>
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <Typography variant="overline" color="text.secondary" display="block">Type</Typography>
+                  <Chip label={course.type} color={
+                    course.type === 'Private' ? 'secondary' :
+                      course.type === 'Public' ? 'primary' :
+                        course.type === 'Others' ? 'error' : 'default'
                   } size="small" variant="outlined"/>
-              </Grid>
-              <Grid md={6} xs={12}>
-                <Typography variant="overline" color="text.secondary" display="block">Status</Typography>
-                <Chip label={course.status} color={
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <Typography variant="overline" color="text.secondary" display="block">Status</Typography>
+                  <Chip label={course.status} color={
                     course.status === 'Active' ? 'success' : 'secondary'
-                } size="small" variant="outlined"/>
+                  } size="small" variant="outlined"/>
 
+                </Grid>
+                <Grid xs={12}>
+                  <Typography variant="overline" color="text.secondary">Description</Typography>
+                  <Typography variant="body2">{course.description}</Typography>
+                </Grid>
+                <Grid xs={12}>
+                  <ExpandMore
+                    expand={expanded}
+                    onClick={handleExpandClick}
+                    aria-expanded={expanded}
+                    aria-label="show more"
+                    sx={{ display: 'flex', mx: 'auto'}}
+                  >
+                    <CaretDownIcon />
+                  </ExpandMore>
+                </Grid>
               </Grid>
-              <Grid xs={12}>
-                <Typography variant="overline" color="text.secondary">Description</Typography>
-                <Typography variant="body2">{course.description}</Typography>
-              </Grid>
-
             </Grid>
-            <ExpandMore
-              expand={expanded}
-              onClick={handleExpandClick}
-              aria-expanded={expanded}
-              aria-label="show more"
-              sx={{ display: 'flex', mx: 'auto' }}
-            >
-              <CaretDownIcon />
-            </ExpandMore>
+
 
             <Collapse in={expanded} timeout="auto" unmountOnExit>
             <Grid container spacing={3}>
-              <Grid md={6} xs={12}>
-                <Typography variant="overline" color="text.secondary">Term ID</Typography>
-                <Typography variant="body2">{course.term.id}</Typography>
-              </Grid>
-              <Grid md={6} xs={12}>
-                <Typography variant="overline" color="text.secondary">Term Name</Typography>
-                <Typography variant="body2">{course.term.name}</Typography>
-              </Grid>
-              <Grid md={6} xs={12}>
-                <Typography variant="overline" color="text.secondary">Term Start Date</Typography>
-                <Typography variant="body2">{course.term.start_date}</Typography>
-              </Grid>
-              <Grid md={6} xs={12}>
-                <Typography variant="overline" color="text.secondary">Term End Date</Typography>
-                <Typography variant="body2">{course.term.end_date}</Typography>
-              </Grid>
-              <Grid md={6} xs={12}>
-                <Typography variant="overline" color="text.secondary">Academic Year ID</Typography>
-                <Typography variant="body2">{course.term.academic_year.id}</Typography>
-              </Grid>
-              <Grid md={6} xs={12}>
-                <Typography variant="overline" color="text.secondary">Academic Year</Typography>
-                <Typography variant="body2">AY {course.term.academic_year.start_year}-{course.term.academic_year.end_year}</Typography>
+              <Grid md={3} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
+
+              <Grid container md={9} xs={12}>
+                <Grid md={6} xs={12}>
+                  <Typography variant="overline" color="text.secondary">Term ID</Typography>
+                  <Typography variant="body2">{course.term.id}</Typography>
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <Typography variant="overline" color="text.secondary">Term Name</Typography>
+                  <Typography variant="body2">{course.term.name}</Typography>
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <Typography variant="overline" color="text.secondary">Term Start Date</Typography>
+                  <Typography variant="body2">{course.term.start_date}</Typography>
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <Typography variant="overline" color="text.secondary">Term End Date</Typography>
+                  <Typography variant="body2">{course.term.end_date}</Typography>
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <Typography variant="overline" color="text.secondary">Academic Year ID</Typography>
+                  <Typography variant="body2">{course.term.academic_year.id}</Typography>
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <Typography variant="overline" color="text.secondary">Academic Year</Typography>
+                  <Typography variant="body2">AY {course.term.academic_year.start_year}-{course.term.academic_year.end_year}</Typography>
+                </Grid>
               </Grid>
             </Grid>
             </Collapse>

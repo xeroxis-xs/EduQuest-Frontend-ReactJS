@@ -48,10 +48,10 @@ function useChartOptions(label: string, data: number[]): ApexOptions {
           backgroundBarColors: ['transparent'],
           backgroundBarRadius: 10,
         },
-        dataLabels: {
-          position: 'top',
-          orientation: 'horizontal'
-        },
+        // dataLabels: {
+        //   position: 'top',
+        //   orientation: 'horizontal'
+        // },
       },
     },
     xaxis: {
@@ -69,7 +69,7 @@ function useChartOptions(label: string, data: number[]): ApexOptions {
       axisTicks: { show: false }
     },
     dataLabels: {
-      textAnchor: 'end',
+      // textAnchor: 'end',
       // offsetX: 30,
       enabled: true,
       formatter: (val: number) => Math.round(val),

@@ -65,6 +65,7 @@ export default function Page(): React.JSX.Element {
       <Stack direction="row" spacing={3}>
         <Stack spacing={1} >
           <Typography variant="h4">My Documents</Typography>
+          <Typography variant="body2" color="text.secondary">You can upload lecture materials here and use them to generate quests and questions!</Typography>
 
         </Stack>
 

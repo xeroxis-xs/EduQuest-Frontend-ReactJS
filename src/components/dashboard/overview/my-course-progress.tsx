@@ -19,6 +19,7 @@ import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
 import Stack from "@mui/material/Stack";
 import type { UserCourseProgression } from "@/types/analytics/user-course-progression";
 import Typography from "@mui/material/Typography";
+import RouterLink from "next/link";
 
 export interface MyEnrolledCoursesProps {
   userCourseProgression?: UserCourseProgression[];
@@ -53,7 +54,7 @@ export function MyCourseProgress({ userCourseProgression = [], sx }: MyEnrolledC
           }
           sx={{ pr: '10px'}}
         />
-        <Tooltip title="The progress of the course that you have enrolled." placement="bottom" >
+        <Tooltip title="The progress of the course that you have enrolled." placement="top" >
           <InfoIcon fontSize="var(--icon-fontSize-sm)" style={{ marginLeft: '0px', cursor: 'pointer', color: 'var(--mui-palette-neutral-500)', marginTop: '16px'}} />
         </Tooltip>
       </Stack>
@@ -72,7 +73,12 @@ export function MyCourseProgress({ userCourseProgression = [], sx }: MyEnrolledC
             </TableHead>
             <TableBody>
               {userCourseProgression.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((aUserCourseProgression) => (
-                <TableRow hover key={aUserCourseProgression.course_id} >
+                <TableRow
+                  hover
+                  key={aUserCourseProgression.course_id}
+                  component={RouterLink} href={`dashboard/course/${aUserCourseProgression.course_id.toString()}`}
+                  sx={{ textDecoration: 'none', height: '90px' }}
+                >
                   <TableCell sx={{ borderBottom: "none", pr:0 }}>{aUserCourseProgression.course_term}</TableCell>
                   <TableCell sx={{ borderBottom: "none", pr:0 }}>{aUserCourseProgression.course_name}</TableCell>
                   <TableCell sx={{ width: '40%', borderBottom: "none" }}>

@@ -11,7 +11,7 @@ import CardHeader from "@mui/material/CardHeader";
 import Chip from "@mui/material/Chip";
 import CardActions from "@mui/material/CardActions";
 import Button from "@mui/material/Button";
-import {CardMedia, Divider} from "@mui/material";
+import {CardMedia} from "@mui/material";
 import { SignIn as SignInIcon } from "@phosphor-icons/react/dist/ssr/SignIn";
 import { Users as UsersIcon } from "@phosphor-icons/react/dist/ssr/Users";
 import { Check as CheckIcon } from "@phosphor-icons/react/dist/ssr/Check";
@@ -85,7 +85,6 @@ export function CourseCard({ rows = [], onEnrolledSuccess }: CourseCardProps): R
                 component="img"
                 alt={course.image.name}
                 image={`/assets/${course.image.filename}`}
-                sx={{ height: 160, objectFit: 'contain', p: 4, mt:1, backgroundColor: '#fafafa' }}
               />
               <CardContent sx={{ flex: 1 }}>
                 <Chip label={course.type} sx={{ mb: 1.5, mr: 1 }} color={
@@ -99,13 +98,18 @@ export function CourseCard({ rows = [], onEnrolledSuccess }: CourseCardProps): R
                 <Typography variant="subtitle1" mb={1}>
                   AY {course.term.academic_year.start_year}-{course.term.academic_year.end_year} {course.term.name}
                 </Typography>
-                <Typography variant="body2">
+                <Typography variant="body2" sx={{
+                  display: '-webkit-box',
+                  WebkitBoxOrient: 'vertical',
+                  overflow: 'hidden',
+                  WebkitLineClamp: 4,
+                  textOverflow: 'ellipsis'
+                }}>
                   {course.description}
                 </Typography>
               </CardContent>
             </CardActionArea>
             <Box>
-              <Divider/>
               <CardActions sx={{ justifyContent: 'space-between'}}>
                 <Box sx={{ mx: '16px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                   <UsersIcon size={20}/>

@@ -21,14 +21,14 @@ export function QuestBadgeCard({ questBadges = [] }: QuestBadgeCardProps): React
 
       {questBadges.map((questBadge) => (
         <Grid key={questBadge.id} lg={3} md={4} xs={12} >
-          <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }} className="card">
             <CardActionArea href='#' sx={{ height: '100%', borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }}>
 
               <CardMedia
                 component="img"
                 alt={questBadge.badge.image.name}
                 image={`/assets/${questBadge.badge.image.filename}`}
-                sx={{ height: 160, objectFit: 'contain', p: 4, backgroundColor: '#fafafa' }}
+                className="badge"
               />
               <CardContent sx={{ flex: 1 }}>
                 <Typography variant="h6" mb={3} align="center">

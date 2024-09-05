@@ -12,6 +12,12 @@ import { MuiTab } from './tab';
 import { MuiTableBody } from './table-body';
 import { MuiTableCell } from './table-cell';
 import { MuiTableHead } from './table-head';
+import { MuiFormLabel } from './form-label';
+import { MuiInputAdornment } from './input-adornment';
+import { MuiInputBase } from './input-base';
+import { MuiOutlinedInput } from './outlined-input';
+import { MuiCheckbox } from "./check-box";
+import { MuiCardMedia } from "@/styles/theme/components/card-media";
 
 export const components = {
   MuiAvatar,
@@ -25,4 +31,10 @@ export const components = {
   MuiTableBody,
   MuiTableCell,
   MuiTableHead,
+  MuiFormLabel,
+  MuiInputAdornment,
+  MuiInputBase,
+  MuiOutlinedInput,
+  MuiCheckbox,
+  MuiCardMedia
 } satisfies Components<Theme>;

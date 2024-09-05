@@ -3,7 +3,6 @@
 import * as React from 'react';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
-import Divider from '@mui/material/Divider';
 import type { SxProps } from '@mui/material/styles';
 import { Ranking as RankingIcon } from '@phosphor-icons/react/dist/ssr/Ranking';
 import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
@@ -31,11 +30,10 @@ export function TopCollectors({ topCollectors = [], sx }: TopCollectorsProps): R
         }
         sx={{ pr: '10px'}}
       />
-      <Tooltip title="Top 5 users with the most badges. " placement="bottom" >
+      <Tooltip title="Top 5 users with the most badges. " placement="top" >
         <InfoIcon fontSize="var(--icon-fontSize-sm)" style={{ marginLeft: '0px', cursor: 'pointer', color: 'var(--mui-palette-neutral-500)', marginTop: '16px'}} />
       </Tooltip>
       </Stack>
-      <Divider />
       <CardContent sx={{ height: '100%', p: '6px', minHeight: '400px'}}>
         { topCollectors?.length > 0 ? (
           <TopCollectorChart topCollectors={topCollectors}/>

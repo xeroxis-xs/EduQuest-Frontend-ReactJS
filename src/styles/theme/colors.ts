@@ -105,14 +105,15 @@ export const shakespeare = {
 } satisfies PaletteRange;
 
 export const stormGrey = {
-  50: '#f9fafb',
-  100: '#f1f1f4',
-  200: '#dcdfe4',
-  300: '#b3b9c6',
-  400: '#8a94a6',
-  500: '#667085',
-  600: '#565e73',
+  50: '#fcfcfd',  // lighter
+  100: '#f7f7fa', // lighter
+  200: '#d8dbe4', // slightly darker
+  300: '#c8ced8', // lighter
+  400: '#a5aabf', // lighter
+  500: '#84889f', // lighter
+  600: '#72778b', // lighter
   700: '#434a60',
   800: '#313749',
   900: '#212636',
 } satisfies PaletteRange;
+

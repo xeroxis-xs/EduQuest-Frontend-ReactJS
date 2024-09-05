@@ -258,162 +258,173 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
                 </Stack> : null
             }
           />
-          <CardMedia
-            component="img"
-            alt={quest.image.name}
-            image={`/assets/${quest.image.filename}`}
-            sx={{ height: 160, objectFit: 'contain', p: 4, mt:1, backgroundColor: '#fafafa' }}
-          />
+
           <CardContent sx={{pb: '16px'}}>
             <Grid container spacing={3}>
-              <Grid md={6} xs={12}>
-                <Typography variant="overline" color="text.secondary">Name</Typography>
-                <Typography variant="body2">{quest.name}</Typography>
+              <Grid md={3} xs={12} display="flex" justifyContent="center" alignItems="center">
+                <CardMedia
+                  component="img"
+                  alt={quest.image.name}
+                  image={`/assets/${quest.image.filename}`}
+                />
               </Grid>
-              <Grid md={6} xs={12}>
-                <Typography variant="overline" color="text.secondary">Description</Typography>
-                <Typography variant="body2">{quest.description}</Typography>
-              </Grid>
-              <Grid md={6} xs={12}>
-                <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
-                  <Typography variant="overline" color="text.secondary">Type</Typography>
-                  <Tooltip title={
-                    <React.Fragment>
-                      <Typography fontSize="inherit">Eduquest MCQ - Quest developed in-house</Typography>
-                      <Typography fontSize="inherit">Wooclap - Quest imported from Wooclap</Typography>
-                      <Typography fontSize="inherit">Kahoot! - Quest imported from Kahoot!</Typography>
-                      <Typography fontSize="inherit">Private - Quest for personal quest generation use only</Typography>
-                    </React.Fragment>
-                  } placement="right">
-                    <InfoIcon style={{ cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
-                  </Tooltip>
-                </Stack>
-                <Chip variant="outlined" label={quest.type} color={
-                  quest.type === 'Eduquest MCQ' ? 'primary' :
-                    quest.type === 'Wooclap' ? 'neon' :
-                      quest.type === 'Kahoot!' ? 'violet' :
-                        quest.type === 'Private' ? 'secondary' : 'default'
-                } size="small"/>
-              </Grid>
-              <Grid md={6} xs={12}>
-                <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
-                  <Typography variant="overline" color="text.secondary">Status</Typography>
-                  <Tooltip title="When the quest is set to 'Expired', it will no longer be available for attempts and the system will issue badges to users." placement="right">
-                    <InfoIcon style={{ cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
-                  </Tooltip>
-                </Stack>
-                <Chip variant="outlined" label={quest.status} color={
+              <Grid container md={9} xs={12}>
+                <Grid md={6} xs={12}>
+                  <Typography variant="overline" color="text.secondary">Name</Typography>
+                  <Typography variant="body2">{quest.name}</Typography>
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <Typography variant="overline" color="text.secondary">Description</Typography>
+                  <Typography variant="body2">{quest.description}</Typography>
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
+                    <Typography variant="overline" color="text.secondary">Type</Typography>
+                    <Tooltip title={
+                      <React.Fragment>
+                        <Typography fontSize="inherit">Eduquest MCQ - Quest developed in-house</Typography>
+                        <Typography fontSize="inherit">Wooclap - Quest imported from Wooclap</Typography>
+                        <Typography fontSize="inherit">Kahoot! - Quest imported from Kahoot!</Typography>
+                        <Typography fontSize="inherit">Private - Quest for personal quest generation use only</Typography>
+                      </React.Fragment>
+                    } placement="right">
+                      <InfoIcon style={{ cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
+                    </Tooltip>
+                  </Stack>
+                  <Chip variant="outlined" label={quest.type} color={
+                    quest.type === 'Eduquest MCQ' ? 'primary' :
+                      quest.type === 'Wooclap' ? 'neon' :
+                        quest.type === 'Kahoot!' ? 'violet' :
+                          quest.type === 'Private' ? 'secondary' : 'default'
+                  } size="small"/>
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
+                    <Typography variant="overline" color="text.secondary">Status</Typography>
+                    <Tooltip title="When the quest is set to 'Expired', it will no longer be available for attempts and the system will issue badges to users." placement="right">
+                      <InfoIcon style={{ cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
+                    </Tooltip>
+                  </Stack>
+                  <Chip variant="outlined" label={quest.status} color={
                     quest.status === 'Active' ? 'success' : 'secondary'
                   } size="small"/>
-              </Grid>
-              <Grid md={6} xs={12}>
-                <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
-                  <Typography variant="overline" color="text.secondary">Expiry Date</Typography>
-                  <Tooltip title="When the expiry date is reached, the quest status will be set to 'Expired'." placement="right">
-                    <InfoIcon style={{ cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
-                  </Tooltip>
-                </Stack>
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
+                    <Typography variant="overline" color="text.secondary">Expiry Date</Typography>
+                    <Tooltip title="When the expiry date is reached, the quest status will be set to 'Expired'." placement="right">
+                      <InfoIcon style={{ cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
+                    </Tooltip>
+                  </Stack>
 
-                {quest.expiration_date ? (
-                  <Typography variant="body2">
-                    {new Date(quest.expiration_date).toLocaleDateString("en-SG", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      second: '2-digit'
-                    })}
-                  </Typography>
-                ) : (
-                  <Typography variant="body2">
-                    No Expiry Date Set
-                  </Typography>
-                )}
+                  {quest.expiration_date ? (
+                    <Typography variant="body2">
+                      {new Date(quest.expiration_date).toLocaleDateString("en-SG", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                      })}
+                    </Typography>
+                  ) : (
+                    <Typography variant="body2">
+                      No Expiry Date Set
+                    </Typography>
+                  )}
 
-              </Grid>
-              <Grid md={6} xs={12}>
-                <Typography variant="overline" color="text.secondary">Number of Questions</Typography>
-                <Typography variant="body2">{quest.total_questions}</Typography>
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <Typography variant="overline" color="text.secondary">Number of Questions</Typography>
+                  <Typography variant="body2">{quest.total_questions}</Typography>
+                </Grid>
+
+                <Grid md={6} xs={12}>
+                  <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
+                    <Typography variant="overline" color="text.secondary">Maximum Points</Typography>
+                    <Tooltip title="Points earned from 'Private' quest will not be credited to your account." placement="right">
+                      <InfoIcon style={{ cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
+                    </Tooltip>
+                  </Stack>
+                  <Stack direction="row" spacing='6px' sx={{ alignItems: 'center' }}>
+                    <Typography variant="body2">{quest.total_max_score}</Typography>
+                    <Points height={18}/>
+                  </Stack>
+                </Grid>
+
+                <Grid md={6} xs={12}>
+                  <Typography variant="overline" color="text.secondary">Maximum Number of Attempts</Typography>
+                  <Typography variant="body2">{quest.max_attempts}</Typography>
+                </Grid>
+
+                <Grid md={6} xs={12}>
+                  <Typography variant="overline" color="text.secondary">Created By</Typography>
+                  <Typography variant="body2">{quest.organiser.username}</Typography>
+                  <Typography variant="body2">{quest.organiser.email}</Typography>
+                </Grid>
+                <Grid xs={12}>
+                  <ExpandMore
+                    expand={expanded}
+                    onClick={handleExpandClick}
+                    aria-expanded={expanded}
+                    aria-label="show more"
+                    sx={{ display: 'flex', mx: 'auto' }}
+                  >
+                    <CaretDownIcon />
+                  </ExpandMore>
+                </Grid>
               </Grid>
 
-              <Grid md={6} xs={12}>
-                <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
-                  <Typography variant="overline" color="text.secondary">Maximum Points</Typography>
-                  <Tooltip title="Points earned from 'Private' quest will not be credited to your account." placement="right">
-                    <InfoIcon style={{ cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
-                  </Tooltip>
-                </Stack>
-                <Stack direction="row" spacing='6px' sx={{ alignItems: 'center' }}>
-                  <Typography variant="body2">{quest.total_max_score}</Typography>
-                  <Points height={18}/>
-                </Stack>
-              </Grid>
-
-              <Grid md={6} xs={12}>
-                <Typography variant="overline" color="text.secondary">Maximum Number of Attempts</Typography>
-                <Typography variant="body2">{quest.max_attempts}</Typography>
-              </Grid>
-
-              <Grid md={6} xs={12}>
-                <Typography variant="overline" color="text.secondary">Created By</Typography>
-                <Typography variant="body2">{quest.organiser.username}</Typography>
-                <Typography variant="body2">{quest.organiser.email}</Typography>
-              </Grid>
 
             </Grid>
 
-            <ExpandMore
-                expand={expanded}
-                onClick={handleExpandClick}
-                aria-expanded={expanded}
-                aria-label="show more"
-                sx={{ display: 'flex', mx: 'auto' }}
-              >
-                <CaretDownIcon />
-              </ExpandMore>
+
 
             <Collapse in={expanded} timeout="auto" unmountOnExit>
-            <Grid container spacing={3}>
-              <Grid xs={12}>
-                <Typography variant="overline" color="text.secondary">Course ID</Typography>
-                <Typography variant="body2">
-                  <Link href={`/dashboard/course/${quest.from_course.id.toString()}`}>{quest.from_course.id}</Link>
-                </Typography>
+              <Grid container spacing={3}>
+                <Grid md={3} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
+                <Grid container md={9} xs={12}>
+                  <Grid xs={12}>
+                    <Typography variant="overline" color="text.secondary">Course ID</Typography>
+                    <Typography variant="body2">
+                      <Link href={`/dashboard/course/${quest.from_course.id.toString()}`}>{quest.from_course.id}</Link>
+                    </Typography>
+                  </Grid>
+                  <Grid md={6} xs={12}>
+                    <Typography variant="overline" color="text.secondary">Course Code</Typography>
+                    <Typography variant="body2">{quest.from_course.code}</Typography>
+                  </Grid>
+                  <Grid md={6} xs={12}>
+                    <Typography variant="overline" color="text.secondary">Course Name</Typography>
+                    <Typography variant="body2">{quest.from_course.name}</Typography>
+                  </Grid>
+                  <Grid md={6} xs={12}>
+                    <Typography variant="overline" color="text.secondary">Course Type</Typography>
+                    <Typography variant="body2">{quest.from_course.type}</Typography>
+                  </Grid>
+                  <Grid md={6} xs={12}>
+                    <Typography variant="overline" color="text.secondary">Course Status</Typography>
+                    <Typography variant="body2">{quest.from_course.status}</Typography>
+                  </Grid>
+                  <Grid md={6} xs={12}>
+                    <Typography variant="overline" color="text.secondary">Course Group</Typography>
+                    <Typography variant="body2">{quest.from_course.group}</Typography>
+                  </Grid>
+                  <Grid xs={12}>
+                    <Typography variant="overline" color="text.secondary">Course Description</Typography>
+                    <Typography variant="body2">{quest.from_course.description}</Typography>
+                  </Grid>
+                  <Grid md={6} xs={12}>
+                    <Typography variant="overline" color="text.secondary">Course Year / Term</Typography>
+                    <Typography variant="body2">AY {quest.from_course.term.academic_year.start_year}-{quest.from_course.term.academic_year.end_year} / {quest.from_course.term.name}</Typography>
+                  </Grid>
+                  <Grid md={6} xs={12}>
+                    <Typography variant="overline" color="text.secondary">Course Duration</Typography>
+                    <Typography variant="body2">From {quest.from_course.term.start_date} to {quest.from_course.term.end_date}</Typography>
+                  </Grid>
+                </Grid>
               </Grid>
-              <Grid md={6} xs={12}>
-                <Typography variant="overline" color="text.secondary">Course Code</Typography>
-                <Typography variant="body2">{quest.from_course.code}</Typography>
-              </Grid>
-              <Grid md={6} xs={12}>
-                <Typography variant="overline" color="text.secondary">Course Name</Typography>
-                <Typography variant="body2">{quest.from_course.name}</Typography>
-              </Grid>
-              <Grid md={6} xs={12}>
-                <Typography variant="overline" color="text.secondary">Course Type</Typography>
-                <Typography variant="body2">{quest.from_course.type}</Typography>
-              </Grid>
-              <Grid md={6} xs={12}>
-                <Typography variant="overline" color="text.secondary">Course Status</Typography>
-                <Typography variant="body2">{quest.from_course.status}</Typography>
-              </Grid>
-              <Grid md={6} xs={12}>
-                <Typography variant="overline" color="text.secondary">Course Group</Typography>
-                <Typography variant="body2">{quest.from_course.group}</Typography>
-              </Grid>
-              <Grid xs={12}>
-                <Typography variant="overline" color="text.secondary">Course Description</Typography>
-                <Typography variant="body2">{quest.from_course.description}</Typography>
-              </Grid>
-              <Grid md={6} xs={12}>
-                <Typography variant="overline" color="text.secondary">Course Year / Term</Typography>
-                <Typography variant="body2">AY {quest.from_course.term.academic_year.start_year}-{quest.from_course.term.academic_year.end_year} / {quest.from_course.term.name}</Typography>
-              </Grid>
-              <Grid md={6} xs={12}>
-                <Typography variant="overline" color="text.secondary">Course Duration</Typography>
-                <Typography variant="body2">From {quest.from_course.term.start_date} to {quest.from_course.term.end_date}</Typography>
-              </Grid>
-            </Grid>
             </Collapse>
           </CardContent>
 
