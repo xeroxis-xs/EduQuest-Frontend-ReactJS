@@ -8,7 +8,7 @@ import apiService from "@/api/api-service";
 import {AxiosError, type AxiosResponse} from "axios";
 import { logger } from '@/lib/default-logger'
 import {authClient} from "@/lib/auth/client";
-import type {Course} from "@/types/course";
+// import type {Course} from "@/types/course";
 import {UserTable} from "@/components/dashboard/insights/student/user-table";
 
 export default function Page(): React.JSX.Element {
