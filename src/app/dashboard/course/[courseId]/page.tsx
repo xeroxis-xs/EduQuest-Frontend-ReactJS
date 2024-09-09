@@ -256,9 +256,9 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
                 <Grid md={6} xs={12}>
                   <Typography variant="overline" color="text.secondary" display="block">Type</Typography>
                   <Chip label={course.type} color={
-                    course.type === 'Private' ? 'secondary' :
-                      course.type === 'Public' ? 'primary' :
-                        course.type === 'Others' ? 'error' : 'default'
+                    course.type === 'System-enroll' ? 'primary' :
+                      course.type === 'Self-enroll' ? 'success' :
+                        course.type === 'Private' ? 'secondary' : 'default'
                   } size="small" variant="outlined"/>
                 </Grid>
                 <Grid md={6} xs={12}>
@@ -329,11 +329,14 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
             </Box>
             {eduquestUser && course.enrolled_users.includes(eduquestUser?.id.toString()) ? (
               <Button endIcon={<CheckIcon/>} disabled>Enrolled</Button>
-            ) : course.status === 'Expired' ?
-              <Button startIcon={<CalendarXIcon/>} disabled>Expired</Button>
-              :
-              <Button endIcon={<SignInIcon/>} onClick={() => handleEnroll()} variant="contained">Enroll</Button>
-            }
+            ) : course.type === 'System-enroll' ?
+              <Button startIcon={<SignInIcon/>} disabled>Enroll</Button>
+              : course.status === 'Expired' ?
+                <Button startIcon={<CalendarXIcon/>} disabled>Expired</Button>
+                : (
+                  <Button endIcon={<SignInIcon/>} onClick={() => handleEnroll()}>Enroll</Button>
+
+                )}
           </CardActions>
 
           <CourseExpiresDialog

@@ -27,6 +27,10 @@ export const paths = {
       catalogue: '/dashboard/badge/badge-catalogue',
       my: '/dashboard/badge/my-badge',
     },
+    insights: {
+      student: '/dashboard/insights/student',
+      course: '/dashboard/insights/course',
+    },
     feedback: '/dashboard/feedback'
   },
   errors: {

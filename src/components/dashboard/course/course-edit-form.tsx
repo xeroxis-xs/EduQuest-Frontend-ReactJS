@@ -32,6 +32,8 @@ import {useRouter} from "next/navigation";
 import Stack from "@mui/material/Stack";
 import FormLabel from "@mui/material/FormLabel";
 import {useTheme} from "@mui/material/styles";
+import Tooltip from "@mui/material/Tooltip";
+import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
 
 
 interface CourseFormProps {
@@ -134,6 +136,7 @@ export function CourseEditForm({ setSubmitStatus, course, toggleForm, onUpdateSu
     const updatedCourse = {
       code: courseCodeRef.current?.value,
       name: courseNameRef.current?.value,
+      type: courseTypeRef.current?.value,
       group: courseGroupRef.current?.value,
       description: courseDescriptionRef.current?.value,
       status: courseStatusRef.current?.value,
@@ -233,9 +236,21 @@ export function CourseEditForm({ setSubmitStatus, course, toggleForm, onUpdateSu
             </Grid>
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
-                <FormLabel htmlFor="course type">Course Type</FormLabel>
+                <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
+                  <FormLabel htmlFor="course type">Course Type</FormLabel>
+                  <Tooltip title={
+                    <Typography variant="inherit">
+                      <strong>System-enroll:</strong> User are not allowed to self-enroll.<br />
+                      <strong>Self-enroll:</strong> User are free to self-enroll.<br />
+                      <strong>Private:</strong> Used for personal quest generation.
+                    </Typography>
+                  } placement="top">
+                    <InfoIcon fontSize="var(--icon-fontSize-sm)" style={{ marginBottom: '8px', cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
+                  </Tooltip>
+                </Stack>
                 <Select defaultValue={course.type} label="Type" inputRef={courseTypeRef} name="type" size="small">
-                  <MenuItem value="Public"><Chip variant="outlined" label="Public" color="primary" size="small"/></MenuItem>
+                  <MenuItem value="System-enroll"><Chip variant="outlined" label="System-enroll" color="primary" size="small"/></MenuItem>
+                  <MenuItem value="Self-enroll"><Chip variant="outlined" label="Self-enroll" color="success" size="small"/></MenuItem>
                   <MenuItem value="Private"><Chip variant="outlined" label="Private" color="secondary" size="small"/></MenuItem>
                 </Select>
               </FormControl>

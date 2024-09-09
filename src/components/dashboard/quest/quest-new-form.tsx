@@ -27,6 +27,9 @@ import type {Image} from "@/types/image";
 import Chip from "@mui/material/Chip";
 import FormLabel from "@mui/material/FormLabel";
 import {useTheme} from "@mui/material/styles";
+import Tooltip from "@mui/material/Tooltip";
+import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
+import Stack from "@mui/material/Stack";
 
 interface CourseFormProps {
   onFormSubmitSuccess: () => void;
@@ -219,7 +222,19 @@ export function QuestNewForm({onFormSubmitSuccess, courseId}: CourseFormProps): 
             </Grid>
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
-                <FormLabel htmlFor="quest type">Quest Type</FormLabel>
+                <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
+                  <FormLabel htmlFor="quest type">Quest Type</FormLabel>
+                  <Tooltip title={
+                    <Typography variant="inherit">
+                      <strong>Eduquest MCQ</strong> Quest developed from EduQuest<br />
+                      <strong>Wooclap:</strong> Quest imported from Wooclap<br />
+                      <strong>Kahoot!:</strong> Quest imported from Kahoot!<br />
+                      <strong>Private:</strong> Quest for personal quest generation use only
+                    </Typography>
+                  } placement="top">
+                    <InfoIcon fontSize="var(--icon-fontSize-sm)" style={{ marginBottom: '8px', cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
+                  </Tooltip>
+                </Stack>
                 <Select defaultValue="Eduquest MCQ" label="Quest Type" inputRef={questTypeRef} name="type" size="small">
                   <MenuItem value="Eduquest MCQ"><Chip variant="outlined" label="Eduquest MCQ" color="primary" size="small"/></MenuItem>
                   <MenuItem value="Private"><Chip variant="outlined" label="Private" color="secondary" size="small"/></MenuItem>

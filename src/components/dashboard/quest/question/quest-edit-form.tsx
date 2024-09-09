@@ -29,6 +29,8 @@ import type {Course} from "@/types/course";
 import type {Image} from "@/types/image";
 import FormLabel from "@mui/material/FormLabel";
 import {useTheme} from "@mui/material/styles";
+import Tooltip from "@mui/material/Tooltip";
+import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
 
 interface QuestEditFormProps {
   quest: Quest
@@ -201,7 +203,19 @@ export default function QuestEditForm( {quest, courses, toggleForm, setSubmitSta
               </Grid>
               <Grid md={6} xs={12}>
                 <FormControl fullWidth required>
-                  <FormLabel htmlFor="quest type">Quest Type</FormLabel>
+                  <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
+                    <FormLabel htmlFor="quest type">Quest Type</FormLabel>
+                    <Tooltip title={
+                      <Typography variant="inherit">
+                        <strong>Eduquest MCQ</strong> Quest developed from EduQuest<br />
+                        <strong>Wooclap:</strong> Quest imported from Wooclap<br />
+                        <strong>Kahoot!:</strong> Quest imported from Kahoot!<br />
+                        <strong>Private:</strong> Quest for personal quest generation use only
+                      </Typography>
+                    } placement="top">
+                      <InfoIcon fontSize="var(--icon-fontSize-sm)" style={{ marginBottom: '8px', cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
+                    </Tooltip>
+                  </Stack>
                   <Select defaultValue={quest.type ?? ""} label="Quest Type" inputRef={questTypeRef} name="type" size="small">
                     <MenuItem value="Eduquest MCQ">
                       <Chip variant="outlined" label="Eduquest MCQ" color="primary" size="small"/>
@@ -329,7 +343,7 @@ export default function QuestEditForm( {quest, courses, toggleForm, setSubmitSta
                               label="Course ID" variant="outlined" type="number" size="small">
                         {courses.map((option) => (
                           <MenuItem key={option.id} value={option.id}>
-                            {option.id} - {option.code} {option.name}
+                            {option.id} - [{option.group}] {option.code} {option.name}
                           </MenuItem>
                         ))}
                       </Select>

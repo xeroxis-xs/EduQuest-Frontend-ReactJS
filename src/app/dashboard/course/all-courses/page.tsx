@@ -28,11 +28,10 @@ export default function Page(): React.JSX.Element {
 
   const getCourses = async (): Promise<void> => {
     try {
-      const response: AxiosResponse<Course[]> = await apiService.get<Course[]>('/api/Course/');
+      const response: AxiosResponse<Course[]> = await apiService.get<Course[]>('/api/Course/non-private');
       const data: Course[] = response.data;
-      const filteredData = data.filter((course) => course.type !== 'Private');
-      setCourses(filteredData);
-      logger.debug('Filtered Courses', filteredData);
+      setCourses(data);
+      logger.debug('Filtered Courses', data);
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         if (error.response?.status === 401) {

@@ -68,18 +68,17 @@ export function ImportCard({ onImportSuccess, courseId }: ImportCardProps): Reac
 
   const getCourses = async (): Promise<void> => {
     try {
-      const response: AxiosResponse<Course[]> = await apiService.get<Course[]>('/api/Course/');
+      const response: AxiosResponse<Course[]> = await apiService.get<Course[]>('/api/Course/non-private');
       const data: Course[] = response.data;
-      const filteredData = data.filter((course) => course.type !== 'Private');
       if (courseId) {
-        const course = filteredData.find(c => c.id === Number(courseId));
+        const course = data.find(c => c.id === Number(courseId));
         if (course) {
           setCourses([course]);
         }
       } else {
-        setCourses(filteredData);
+        setCourses(data);
       }
-      logger.debug('Filtered Courses', filteredData);
+      logger.debug('Filtered Courses', data);
     } catch (error: unknown) {
       if (error instanceof AxiosError) {
         if (error.response?.status === 401) {
@@ -356,7 +355,7 @@ export function ImportCard({ onImportSuccess, courseId }: ImportCardProps): Reac
                             disabled={Boolean(courseId)}>
                       {courses.map((option) => (
                         <MenuItem key={option.id} value={option.id}>
-                          {option.group} - {option.code} {option.name}
+                          {option.id} - [{option.group}] {option.code} {option.name}
                         </MenuItem>
                       ))}
                     </Select>

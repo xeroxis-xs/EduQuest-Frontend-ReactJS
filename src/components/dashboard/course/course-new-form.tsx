@@ -27,6 +27,9 @@ import {CardMedia, TextField} from "@mui/material";
 import Chip from "@mui/material/Chip";
 import Skeleton from "@mui/material/Skeleton";
 import {useTheme} from "@mui/material/styles";
+import Tooltip from "@mui/material/Tooltip";
+import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
+import Stack from "@mui/material/Stack";
 
 interface CourseFormProps {
   onFormSubmitSuccess: () => void;
@@ -219,9 +222,21 @@ export function CourseNewForm({ onFormSubmitSuccess }: CourseFormProps): React.J
 
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
-                <FormLabel htmlFor="course type">Course Type</FormLabel>
-                <Select defaultValue="Public" size='small' label="Course Type" inputRef={courseTypeRef} name="type">
-                  <MenuItem value="Public"><Chip variant="outlined" label="Public" color="primary" size="small"/></MenuItem>
+                <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
+                  <FormLabel htmlFor="course type">Course Type</FormLabel>
+                  <Tooltip title={
+                    <Typography variant="inherit">
+                      <strong>System-enroll:</strong> User are not allowed to self-enroll.<br />
+                      <strong>Self-enroll:</strong> User are free to self-enroll.<br />
+                      <strong>Private:</strong> Used for personal quest generation.
+                    </Typography>
+                  } placement="top">
+                    <InfoIcon fontSize="var(--icon-fontSize-sm)" style={{ marginBottom: '8px', cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
+                  </Tooltip>
+                </Stack>
+                <Select defaultValue="System-enroll" size='small' label="Course Type" inputRef={courseTypeRef} name="type">
+                  <MenuItem value="System-enroll"><Chip variant="outlined" label="System-enroll" color="primary" size="small"/></MenuItem>
+                  <MenuItem value="Self-enroll"><Chip variant="outlined" label="Self-enroll" color="success" size="small"/></MenuItem>
                   <MenuItem value="Private"><Chip variant="outlined" label="Private" color="secondary" size="small"/></MenuItem>
                 </Select>
               </FormControl>

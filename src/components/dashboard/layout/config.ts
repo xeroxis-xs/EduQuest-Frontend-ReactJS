@@ -79,6 +79,23 @@ export const navItems = [
     matcher: { type: 'startsWith', href: paths.dashboard.import },
   },
   {
+    key: 'insights',
+    title: 'Insights',
+    icon: 'chart-bar-horizontal',
+    items: [
+      {
+        key: 'student',
+        title: 'Students',
+        href: paths.dashboard.insights.student
+      },
+      {
+        key: 'course',
+        title: 'Courses',
+        href: paths.dashboard.insights.course
+      }
+    ]
+  },
+  {
     key: 'eduquest-user',
     title: 'Eduquest Users',
     href: paths.dashboard.user,

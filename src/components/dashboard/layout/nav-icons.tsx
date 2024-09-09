@@ -11,6 +11,7 @@ import { MagicWand as MagicWandIcon } from "@phosphor-icons/react/dist/ssr/Magic
 import { Medal as MedalIcon } from '@phosphor-icons/react/dist/ssr/Medal';
 import { Upload as UploadIcon } from '@phosphor-icons/react/dist/ssr/Upload';
 import { ChatCircleDots as ChatCircleDotsIcon } from '@phosphor-icons/react/dist/ssr/ChatCircleDots';
+import { ChartBarHorizontal as ChartBarHorizontalIcon } from "@phosphor-icons/react/dist/ssr/ChartBarHorizontal";
 
 export const navIcons = {
   'chart-pie': ChartPieIcon,
@@ -25,4 +26,5 @@ export const navIcons = {
   'magic-wand': MagicWandIcon,
   'upload': UploadIcon,
   'chat-circle-dots': ChatCircleDotsIcon,
+  'chart-bar-horizontal': ChartBarHorizontalIcon,
 } as Record<string, Icon>;

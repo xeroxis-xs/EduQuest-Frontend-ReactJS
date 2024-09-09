@@ -122,11 +122,10 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
 
   const getCourses = async (output:Quest | undefined): Promise<void> => {
     try {
-      const response: AxiosResponse<Course[]> = await apiService.get<Course[]>(`/api/Course/`);
+      const response: AxiosResponse<Course[]> = await apiService.get<Course[]>(`/api/Course/non-private`);
       const data: Course[] = response.data;
-      const filteredData = data.filter(c => c.name !== 'Private Course');
-      setCourses(filteredData);
-      logger.debug('Filtered Courses', filteredData);
+      setCourses(data);
+      logger.debug('Filtered Courses', data);
       logger.debug('Quest from_course ID:', output?.from_course?.id);
       const foundCourse = data?.find(c => c.id === output?.from_course?.id);
       logger.debug('Found Course', foundCourse);
@@ -281,12 +280,12 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
                   <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
                     <Typography variant="overline" color="text.secondary">Type</Typography>
                     <Tooltip title={
-                      <React.Fragment>
-                        <Typography fontSize="inherit">Eduquest MCQ - Quest developed in-house</Typography>
-                        <Typography fontSize="inherit">Wooclap - Quest imported from Wooclap</Typography>
-                        <Typography fontSize="inherit">Kahoot! - Quest imported from Kahoot!</Typography>
-                        <Typography fontSize="inherit">Private - Quest for personal quest generation use only</Typography>
-                      </React.Fragment>
+                      <Typography variant="inherit">
+                        <strong>Eduquest MCQ</strong> Quest developed from EduQuest<br />
+                        <strong>Wooclap:</strong> Quest imported from Wooclap<br />
+                        <strong>Kahoot!:</strong> Quest imported from Kahoot!<br />
+                        <strong>Private:</strong> Quest for personal quest generation use only
+                      </Typography>
                     } placement="right">
                       <InfoIcon style={{ cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
                     </Tooltip>
@@ -400,12 +399,31 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
                     <Typography variant="body2">{quest.from_course.name}</Typography>
                   </Grid>
                   <Grid md={6} xs={12}>
-                    <Typography variant="overline" color="text.secondary">Course Type</Typography>
-                    <Typography variant="body2">{quest.from_course.type}</Typography>
+                    <Stack direction="row" sx={{ alignItems: 'center' }} spacing={0}>
+                      <Typography variant="overline" color="text.secondary">Course Type</Typography>
+                      <Tooltip title={
+                        <Typography variant="inherit">
+                          <strong>System-enroll:</strong> User are not allowed to self-enroll.<br />
+                          <strong>Self-enroll:</strong> User are free to self-enroll.<br />
+                          <strong>Private:</strong> Used for personal quest generation.
+                        </Typography>
+                      } placement="top">
+                        <InfoIcon fontSize="var(--icon-fontSize-sm)" style={{ marginLeft: '8px', cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
+                      </Tooltip>
+                    </Stack>
+                    <Chip variant="outlined" label={quest.from_course.type} color={
+                      quest.from_course.type === 'System-enroll' ? 'primary' :
+                        quest.from_course.type === 'Self-enroll' ? 'success' :
+                          quest.from_course.type === 'Private' ? 'secondary' : 'default'
+                    } size="small"/>
                   </Grid>
                   <Grid md={6} xs={12}>
                     <Typography variant="overline" color="text.secondary">Course Status</Typography>
                     <Typography variant="body2">{quest.from_course.status}</Typography>
+                    <Chip variant="outlined" label={quest.from_course.status} color={
+                      quest.from_course.status === 'Active' ? 'success' :
+                          quest.from_course.status === 'Expired' ? 'secondary' : 'default'
+                    } size="small"/>
                   </Grid>
                   <Grid md={6} xs={12}>
                     <Typography variant="overline" color="text.secondary">Course Group</Typography>

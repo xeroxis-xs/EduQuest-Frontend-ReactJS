@@ -88,9 +88,9 @@ export function CourseCard({ rows = [], onEnrolledSuccess }: CourseCardProps): R
               />
               <CardContent sx={{ flex: 1 }}>
                 <Chip label={course.type} sx={{ mb: 1.5, mr: 1 }} color={
-                  course.type === 'Private' ? 'secondary' :
-                    course.type === 'Public' ? 'primary' :
-                      course.type === 'Others' ? 'default' : 'default'
+                  course.type === 'System-enroll' ? 'primary' :
+                    course.type === 'Self-enroll' ? 'success' :
+                      course.type === 'Private' ? 'secondary' : 'default'
                 } size="small" variant="outlined"/>
                 <Chip label={course.status} sx={{ mb: 1.5 }} color={
                     course.status === 'Active' ? 'success' : 'secondary'
@@ -119,7 +119,9 @@ export function CourseCard({ rows = [], onEnrolledSuccess }: CourseCardProps): R
                 </Box>
                 {eduquestUser && course.enrolled_users.includes(eduquestUser?.id.toString()) ? (
                   <Button endIcon={<CheckIcon/>} disabled>Enrolled</Button>
-                ) : course.status === 'Expired' ?
+                ) : course.type === 'System-enroll' ?
+                  <Button startIcon={<SignInIcon/>} disabled>Enroll</Button>
+                  : course.status === 'Expired' ?
                   <Button startIcon={<CalendarXIcon/>} disabled>Expired</Button>
                   : (
                   <Button endIcon={<SignInIcon/>} onClick={() => handleEnroll(course.id)}>Enroll</Button>
