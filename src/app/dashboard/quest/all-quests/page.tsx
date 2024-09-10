@@ -83,9 +83,11 @@ export default function Page(): React.JSX.Element {
 
       <Grid container spacing={1} sx={{ justifyContent: 'space-between' }}>
         <Grid md={6} xs={12}>
-          <Typography variant="h4">All Quests</Typography>
-          <Typography variant="body2" color="text.secondary">You can view all quests here.</Typography>
-        </Grid>
+          <Stack spacing={1}>
+            <Typography variant="h4">All Quests</Typography>
+            <Typography variant="body2" color="text.secondary">List of all the quests available on the platform.</Typography>
+          </Stack>
+          </Grid>
         <Grid md={6} xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
           <Stack direction="column" spacing={2} alignItems="center">
             {eduquestUser?.is_staff ? (

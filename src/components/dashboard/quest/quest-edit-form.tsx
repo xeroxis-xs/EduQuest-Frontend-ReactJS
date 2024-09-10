@@ -55,6 +55,7 @@ export default function QuestEditForm( {quest, courses, toggleForm, setSubmitSta
   const questMaxAttemptsRef = React.useRef<HTMLInputElement>(null);
   const questStatusRef = React.useRef<HTMLInputElement>(null);
   const questExpirationDateRef = React.useRef<HTMLInputElement>(null);
+  const questTutorialDateRef = React.useRef<HTMLInputElement>(null);
   const questCourseIdRef = React.useRef<HTMLInputElement>(null);
   const questImageIdRef = React.useRef<HTMLInputElement>(null);
 
@@ -116,6 +117,9 @@ export default function QuestEditForm( {quest, courses, toggleForm, setSubmitSta
       status: questStatusRef.current?.value,
       expiration_date: questExpirationDateRef.current?.value
         ? new Date(questExpirationDateRef.current.value).toISOString()
+        : null,
+      tutorial_date: questTutorialDateRef.current?.value
+        ? new Date(questTutorialDateRef.current.value).toISOString()
         : null,
       max_attempts: questMaxAttemptsRef.current?.value,
       from_course: selectedCourse || quest?.from_course,
@@ -203,6 +207,19 @@ export default function QuestEditForm( {quest, courses, toggleForm, setSubmitSta
               </Grid>
               <Grid md={6} xs={12}>
                 <FormControl fullWidth required>
+                  <FormLabel htmlFor="quest max attempts">Quest Maximum Attempts</FormLabel>
+                  <TextField
+                    defaultValue={quest.max_attempts}
+                    inputRef={questMaxAttemptsRef}
+                    type="number"
+                    variant='outlined'
+                    size='small'
+                    inputProps={{ min: 1 }}
+                  />
+                </FormControl>
+              </Grid>
+              <Grid md={6} xs={12}>
+                <FormControl fullWidth required>
                   <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
                     <FormLabel htmlFor="quest type">Quest Type</FormLabel>
                     <Tooltip title={
@@ -247,28 +264,48 @@ export default function QuestEditForm( {quest, courses, toggleForm, setSubmitSta
                 </FormControl>
               </Grid>
               <Grid md={6} xs={12}>
-                <FormControl fullWidth required>
-                  <FormLabel htmlFor="quest max attempts">Quest Maximum Attempts</FormLabel>
-                  <TextField
-                    defaultValue={quest.max_attempts}
-                    inputRef={questMaxAttemptsRef}
-                    type="number"
-                    variant='outlined'
-                    size='small'
-                  />
-                </FormControl>
-              </Grid>
-              <Grid md={6} xs={12}>
                 <FormControl fullWidth>
-                  <FormLabel htmlFor="quest expiry date">Quest Expiry Date</FormLabel>
+                  <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
+                    <FormLabel htmlFor="quest expiry date">Quest Expiry Date</FormLabel>
+                    <Tooltip title="Optional: When the expiry date is reached, the quest status will be set to 'Expired'." placement="right">
+                      <InfoIcon style={{ marginBottom: '8px',cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
+                    </Tooltip>
+                  </Stack>
                   <TextField
-                    defaultValue={quest.expiration_date ? new Date(quest.expiration_date).toISOString().slice(0, 16) : ''}
+                    defaultValue={quest.expiration_date ?
+                      new Date(new Date(quest.expiration_date).getTime() - (new Date().getTimezoneOffset() * 60000))
+                        .toISOString()
+                        .slice(0, 16) // Convert to local time and format to 'YYYY-MM-DDTHH:MM'
+                      : ''}
                     inputRef={questExpirationDateRef}
                     name="Quest Expiry Date"
                     type="datetime-local"
                     variant='outlined'
                     size='small'
-                    />
+                  />
+
+                </FormControl>
+              </Grid>
+              <Grid md={6} xs={12}>
+                <FormControl fullWidth>
+                  <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
+                    <FormLabel htmlFor="quest tutorial date">Quest Tutorial Date</FormLabel>
+                    <Tooltip title="Optional: The date and time of the tutorial session conducted" placement="right">
+                      <InfoIcon style={{ marginBottom: '8px',cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
+                    </Tooltip>
+                  </Stack>
+                  <TextField
+                    defaultValue={quest.tutorial_date ?
+                      new Date(new Date(quest.tutorial_date).getTime() - (new Date().getTimezoneOffset() * 60000))
+                        .toISOString()
+                        .slice(0, 16) // Convert to local time and format to 'YYYY-MM-DDTHH:MM'
+                      : ''}
+                    inputRef={questTutorialDateRef}
+                    name="Quest Tutorial Date"
+                    type="datetime-local"
+                    variant='outlined'
+                    size='small'
+                  />
                 </FormControl>
               </Grid>
               <Grid xs={12}>

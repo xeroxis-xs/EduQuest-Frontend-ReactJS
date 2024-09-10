@@ -14,5 +14,6 @@ export interface Quest {
   total_max_score: number;
   total_questions: number;
   expiration_date: string | null;
+  tutorial_date: string | null;
   image: Image;
 }

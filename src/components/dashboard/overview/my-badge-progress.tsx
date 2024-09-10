@@ -46,7 +46,7 @@ export function MyBadgeProgress({ userBadgeProgression = [], sx }: MyEarnedBadge
           direction="column"
           justifyContent="space-evenly"
           alignItems="center"
-          // spacing={2}
+          spacing={1}
           height="100%"
           px={2}
         >

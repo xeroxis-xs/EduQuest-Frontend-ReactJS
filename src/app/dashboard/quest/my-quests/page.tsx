@@ -68,7 +68,12 @@ export default function Page(): React.JSX.Element {
   return (
     <Stack spacing={3}>
       <Stack direction="row" spacing={1} sx={{justifyContent: 'space-between'}}>
-        <Typography variant="h4">My Quests</Typography>
+        <Stack spacing={1}>
+          <Typography variant="h4">My Quests</Typography>
+          <Typography variant="body2" color="text.secondary">
+            List of all quests from the courses you are enrolled in.
+          </Typography>
+        </Stack>
         <Stack direction="row" spacing={2} sx={{ alignItems: 'center' }}>
           <FunnelIcon height={20} width={20}/>
           <FormControl size="small">

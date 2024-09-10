@@ -42,10 +42,12 @@ export function QuestNewForm({onFormSubmitSuccess, courseId}: CourseFormProps): 
   const questTypeRef = React.useRef<HTMLInputElement>(null);
   const questNameRef = React.useRef<HTMLInputElement>(null);
   const questExpirationDateRef = React.useRef<HTMLInputElement>(null);
+  const questTutorialDateRef = React.useRef<HTMLInputElement>(null);
   const questDescriptionRef = React.useRef<HTMLInputElement>(null);
   const questStatusRef = React.useRef<HTMLInputElement>(null);
   const questCourseIdRef = React.useRef<HTMLInputElement>(null);
   const questImageIdRef = React.useRef<HTMLInputElement>(null);
+  const questMaxAttemptsRef = React.useRef<HTMLInputElement>(null);
   const [courses, setCourses] = React.useState<Course[]>();
   const [images, setImages] = React.useState<Image[]>();
   const [selectedCourse, setSelectedCourse] = React.useState<Course | null>(null);
@@ -155,7 +157,14 @@ export function QuestNewForm({onFormSubmitSuccess, courseId}: CourseFormProps): 
       type: questTypeRef.current?.value,
       name: questNameRef.current?.value,
       description: questDescriptionRef.current?.value,
+      expiration_date: questExpirationDateRef.current?.value
+        ? new Date(questExpirationDateRef.current.value).toISOString()
+        : null,
+      tutorial_date: questTutorialDateRef.current?.value
+        ? new Date(questTutorialDateRef.current.value).toISOString()
+        : null,
       status: questStatusRef.current?.value,
+      max_attempts: questMaxAttemptsRef.current?.value,
       from_course: selectedCourse || courses?.[0],
       organiser: eduquestUser,
       image: selectedImage || images?.[0]
@@ -210,16 +219,19 @@ export function QuestNewForm({onFormSubmitSuccess, courseId}: CourseFormProps): 
               </FormControl>
             </Grid>
             <Grid md={6} xs={12}>
-              <FormControl fullWidth>
-                <FormLabel htmlFor="quest expiry date">Quest Expiry Date</FormLabel>
+              <FormControl fullWidth required>
+                <FormLabel htmlFor="quest max attempts">Quest Maximum Attempts</FormLabel>
                 <TextField
-                  inputRef={questExpirationDateRef}
-                  type="datetime-local"
+                  defaultValue={1}
+                  inputRef={questMaxAttemptsRef}
+                  type="number"
                   variant='outlined'
                   size='small'
+                  inputProps={{ min: 1 }}
                 />
               </FormControl>
             </Grid>
+
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
                 <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
@@ -252,6 +264,38 @@ export function QuestNewForm({onFormSubmitSuccess, courseId}: CourseFormProps): 
                 </Select>
               </FormControl>
             </Grid>
+            <Grid md={6} xs={12}>
+              <FormControl fullWidth>
+                <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
+                  <FormLabel htmlFor="quest expiry date">Quest Expiry Date</FormLabel>
+                  <Tooltip title="Optional: When the expiry date is reached, the quest status will be set to 'Expired'." placement="right">
+                    <InfoIcon style={{ marginBottom: '8px',cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
+                  </Tooltip>
+                </Stack>
+                <TextField
+                  inputRef={questExpirationDateRef}
+                  type="datetime-local"
+                  variant='outlined'
+                  size='small'
+                />
+              </FormControl>
+            </Grid>
+            <Grid md={6} xs={12}>
+              <FormControl fullWidth>
+                <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
+                  <FormLabel htmlFor="quest tutorial date">Quest Tutorial Date</FormLabel>
+                  <Tooltip title="Optional: The date and time of the tutorial session conducted" placement="right">
+                    <InfoIcon style={{ marginBottom: '8px',cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
+                  </Tooltip>
+                </Stack>
+                <TextField
+                  inputRef={questTutorialDateRef}
+                  type="datetime-local"
+                  variant='outlined'
+                  size='small'
+                />
+              </FormControl>
+            </Grid>
             <Grid xs={12}>
               <FormControl fullWidth required>
                 <FormLabel htmlFor="quest description">Quest Description</FormLabel>
@@ -265,7 +309,7 @@ export function QuestNewForm({onFormSubmitSuccess, courseId}: CourseFormProps): 
                 />
               </FormControl>
             </Grid>
-          </Grid>
+            </Grid>
 
           <Typography sx={{my:3}} variant="h6">Thumbnail</Typography>
           {images ?

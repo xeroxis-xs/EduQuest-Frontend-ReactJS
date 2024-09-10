@@ -10,6 +10,8 @@ import { Crown as CrownIcon } from '@phosphor-icons/react/dist/ssr/Crown';
 import { Info as InfoIcon } from '@phosphor-icons/react/dist/ssr/Info';
 import { User as UserIcon } from '@phosphor-icons/react/dist/ssr/User';
 import type {ShortestTimeUser} from "@/types/analytics/shortest-time-user";
+import Box from "@mui/material/Box";
+import {useRouter} from "next/navigation";
 
 export interface BudgetProps {
   sx?: SxProps;
@@ -32,6 +34,12 @@ export function formatTime(milliseconds: number): string {
 }
 
 export function ShortestUser ({ sx, shortestTimeUser }: BudgetProps): React.JSX.Element {
+  const router = useRouter();
+  const handleRouteToQuest = (questId: string): void => {
+    router.push(`/dashboard/quest/${questId}`);
+  };
+
+
   return (
     <Card sx={sx}>
       <CardContent sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%', py: '24px' }}>
@@ -55,7 +63,17 @@ export function ShortestUser ({ sx, shortestTimeUser }: BudgetProps): React.JSX.
                     <UserIcon fontSize="var(--icon-fontSize-md)"/>
                     <Typography variant="h6">{shortestTimeUser.nickname}</Typography>
                   </Stack>
-                  <Typography variant="body2">Quest: {shortestTimeUser.quest_name}</Typography>
+                  <Typography variant="body2">
+                    Quest:
+                    <Box
+                      component="span"
+                      sx={{ display: 'inline', cursor: 'pointer', mx: '6px', fontWeight: '600' }}
+                      onClick={() => { handleRouteToQuest(shortestTimeUser.quest_id.toString()); }}
+                    >
+                    {shortestTimeUser.quest_name}
+                    </Box>
+                    from {shortestTimeUser.course}
+                  </Typography>
                   <Typography variant="body2">Time Taken: {formatTime(shortestTimeUser.time_taken)}</Typography>
                 </>
               ) : (

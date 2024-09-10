@@ -58,6 +58,12 @@ export function MainNav(): React.JSX.Element {
             await authClient.signInWithMsal();
           }
         } else {
+          setShowUserInitials(true);
+          setUserAvatarProps({
+            name: formatName(eduquestUser.nickname),
+            bgColor: 'var(--mui-palette-neutral-900)',
+            textColor: "white",
+          });
           logger.error('Error fetching user photo: ', error)
         }
       }
@@ -139,7 +145,7 @@ export function MainNav(): React.JSX.Element {
                   ref={userPopover.anchorRef}
                   src={userPhoto}
                   sx={{ cursor: 'pointer' }}
-                /> : <UserIcon size={48} color="var(--mui-palette-primary-main)" />
+                /> : <UserIcon size={32} color="var(--mui-palette-primary-main)" />
             }
 
           </Stack>

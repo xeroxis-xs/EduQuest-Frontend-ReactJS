@@ -37,6 +37,7 @@ export default function Page({ params }: { params: { courseId: string } }): Reac
       <Stack direction="row" spacing={3}>
         <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
           <Typography variant="h4">Import Quest Attempts</Typography>
+          <Typography variant="body2" color="text.secondary">Import external quest conducted during tutorial sessions</Typography>
         </Stack>
 
 

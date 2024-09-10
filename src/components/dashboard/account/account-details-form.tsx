@@ -96,6 +96,12 @@ export function AccountDetailsForm(): React.JSX.Element {
             await authClient.signInWithMsal();
           }
         } else {
+          setShowUserInitials(true);
+          setUserAvatarProps({
+            name: formatName(eduquestUser.nickname),
+            bgColor: 'var(--mui-palette-neutral-900)',
+            textColor: "white",
+          });
           logger.error('Error fetching user photo: ', error)
         }
       }
@@ -133,7 +139,7 @@ export function AccountDetailsForm(): React.JSX.Element {
               <Avatar
                 src={userPhoto}
                 sx={{width: 48, height: 48}}
-              /> : <UserIcon size={48} color="var(--mui-palette-primary-main)" />
+              /> : <UserIcon size={32} color="var(--mui-palette-primary-main)" />
           }
         />
 

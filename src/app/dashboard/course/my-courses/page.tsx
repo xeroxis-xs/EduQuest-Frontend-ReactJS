@@ -53,9 +53,9 @@ export default function Page(): React.JSX.Element {
   return (
     <Stack spacing={3}>
       <Stack direction="row" spacing={3}>
-        <Stack spacing={1} sx={{ flex: '1 1 auto' }}>
+        <Stack spacing={1}>
           <Typography variant="h4">My Courses</Typography>
-
+          <Typography variant="body2" color="text.secondary">List of courses you are enrolled in.</Typography>
         </Stack>
 
       </Stack>

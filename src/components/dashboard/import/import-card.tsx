@@ -4,7 +4,7 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import CardHeader from "@mui/material/CardHeader";
-import {CardMedia, TextField, Skeleton } from "@mui/material";
+import { CardMedia, TextField, Skeleton } from "@mui/material";
 import Divider from "@mui/material/Divider";
 import FormControl from "@mui/material/FormControl";
 import Select, {type SelectChangeEvent} from "@mui/material/Select";
@@ -26,6 +26,9 @@ import Alert from "@mui/material/Alert";
 import Chip from "@mui/material/Chip";
 import {Loading} from "@/components/dashboard/loading/loading";
 import FormLabel from "@mui/material/FormLabel";
+import Stack from "@mui/material/Stack";
+import Tooltip from "@mui/material/Tooltip";
+import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
 
 
 
@@ -53,6 +56,7 @@ export function ImportCard({ onImportSuccess, courseId }: ImportCardProps): Reac
   const questTypeRef = React.useRef<HTMLInputElement>(null);
   const questNameRef = React.useRef<HTMLInputElement>(null);
   const questDescriptionRef = React.useRef<HTMLInputElement>(null);
+  const questTutorialDateRef = React.useRef<HTMLInputElement>(null);
   const questCourseIdRef = React.useRef<HTMLInputElement>(null);
   const questImageIdRef = React.useRef<HTMLInputElement>(null);
   const [isProcessing, setIsProcessing] = React.useState(false);
@@ -60,6 +64,7 @@ export function ImportCard({ onImportSuccess, courseId }: ImportCardProps): Reac
   const [isImagesLoading, setIsImagesLoading] = React.useState(true);
   const [courses, setCourses] = React.useState<Course[]>([]);
   const [images, setImages] = React.useState<Image[]>([]);
+  const [isDragging, setIsDragging] = React.useState(false);
   const [selectedCourse, setSelectedCourse] = React.useState<Course | null>(null);
   const [selectedImage, setSelectedImage] = React.useState<Image | null>(null);
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
@@ -109,6 +114,25 @@ export function ImportCard({ onImportSuccess, courseId }: ImportCardProps): Reac
       setIsImagesLoading(false);
     }
   }
+
+
+
+  const handleDragOver = (event: React.DragEvent<HTMLDivElement>): void => {
+    event.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDrop = (event: React.DragEvent<HTMLDivElement>): void => {
+    event.preventDefault();
+    setIsDragging(false);
+    const file = event.dataTransfer.files ? event.dataTransfer.files[0] : null;
+    setSelectedFile(file);
+    logger.debug('Dropped File:', file);
+  };
+
+  const handleDragLeave = (): void => {
+    setIsDragging(false);
+  };
 
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
@@ -166,12 +190,16 @@ export function ImportCard({ onImportSuccess, courseId }: ImportCardProps): Reac
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     setIsProcessing(true);
+    const tutorialDate = questTutorialDateRef.current?.value
+        ? new Date(questTutorialDateRef.current.value).toISOString()
+        : null;
     // Create FormData
     const formData = new FormData();
     // Append other data as needed
     formData.append('type', questTypeRef.current?.value || '');
     formData.append('name', questNameRef.current?.value || '');
     formData.append('description', questDescriptionRef.current?.value || '');
+    formData.append('tutorial_date', tutorialDate || '');
     formData.append('status', 'Active');
     formData.append('max_attempts', '1');
     // Assuming selectedCourse and selectedImage are objects, you might need to stringify them or just append their IDs
@@ -230,7 +258,16 @@ export function ImportCard({ onImportSuccess, courseId }: ImportCardProps): Reac
 
   return (
     <form onSubmit={handleSubmit}>
-    <Card>
+      <Card
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+        onDragLeave={handleDragLeave}
+        sx={{
+          border: isDragging ? '2px dashed var(--mui-palette-primary-main)' : '1px solid var(--mui-palette-neutral-200)',
+          backgroundColor: isDragging ? 'var(--mui-palette-background-level2)' : 'var(--mui-palette-background-paper)',
+          transition: 'background-color, border '
+        }}
+      >
       <CardHeader title="New Quest Import" subheader="Create a new quest for this import"/>
       <Divider/>
 
@@ -238,7 +275,7 @@ export function ImportCard({ onImportSuccess, courseId }: ImportCardProps): Reac
 
         <Grid container spacing={3}>
 
-          <Grid md={4} xs={12}>
+          <Grid md={6} xs={12}>
             <FormControl fullWidth required>
               <FormLabel htmlFor="quest name">Quest Name</FormLabel>
               <TextField
@@ -249,9 +286,21 @@ export function ImportCard({ onImportSuccess, courseId }: ImportCardProps): Reac
               />
             </FormControl>
           </Grid>
-          <Grid md={4} xs={12}>
+          <Grid md={6} xs={12}>
             <FormControl fullWidth required>
-              <FormLabel htmlFor="quest type">Quest Type</FormLabel>
+              <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
+                <FormLabel htmlFor="quest type">Quest Type</FormLabel>
+                <Tooltip title={
+                  <Typography variant="inherit">
+                    <strong>Eduquest MCQ</strong> Quest developed from EduQuest<br />
+                    <strong>Wooclap:</strong> Quest imported from Wooclap<br />
+                    <strong>Kahoot!:</strong> Quest imported from Kahoot!<br />
+                    <strong>Private:</strong> Quest for personal quest generation use only
+                  </Typography>
+                } placement="top">
+                  <InfoIcon fontSize="var(--icon-fontSize-sm)" style={{ marginBottom: '8px', cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
+                </Tooltip>
+              </Stack>
               <Select defaultValue="Wooclap" label="Quest Type" inputRef={questTypeRef} name="type" size="small">
                 <MenuItem value="Eduquest MCQ"><Chip variant="outlined" label="Eduquest MCQ" color="primary" size="small"/></MenuItem>
                 <MenuItem value="Private"><Chip variant="outlined" label="Private" color="secondary" size="small"/></MenuItem>
@@ -261,20 +310,37 @@ export function ImportCard({ onImportSuccess, courseId }: ImportCardProps): Reac
             </FormControl>
           </Grid>
 
-          <Grid md={4} xs={12}>
+          <Grid md={6} xs={12}>
+            <FormControl fullWidth required>
+              <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
+                <FormLabel htmlFor="quest tutorial date">Quest Tutorial Date</FormLabel>
+                <Tooltip title="The date and time of the tutorial session conducted" placement="right">
+                  <InfoIcon style={{ marginBottom: '8px',cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
+                </Tooltip>
+              </Stack>
+              <TextField
+                inputRef={questTutorialDateRef}
+                type="datetime-local"
+                variant='outlined'
+                size='small'
+              />
+            </FormControl>
+          </Grid>
+
+          <Grid md={6} xs={12}>
             <FormControl fullWidth required>
               <FormLabel htmlFor="select file">External Report</FormLabel>
-              <Button
-                component="label"
-                role={undefined}
-                variant="outlined"
-                tabIndex={-1}
-                startIcon={<FileXlsIcon/>}
-                sx={{height: '100%'}}
-              >
-                { selectedFile ? selectedFile.name : 'Select File' }
-                <VisuallyHiddenInput type="file" onChange={handleFileChange} />
-              </Button>
+                <Button
+                  component="label"
+                  role={undefined}
+                  variant="outlined"
+                  tabIndex={-1}
+                  startIcon={<FileXlsIcon />}
+                  sx={{ height: '100%' }}
+                >
+                  {selectedFile ? selectedFile.name : 'Select File or Drag and Drop'}
+                  <VisuallyHiddenInput type="file" onChange={handleFileChange} />
+                </Button>
             </FormControl>
           </Grid>
 
@@ -284,11 +350,12 @@ export function ImportCard({ onImportSuccess, courseId }: ImportCardProps): Reac
               <FormLabel htmlFor="quest description">Quest Description</FormLabel>
               <TextField
                 inputRef={questDescriptionRef}
-                placeholder="The description of the quest. E.g. 'This quiz is based on the content covered in Week 1 of the course.'"
+                placeholder="The description of the quest. E.g. 'This quest is for tutorial 1 conducted on week 3.'"
                 variant='outlined'
                 multiline
                 rows={3}
               />
+
             </FormControl>
           </Grid>
         </Grid>

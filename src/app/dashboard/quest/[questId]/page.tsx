@@ -34,7 +34,7 @@ import Collapse from '@mui/material/Collapse';
 import { SkeletonQuestDetailCard } from "@/components/dashboard/skeleton/skeleton-quest-detail-card";
 import { SkeletonQuestAttemptTable } from "@/components/dashboard/skeleton/skeleton-quest-attempt-table";
 import {NewQuestionForm} from "@/components/dashboard/quest/question/new-question-form";
-import QuestEditForm from "@/components/dashboard/quest/question/quest-edit-form";
+import QuestEditForm from "@/components/dashboard/quest/quest-edit-form";
 import {IOSSwitch} from "@/components/dashboard/misc/buttons";
 import {useState} from "react";
 import Tooltip from "@mui/material/Tooltip";
@@ -329,7 +329,33 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
                     </Typography>
                   ) : (
                     <Typography variant="body2">
-                      No Expiry Date Set
+                      No expiry date set
+                    </Typography>
+                  )}
+
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
+                    <Typography variant="overline" color="text.secondary">Tutorial Date</Typography>
+                    <Tooltip title="The date and time of the tutorial session conducted" placement="right">
+                      <InfoIcon style={{ cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
+                    </Tooltip>
+                  </Stack>
+
+                  {quest.tutorial_date ? (
+                    <Typography variant="body2">
+                      {new Date(quest.tutorial_date).toLocaleDateString("en-SG", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                      })}
+                    </Typography>
+                  ) : (
+                    <Typography variant="body2">
+                      No tutorial date set
                     </Typography>
                   )}
 

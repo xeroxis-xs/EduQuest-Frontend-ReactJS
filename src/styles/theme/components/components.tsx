@@ -18,6 +18,7 @@ import { MuiInputBase } from './input-base';
 import { MuiOutlinedInput } from './outlined-input';
 import { MuiCheckbox } from "./check-box";
 import { MuiCardMedia } from "@/styles/theme/components/card-media";
+import { MuiRadio } from "@/styles/theme/components/radio";
 
 export const components = {
   MuiAvatar,
@@ -36,5 +37,6 @@ export const components = {
   MuiInputBase,
   MuiOutlinedInput,
   MuiCheckbox,
-  MuiCardMedia
+  MuiCardMedia,
+  MuiRadio,
 } satisfies Components<Theme>;

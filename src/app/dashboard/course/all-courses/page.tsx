@@ -59,8 +59,10 @@ export default function Page(): React.JSX.Element {
   return (
     <Stack spacing={3}>
       <Stack direction="row" spacing={1} sx={{justifyContent: 'space-between'}}>
-        <Typography variant="h4">All Courses</Typography>
-
+        <Stack spacing={1}>
+          <Typography variant="h4">All Courses</Typography>
+          <Typography variant="body2" color="text.secondary">List of all courses available on the platform.</Typography>
+        </Stack>
         {eduquestUser?.is_staff ?
           <Stack direction="row" sx={{ alignItems: 'center' }}>
             <Button
