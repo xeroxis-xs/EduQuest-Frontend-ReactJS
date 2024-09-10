@@ -19,14 +19,15 @@ import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
 import Stack from "@mui/material/Stack";
 import type { UserCourseProgression } from "@/types/analytics/user-course-progression";
 import Typography from "@mui/material/Typography";
-import RouterLink from "next/link";
+// import RouterLink from "next/link";
 
 export interface MyEnrolledCoursesProps {
-  userCourseProgression?: UserCourseProgression[];
+  userCourseProgression: UserCourseProgression[];
+  handleOnClick: (UserCourseProgression: UserCourseProgression) => void;
   sx?: SxProps;
 }
 
-export function MyCourseProgress({ userCourseProgression = [], sx }: MyEnrolledCoursesProps): React.JSX.Element {
+export function MyCourseProgress({ userCourseProgression = [], sx, handleOnClick }: MyEnrolledCoursesProps): React.JSX.Element {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
@@ -73,11 +74,17 @@ export function MyCourseProgress({ userCourseProgression = [], sx }: MyEnrolledC
             </TableHead>
             <TableBody>
               {userCourseProgression.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((aUserCourseProgression) => (
+                // <TableRow
+                //   hover
+                //   key={aUserCourseProgression.course_id}
+                //   component={RouterLink} href={`dashboard/course/${aUserCourseProgression.course_id.toString()}`}
+                //   sx={{ textDecoration: 'none', height: '90px' }}
+                // >
                 <TableRow
                   hover
                   key={aUserCourseProgression.course_id}
-                  component={RouterLink} href={`dashboard/course/${aUserCourseProgression.course_id.toString()}`}
-                  sx={{ textDecoration: 'none', height: '90px' }}
+                  onClick={() => { handleOnClick(aUserCourseProgression); }}
+                  sx={{ textDecoration: 'none', height: '90px', cursor: 'pointer' }}
                 >
                   <TableCell sx={{ borderBottom: "none", pr:0 }}>{aUserCourseProgression.course_term}</TableCell>
                   <TableCell sx={{ borderBottom: "none", pr:0 }}>{aUserCourseProgression.course_name}</TableCell>

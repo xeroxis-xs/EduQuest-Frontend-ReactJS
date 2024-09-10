@@ -5,4 +5,12 @@ export interface UserCourseProgression {
   completed_quests: number;
   total_quests: number;
   completion_ratio: number;
+  quest_scores: QuestScore[];
+}
+
+export interface QuestScore {
+  quest_id: number;
+  quest_name: string;
+  max_score: number;
+  highest_score: number;
 }

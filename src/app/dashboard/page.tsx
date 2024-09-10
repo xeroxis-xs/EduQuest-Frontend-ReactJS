@@ -34,6 +34,7 @@ import {SkeletonMyBadgeProgress} from "@/components/dashboard/skeleton/analytics
 import Stack from "@mui/material/Stack";
 import {LiveIndicator} from "@/components/dashboard/overview/chart/LiveIndicator";
 import Typography from "@mui/material/Typography";
+import {MyQuestScores} from "@/components/dashboard/overview/my-quest-scores";
 
 
 export interface AnalyticsPartOne {
@@ -55,6 +56,7 @@ export interface AnalyticsPartThree {
 
 export default function Page(): React.JSX.Element {
   const { eduquestUser } = useUser();
+  const [userCourseProgression, setUserCourseProgression] = React.useState<UserCourseProgression | null>(null);
   const [analyticsPartOneLoading, setAnalyticsPartOneLoading] = React.useState(true);
   const [analyticsPartTwoLoading, setAnalyticsPartTwoLoading] = React.useState(true);
   const [analyticsPartThreeLoading, setAnalyticsPartThreeLoading] = React.useState(true);
@@ -138,6 +140,10 @@ export default function Page(): React.JSX.Element {
       setAnalyticsPartThreeLoading(false);
     }
   };
+
+  const handleOnClick = (aUserCourseProgression: UserCourseProgression ) => {
+    setUserCourseProgression(aUserCourseProgression);
+  }
 
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
@@ -224,10 +230,16 @@ export default function Page(): React.JSX.Element {
         <Grid lg={8} md={12} xs={12}>
           { analyticsPartTwoLoading? <SkeletonMyCourseProgress /> :
             (analyticsPartTwo.user_course_progression ?
-              <MyCourseProgress userCourseProgression={analyticsPartTwo.user_course_progression} sx={{ height: '100%' }} /> : null
+              <MyCourseProgress userCourseProgression={analyticsPartTwo.user_course_progression} handleOnClick={handleOnClick} sx={{ height: '100%' }} /> : null
             )
           }
-
+        </Grid>
+        <Grid lg={4} md={12} xs={12}>
+          { analyticsPartTwoLoading? <SkeletonMyCourseProgress /> :
+            (analyticsPartTwo.user_course_progression ?
+                <MyQuestScores userCourseProgression={userCourseProgression} sx={{ height: '100%' }} /> : null
+            )
+          }
         </Grid>
         <Grid lg={4} md={12} xs={12}>
           { analyticsPartTwoLoading? <SkeletonMyBadgeProgress /> :
