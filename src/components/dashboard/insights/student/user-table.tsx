@@ -19,14 +19,14 @@ import {logger} from "@/lib/default-logger";
 import {AxiosError} from "axios";
 import {authClient} from "@/lib/auth/client";
 import type {Course} from "@/types/course";
+import Points from "../../../../../public/assets/point.svg";
 
 interface UserTableProps {
   rows?: EduquestUser[];
+  handleUserSelection: (id: number) => void;
 }
 
-export function UserTable({
-  rows = [],
-}: UserTableProps): React.JSX.Element {
+export function UserTable({ rows = [], handleUserSelection }: UserTableProps): React.JSX.Element {
   // const rowIds = React.useMemo(() => {
   //   return rows.map((eduquestUser) => eduquestUser.id);
   // }, [rows]);
@@ -35,8 +35,10 @@ export function UserTable({
   //
   // const selectedSome = (selected?.size ?? 0) > 0 && (selected?.size ?? 0) < rows.length;
   // const selectedAll = rows.length > 0 && selected?.size === rows.length;
+  const [activeRow, setActiveRow] = React.useState<number | null>(null);
+
   const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(15);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
@@ -52,29 +54,31 @@ export function UserTable({
     setPage(0);
   };
 
-  const handleViewUser = async (id: number): Promise<void> => {
-    logger.debug('handleViewUser', id);
-    await getCourseInsights(id);
+  const handleRowClick = (id: number): void => {
+    setActiveRow(id);
+    handleUserSelection(id);
   };
 
-  const getCourseInsights = async (id: number): Promise<void> => {
-    try {
-      const response = await apiService.get<Course[]>(`/api/Course/${id.toString()}`);
-      logger.debug('response', response);
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-      }
-      logger.error('Failed to load course insights', error);
-    }
-  };
+  // const handleViewUser = async (id: number): Promise<void> => {
+  //   logger.debug('handleViewUser', id);
+  //   await getCourseInsights(id);
+  // };
+  //
+  // const getCourseInsights = async (id: number): Promise<void> => {
+  //   try {
+  //     const response = await apiService.get<Course[]>(`/api/Course/${id.toString()}`);
+  //     logger.debug('response', response);
+  //   } catch (error: unknown) {
+  //     if (error instanceof AxiosError) {
+  //       if (error.response?.status === 401) {
+  //         await authClient.signInWithMsal();
+  //       }
+  //     }
+  //     logger.error('Failed to load course insights', error);
+  //   }
+  // };
 
   return (
-    <Stack spacing={4}>
-    <Typography variant="body1">Total number of users in the system: {rows?.length}</Typography>
-
     <Card>
       <Box sx={{ overflowX: 'auto' }}>
         <Table sx={{ minWidth: '800px' }}>
@@ -83,6 +87,7 @@ export function UserTable({
               <TableCell>ID</TableCell>
               <TableCell>Email</TableCell>
               <TableCell>Username</TableCell>
+              <TableCell>Points</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -90,12 +95,24 @@ export function UserTable({
                 <TableRow
                   hover
                   key={row.id}
-                  onClick={() => handleViewUser(row.id)}
-                  sx={{ textDecoration: 'none', cursor: 'pointer' }}
+                  onClick={() => { handleRowClick(row.id); }}
+                  sx={{
+                    textDecoration: 'none',
+                    cursor: 'pointer',
+                    backgroundColor: activeRow === row.id ? 'rgba(0, 0, 0, 0.08)' : 'inherit'
+                  }}
                 >
                   <TableCell>{row.id}</TableCell>
                   <TableCell>{row.email}</TableCell>
                   <TableCell>{row.username}</TableCell>
+                  <TableCell>
+                    <Stack direction="row" spacing={0.5} alignItems="center">
+                      <Typography variant="body2" color="text.secondary" >
+                        {row.total_points.toFixed(2)}
+                      </Typography>
+                      <Points height={18}/>
+                    </Stack>
+                  </TableCell>
                 </TableRow>
             ))}
           </TableBody>
@@ -109,9 +126,8 @@ export function UserTable({
         onRowsPerPageChange={handleChangeRowsPerPage}
         page={page}
         rowsPerPage={rowsPerPage}
-        rowsPerPageOptions={[15, 20, 25]}
+        rowsPerPageOptions={[10, 15, 20]}
       />
     </Card>
-    </Stack>
   );
 }

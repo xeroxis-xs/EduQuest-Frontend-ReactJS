@@ -20,7 +20,7 @@ export function BadgeChart({ aUserBadgeProgression, maxCount }: CourseChartProps
       series={[{name: 'Collected', data: [aUserBadgeProgression.count] }]}
       type="bar"
       width="100%"
-      height={20}
+      height="20"
     />
   );
 }
@@ -41,9 +41,9 @@ function useChartOptions(label: string, data: number[]): ApexOptions {
     plotOptions: {
       bar: {
         horizontal: true,
+        barHeight: 20,
         borderRadius: 10,
         borderRadiusApplication: 'end',
-        barHeight: '100%',
         colors: {
           backgroundBarColors: ['transparent'],
           backgroundBarRadius: 10,
@@ -53,6 +53,21 @@ function useChartOptions(label: string, data: number[]): ApexOptions {
         //   orientation: 'horizontal'
         // },
       },
+    },
+    states: {
+      hover: {
+        filter: {
+          type: 'none',
+          value: 0,
+        }
+      },
+      active: {
+        allowMultipleDataPointsSelection: false,
+        filter: {
+          type: 'none',
+          value: 0,
+        }
+      }
     },
     xaxis: {
       categories: [label],
@@ -82,6 +97,9 @@ function useChartOptions(label: string, data: number[]): ApexOptions {
     },
     tooltip: {
       enabled: true,
+      style: {
+        fontFamily: theme.typography.fontFamily,
+      }
     },
     grid: {
       show: false,

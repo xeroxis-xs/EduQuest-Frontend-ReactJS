@@ -53,7 +53,7 @@ export function LinearProgressWithLabel(props: LinearProgressProps & { value: nu
 
 
 export function LinearProgressForLevel(props: LinearProgressProps & { value: number, level: string, absValue: number }): React.JSX.Element {
-  let absValue = props.absValue;
+  const absValue = props.absValue;
   return (
 
     <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>

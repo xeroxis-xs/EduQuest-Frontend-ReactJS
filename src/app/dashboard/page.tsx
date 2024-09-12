@@ -32,9 +32,10 @@ import {SkeletonTotalQuest} from "@/components/dashboard/skeleton/analytics/skel
 import {SkeletonShortestUser} from "@/components/dashboard/skeleton/analytics/skeleton-shortest-user";
 import {SkeletonMyBadgeProgress} from "@/components/dashboard/skeleton/analytics/skeleton-my-badge-progress";
 import Stack from "@mui/material/Stack";
-import {LiveIndicator} from "@/components/dashboard/overview/chart/LiveIndicator";
+import {LiveIndicator} from "@/components/dashboard/overview/chart/live-indicator";
 import Typography from "@mui/material/Typography";
 import {MyQuestScores} from "@/components/dashboard/overview/my-quest-scores";
+import {SkeletonMyQuestScores} from "@/components/dashboard/skeleton/analytics/skeleton-my-quest-scores";
 
 
 export interface AnalyticsPartOne {
@@ -173,40 +174,43 @@ export default function Page(): React.JSX.Element {
       </Stack>
 
       <Grid container spacing={5}>
-        <Grid lg={3} sm={6} xs={12}>
-          { analyticsPartOneLoading? <SkeletonTotalUser /> :
-            (analyticsPartOne.user_stats ?
-                <TotalUser
+        <Grid lg={4} md={4} xs={12}>
+          { eduquestUser?.is_staff ?
+            analyticsPartOneLoading ? <SkeletonTotalUser /> :
+              (analyticsPartOne.user_stats ?
+                  <TotalUser
+                    sx={{ height: '100%' }}
+                    value={analyticsPartOne.user_stats.total_users}
+                    trend="up"
+                    diff={analyticsPartOne.user_stats.new_users_percentage} /> :
+                  <TotalUser
+                    sx={{ height: '100%' }}
+                    value={null}
+                    trend="up"
+                    diff={null} />
+              )
+          : null }
+        </Grid>
+        <Grid lg={4} md={4} xs={12}>
+          { eduquestUser?.is_staff ?
+            analyticsPartOneLoading ? <SkeletonTotalCourse /> :
+              (analyticsPartOne.course_enrollment_stats ?
+                <TotalCourse
                   sx={{ height: '100%' }}
-                  value={analyticsPartOne.user_stats.total_users}
+                  value={analyticsPartOne.course_enrollment_stats.total_enrollments}
                   trend="up"
-                  diff={analyticsPartOne.user_stats.new_users_percentage} /> :
-                <TotalUser
+                  diff={analyticsPartOne.course_enrollment_stats.new_enrollments_percentage} /> :
+                <TotalCourse
                   sx={{ height: '100%' }}
                   value={ null }
                   trend="up"
                   diff={ null } />
-            )
-          }
+              )
+          : null }
         </Grid>
-        <Grid lg={3} sm={6} xs={12}>
-          { analyticsPartOneLoading? <SkeletonTotalCourse /> :
-            (analyticsPartOne.course_enrollment_stats ?
-              <TotalCourse
-                sx={{ height: '100%' }}
-                value={analyticsPartOne.course_enrollment_stats.total_enrollments}
-                trend="up"
-                diff={analyticsPartOne.course_enrollment_stats.new_enrollments_percentage} /> :
-              <TotalCourse
-                sx={{ height: '100%' }}
-                value={ null }
-                trend="up"
-                diff={ null } />
-            )
-          }
-        </Grid>
-        <Grid lg={3} sm={6} xs={12}>
-          { analyticsPartOneLoading? <SkeletonTotalQuest /> :
+        <Grid lg={4} md={4} xs={12}>
+          { eduquestUser?.is_staff ?
+            analyticsPartOneLoading? <SkeletonTotalQuest /> :
             (analyticsPartOne.quest_attempt_stats ?
               <TotalQuest
                 sx={{ height: '100%' }}
@@ -219,48 +223,76 @@ export default function Page(): React.JSX.Element {
                 trend="up"
                 diff={ null } />
             )
-          }
+           : null }
         </Grid>
-        <Grid lg={3} sm={6} xs={12}>
-          { analyticsPartOneLoading? <SkeletonShortestUser /> :
-              <ShortestUser shortestTimeUser={analyticsPartOne.shortest_time_user} sx={{ height: '100%' }} />
 
-          }
-        </Grid>
-        <Grid lg={8} md={12} xs={12}>
-          { analyticsPartTwoLoading? <SkeletonMyCourseProgress /> :
+        <Grid lg={5} md={6} xs={12}>
+          { analyticsPartTwoLoading ?
+            <SkeletonMyCourseProgress
+              title="My Courses"
+              tooltip="The progress of the courses that you are enrolled in"
+            /> :
             (analyticsPartTwo.user_course_progression ?
-              <MyCourseProgress userCourseProgression={analyticsPartTwo.user_course_progression} handleOnClick={handleOnClick} sx={{ height: '100%' }} /> : null
+              <MyCourseProgress
+                userCourseProgression={analyticsPartTwo.user_course_progression}
+                handleOnClick={handleOnClick}
+                title="My Courses"
+                tooltip="The progress of the courses that you are enrolled in"
+                nullPrompt="No data available."
+                sx={{ height: '100%' }} /> : null
             )
           }
         </Grid>
-        <Grid lg={4} md={12} xs={12}>
-          { analyticsPartTwoLoading? <SkeletonMyCourseProgress /> :
+        <Grid lg={4} md={6} xs={12}>
+          { analyticsPartTwoLoading ?
+            <SkeletonMyQuestScores
+              title="My Quest"
+              tooltip="The highest score you have achieved for each quests"
+            /> :
             (analyticsPartTwo.user_course_progression ?
-                <MyQuestScores userCourseProgression={userCourseProgression} sx={{ height: '100%' }} /> : null
+                <MyQuestScores
+                  userCourseProgression={userCourseProgression}
+                  title="My Quest"
+                  prompt="Select a course to view your quest scores"
+                  tooltip="The highest score you have achieved for each quests"
+                /> : null
             )
           }
         </Grid>
-        <Grid lg={4} md={12} xs={12}>
+        <Grid lg={3} md={6} xs={12}>
           { analyticsPartTwoLoading? <SkeletonMyBadgeProgress /> :
             (analyticsPartTwo.user_badge_progression ?
-              <MyBadgeProgress userBadgeProgression={analyticsPartTwo.user_badge_progression} sx={{ height: "100%" }}/> : null
-        )}
-          </Grid>
-        <Grid lg={6} md={12} xs={12}>
-          {analyticsPartThreeLoading ? <SkeletonTopCollector /> :
-            (analyticsPartThree.top_users_with_most_badges ?
-                <TopCollectors topCollectors={analyticsPartThree.top_users_with_most_badges} sx={{ height: '100%' }} /> : null
-            )
-          }
+                <MyBadgeProgress userBadgeProgression={analyticsPartTwo.user_badge_progression} sx={{ height: "100%" }}/> : null
+            )}
         </Grid>
-        <Grid lg={6} md={12} xs={12}>
+
+        <Grid container lg={5} md={6} xs={12}>
+          <Grid xs={12}>
+            { analyticsPartOneLoading? <SkeletonShortestUser /> :
+              <ShortestUser shortestTimeUser={analyticsPartOne.shortest_time_user} />
+
+            }
+          </Grid>
+          <Grid xs={12}>
+            {analyticsPartThreeLoading ? <SkeletonTopCollector /> :
+              (analyticsPartThree.top_users_with_most_badges ?
+                  <TopCollectors topCollectors={analyticsPartThree.top_users_with_most_badges} /> : null
+              )
+            }
+          </Grid>
+
+        </Grid>
+
+
+        <Grid lg={7} md={6} xs={12}>
           {analyticsPartThreeLoading ? <SkeletonRecentAchievements /> :
             (analyticsPartThree.recent_badge_awards ?
-                <RecentAchievements recentBadges={analyticsPartThree.recent_badge_awards} sx={{ height: '100%' }} /> : null
+                <RecentAchievements recentBadges={analyticsPartThree.recent_badge_awards} /> : null
             )
           }
         </Grid>
+
+
       </Grid>
     </Stack>
   );

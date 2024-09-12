@@ -21,20 +21,20 @@ export interface TopCollectorsProps {
 
 export function TopCollectors({ topCollectors = [], sx }: TopCollectorsProps): React.JSX.Element {
   return (
-    <Card sx={{ ...sx, display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <Card sx={{ ...sx, display: 'flex', flexDirection: 'column'}}>
       <Stack direction="row" sx={{ alignItems: 'center' }} spacing={0}>
-      <CardHeader
-        title="Top Collectors"
-        avatar={
-          <RankingIcon fontSize="var(--icon-fontSize-md)" color="var(--mui-palette-primary-main)" />
-        }
-        sx={{ pr: '10px'}}
-      />
-      <Tooltip title="Top 5 users with the most badges. " placement="top" >
-        <InfoIcon fontSize="var(--icon-fontSize-sm)" style={{ marginLeft: '0px', cursor: 'pointer', color: 'var(--mui-palette-neutral-500)', marginTop: '16px'}} />
-      </Tooltip>
+        <CardHeader
+          title="Top Collectors"
+          avatar={
+            <RankingIcon fontSize="var(--icon-fontSize-md)" color="var(--mui-palette-primary-main)" />
+          }
+          sx={{ pr: '10px'}}
+        />
+        <Tooltip title="Top 5 users with the most badges. " placement="top" >
+          <InfoIcon fontSize="var(--icon-fontSize-sm)" style={{ marginLeft: '0px', cursor: 'pointer', color: 'var(--mui-palette-neutral-500)', marginTop: '16px'}} />
+        </Tooltip>
       </Stack>
-      <CardContent sx={{ height: '100%', p: '6px', minHeight: '400px'}}>
+      <CardContent sx={{  justifyContent: 'center', paddingTop: 0, '&:last-child': { paddingBottom: 0 }  }}>
         { topCollectors?.length > 0 ? (
           <TopCollectorChart topCollectors={topCollectors}/>
         ) : (

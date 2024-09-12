@@ -12,7 +12,7 @@ import {TrendUp as TrendUpIcon} from "@phosphor-icons/react/dist/ssr/TrendUp";
 
 export function SkeletonRecentAchievements(): React.JSX.Element {
   return (
-    <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Card sx={{ display: 'flex', flexDirection: 'column' }}>
       <Stack direction="row" sx={{ alignItems: 'center' }} spacing={0}>
         <CardHeader
           title="Recent Achievements"
@@ -25,23 +25,14 @@ export function SkeletonRecentAchievements(): React.JSX.Element {
         </Tooltip>
       </Stack>
       <CardContent sx={{ height: '100%'}}>
-        {Array.from({ length: 5 }).map((_, index) => (
-          <Grid container spacing={2} key={index}>
-            <Grid xs={4}>
-              <Typography sx={{ mb: 2 }} variant="body2" >
-                <Skeleton />
-              </Typography>
-            </Grid>
-            <Grid xs={8}>
-              <Typography sx={{ mb: 2 }} variant="body2">
-                <Skeleton />
-              </Typography>
-              <Typography sx={{ mb: 2 }} variant="body2">
-                <Skeleton />
-              </Typography>
-            </Grid>
-          </Grid>
-        ))}
+        <Stack spacing={3} justifyContent="space-evenly" alignItems="center" height="100%">
+          <Skeleton variant="rounded" width="100%" height={20}/>
+          <Skeleton variant="rounded" width="100%" height={20}/>
+          <Skeleton variant="rounded" width="100%" height={20}/>
+          <Skeleton variant="rounded" width="100%" height={20}/>
+          <Skeleton variant="rounded" width="100%" height={20}/>
+
+        </Stack>
       </CardContent>
     </Card>
   );

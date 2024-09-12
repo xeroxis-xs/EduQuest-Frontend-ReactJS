@@ -12,6 +12,11 @@ import { User as UserIcon } from '@phosphor-icons/react/dist/ssr/User';
 import type {ShortestTimeUser} from "@/types/analytics/shortest-time-user";
 import Box from "@mui/material/Box";
 import {useRouter} from "next/navigation";
+import CardHeader from "@mui/material/CardHeader";
+import {Lightning as LightningIcon} from "@phosphor-icons/react/dist/ssr/Lightning";
+import Grid from "@mui/material/Unstable_Grid2";
+import { keyframes } from '@emotion/react';
+
 
 export interface BudgetProps {
   sx?: SxProps;
@@ -39,49 +44,65 @@ export function ShortestUser ({ sx, shortestTimeUser }: BudgetProps): React.JSX.
     router.push(`/dashboard/quest/${questId}`);
   };
 
+  // Define keyframe animation
+  const fadeIn = keyframes`
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+`;
+
 
   return (
     <Card sx={sx}>
-      <CardContent sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%', py: '24px' }}>
-        <Stack spacing={3}>
-          <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
-            <Avatar sx={{ backgroundColor: 'white', height: '56px', width: '56px' }}>
-              <CrownIcon fontSize="var(--icon-fontSize-lg)" color="var(--mui-palette-primary-main)" />
-            </Avatar>
-            <Stack spacing={1}>
-              <Stack direction="row" sx={{ alignItems: 'center' }} spacing={0}>
-                <Typography color="text.secondary" variant="overline">
-                  G.o.a.t.
-                </Typography>
-                <Tooltip title="Greatest Of All Time: User with a perfect score and fastest time." placement="top">
-                  <InfoIcon fontSize="var(--icon-fontSize-sm)" style={{ marginLeft: '8px', cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
-                </Tooltip>
-              </Stack>
-              {shortestTimeUser ? (
-                <>
-                  <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
-                    <UserIcon fontSize="var(--icon-fontSize-md)"/>
-                    <Typography variant="h6">{shortestTimeUser.nickname}</Typography>
-                  </Stack>
-                  <Typography variant="body2">
-                    Quest:
-                    <Box
-                      component="span"
-                      sx={{ display: 'inline', cursor: 'pointer', mx: '6px', fontWeight: '600' }}
-                      onClick={() => { handleRouteToQuest(shortestTimeUser.quest_id.toString()); }}
-                    >
-                    {shortestTimeUser.quest_name}
-                    </Box>
-                    from {shortestTimeUser.course}
-                  </Typography>
-                  <Typography variant="body2">Time Taken: {formatTime(shortestTimeUser.time_taken)}</Typography>
-                </>
-              ) : (
-                <Typography variant="body2">No User</Typography>
-              )}
+      <Stack direction="row" sx={{ alignItems: 'center' }} spacing={0}>
+        <CardHeader
+          title="Ultimate Speedster"
+          avatar={
+            <LightningIcon fontSize="var(--icon-fontSize-lg)" color="var(--mui-palette-primary-main)" />
+          }
+          sx={{ pr: '10px' }}
+        />
+        <Tooltip title="User who has achieved both the fastest time and a perfect score" placement="top">
+          <InfoIcon fontSize="var(--icon-fontSize-sm)" style={{ marginLeft: '0px', cursor: 'pointer', color: "var(--mui-palette-neutral-500)", marginTop: '16px' }} />
+        </Tooltip>
+      </Stack>
+      <CardContent sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '100%', py: 1 }}>
+        {shortestTimeUser ? (
+          <Stack>
+            <Stack direction="row" sx={{ alignItems: 'center', justifyContent: 'center', pb: 3, animation: `${fadeIn} 1s ease-in-out` }} spacing={1} >
+              <UserIcon fontSize="var(--icon-fontSize-md)" />
+              <Typography variant="h6" align="center">
+                {shortestTimeUser.nickname}
+              </Typography>
             </Stack>
+            <Grid container spacing={3} justifyContent="center">
+              <Grid xs={6}>
+                <Typography variant="overline" color="text.secondary">
+                  Quest
+                </Typography>
+                <Typography
+                  variant="body2"
+                  sx={{ cursor: 'pointer' }}
+                  onClick={() => { handleRouteToQuest(shortestTimeUser.quest_id.toString())}}>
+                  {shortestTimeUser.quest_name} from {shortestTimeUser.course}
+                </Typography>
+              </Grid>
+              <Grid xs={6}>
+                <Typography variant="overline" color="text.secondary">
+                  Time Taken
+                </Typography>
+                <Typography variant="body2">{formatTime(shortestTimeUser.time_taken)}</Typography>
+              </Grid>
+            </Grid>
           </Stack>
-        </Stack>
+        ) : (
+          <Typography variant="body2">No User</Typography>
+        )}
       </CardContent>
     </Card>
   );

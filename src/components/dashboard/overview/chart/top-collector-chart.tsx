@@ -48,7 +48,7 @@ export function TopCollectorChart({ topCollectors = [] }: TopCollectorsProps): R
       series={[{ name: 'Total Badges', data: badgeCounts }]}
       type="bar"
       width="100%"
-      height="100%"
+      height="auto"
     />
   );
 }
@@ -56,7 +56,6 @@ export function TopCollectorChart({ topCollectors = [] }: TopCollectorsProps): R
 function useChartOptions(labels: string[], data: number[], badgeDetails: Record<string, { count: number, image: string }>[]): ApexOptions {
   const theme = useTheme();
   const maxValue = Math.max(...data);
-
   return {
     chart: {
       type: 'bar',
@@ -69,7 +68,7 @@ function useChartOptions(labels: string[], data: number[], badgeDetails: Record<
         horizontal: true,
         borderRadius: 10,
         borderRadiusApplication: 'end',
-        barHeight: '35%',
+        barHeight: 20,
         // columnWidth: '50%',
         colors: {
           backgroundBarColors: ['transparent'],
@@ -78,23 +77,42 @@ function useChartOptions(labels: string[], data: number[], badgeDetails: Record<
 
       },
     },
+    states: {
+      hover: {
+        filter: {
+          type: 'none',
+          value: 0,
+        }
+      },
+      active: {
+        allowMultipleDataPointsSelection: false,
+        filter: {
+          type: 'none',
+          value: 0,
+        }
+      }
+    },
+    legend: {
+      show: false
+    },
     xaxis: {
       categories: labels,
       max: maxValue,
       labels: {
         show: false,
-        rotate: 0,
-        rotateAlways: false,
-        trim: true,
-        style: {
-          fontFamily: theme.typography.fontFamily,
-        }
       },
       axisBorder: { show: false },
       axisTicks: { show: false }
     },
     yaxis: {
       show: true,
+      labels: {
+        show: true,
+        style: {
+          fontFamily: theme.typography.fontFamily,
+          fontSize: '12px',
+        },
+      },
       axisBorder: { show: false },
       axisTicks: { show: false }
     },
@@ -110,6 +128,9 @@ function useChartOptions(labels: string[], data: number[], badgeDetails: Record<
     },
     tooltip: {
       enabled: true,
+      style: {
+        fontFamily: theme.typography.fontFamily,
+      },
 
       custom: ({ dataPointIndex }) => {
         /* eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- dataPointIndex is a number */
@@ -121,8 +142,8 @@ function useChartOptions(labels: string[], data: number[], badgeDetails: Record<
           </div>
         `);
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access -- dataPointIndex is a number
-        return `<div style="font-family: 'Arial', sans-serif; font-size: 12px; font-weight: 600; color: #373d3f; padding: 5px 10px; background: #f3f4f5; border-bottom: 1px solid #e3e4e5;">${labels[dataPointIndex]}</div>
-          <div style="padding: 5px 10px; font-family: 'Arial', sans-serif; font-size: 12px;">
+        return `<div style=" font-size: 12px; font-weight: 600; color: #373d3f; padding: 5px 10px; background: #f3f4f5; border-bottom: 1px solid #e3e4e5;">${labels[dataPointIndex]}</div>
+          <div style="padding: 5px 10px;  font-size: 12px;">
             ${detailStrings.join('')}
           </div>
         `;

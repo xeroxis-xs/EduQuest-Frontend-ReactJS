@@ -25,11 +25,11 @@ export function SkeletonTopCollector(): React.JSX.Element {
       </Stack>
       <CardContent sx={{ height: '100%'}}>
         <Stack spacing={3} justifyContent="space-evenly" alignItems="center" height="100%">
-          <Skeleton variant="rectangular" width="100%" height={40}/>
-          <Skeleton variant="rectangular" width="100%" height={40}/>
-          <Skeleton variant="rectangular" width="100%" height={40}/>
-          <Skeleton variant="rectangular" width="100%" height={40}/>
-          <Skeleton variant="rectangular" width="100%" height={40}/>
+          <Skeleton variant="rounded" width="100%" height={20}/>
+          <Skeleton variant="rounded" width="100%" height={20}/>
+          <Skeleton variant="rounded" width="100%" height={20}/>
+          <Skeleton variant="rounded" width="100%" height={20}/>
+          <Skeleton variant="rounded" width="100%" height={20}/>
 
         </Stack>
       </CardContent>

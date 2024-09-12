@@ -62,7 +62,7 @@ export function RecentAchievements({ recentBadges = [], sx }: RecentAchievements
   };
 
   return (
-    <Card sx={{ ...sx, display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <Card sx={{ ...sx, display: 'flex', flexDirection: 'column' }}>
       <Stack direction="row" sx={{ alignItems: 'center' }} spacing={0}>
         <CardHeader
           title="Recent Achievements"
@@ -75,29 +75,25 @@ export function RecentAchievements({ recentBadges = [], sx }: RecentAchievements
           <InfoIcon fontSize="var(--icon-fontSize-sm)" style={{ marginLeft: '0px', cursor: 'pointer', color: "var(--mui-palette-neutral-500)", marginTop: '16px' }} />
         </Tooltip>
       </Stack>
-      <CardContent>
+      <CardContent >
         {recentBadges.length > 0 ? (
           recentBadges.map((recentBadge) => (
             <React.Fragment key={recentBadge.id}>
               {isExtendedUserCourseBadge(recentBadge) && (
-                <Grid container spacing={1} mb={1}>
-                  <Grid xs={2}>
+                <Stack mb={2}>
+                  <Box >
                     <Typography variant="overline" color="text.secondary" display="block">
                       {new Date(recentBadge.awarded_date).toLocaleDateString("en-SG", {
                         day: "2-digit",
                         month: "short",
-                        year: "numeric"
-                      })}
-                    </Typography>
-                    <Typography variant="overline" color="text.secondary">
-                      {new Date(recentBadge.awarded_date).toLocaleTimeString("en-SG", {
+                        year: "numeric",
                         hour: '2-digit',
                         minute: '2-digit',
                         second: '2-digit'
                       })}
                     </Typography>
-                  </Grid>
-                  <Grid xs={10}>
+                  </Box>
+                  <Box >
                     <Typography variant="body2">
                       <Box component="span" sx={{ display: 'inline-block', verticalAlign: 'middle', mr: '4px' }}>
                         <UserIcon width={20} height={20} />
@@ -114,32 +110,30 @@ export function RecentAchievements({ recentBadges = [], sx }: RecentAchievements
                         sx={{ display: 'inline-block', cursor: 'pointer', mx: '6px', fontWeight: '600' }}
                         onClick={() => { handleRouteToCourse(recentBadge.course_completed.course.id.toString()); }}
                       >
+                        {recentBadge.course_completed.course.code} {recentBadge.course_completed.course.name}
 
-                      {recentBadge.course_completed.course.code} {recentBadge.course_completed.course.name}
                       </Box>
-                      </Typography>
-                  </Grid>
-                </Grid>
+                    </Typography>
+                  </Box>
+                </Stack>
+
+
               )}
               {isExtendedUserQuestBadge(recentBadge) && (
-                <Grid container spacing={1} mb={1}>
-                  <Grid xs={2}>
+                <Stack mb={2}>
+                  <Box >
                     <Typography variant="overline" color="text.secondary" display="block">
                       {new Date(recentBadge.awarded_date).toLocaleDateString("en-SG", {
                         day: "2-digit",
                         month: "short",
-                        year: "numeric"
-                      })}
-                    </Typography>
-                    <Typography variant="overline" color="text.secondary">
-                      {new Date(recentBadge.awarded_date).toLocaleTimeString("en-SG", {
+                        year: "numeric",
                         hour: '2-digit',
                         minute: '2-digit',
                         second: '2-digit'
                       })}
                     </Typography>
-                  </Grid>
-                  <Grid xs={10}>
+                  </Box>
+                  <Box >
                     <Typography variant="body2">
                       <Box component="span" sx={{ display: 'inline-block', verticalAlign: 'middle', mr: '4px' }}>
                         <UserIcon width={20} height={20} />
@@ -161,8 +155,8 @@ export function RecentAchievements({ recentBadges = [], sx }: RecentAchievements
                       in {recentBadge.quest_attempted.quest.from_course.code} {recentBadge.quest_attempted.quest.from_course.name}
 
                     </Typography>
-                  </Grid>
-                </Grid>
+                  </Box>
+                </Stack>
               )}
             </React.Fragment>
           ))

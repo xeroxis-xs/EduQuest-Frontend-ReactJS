@@ -23,7 +23,7 @@ export function SideNav(): React.JSX.Element {
 
   // Filter out the 'import' and 'eduquest-user' item if the user is not a staff member
   const filteredNavItems = eduquestUser?.is_staff ? navItems : navItems.filter(
-    item => item.key !== 'import' && item.key !== 'eduquest-user'
+    item => item.key !== 'import' && item.key !== 'eduquest-user' && item.key !== 'insights'
   );
 
   return (

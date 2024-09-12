@@ -17,6 +17,7 @@ import {paths} from "@/paths";
 import RouterLink from "next/link";
 import { CaretRight as CaretRightIcon } from "@phosphor-icons/react/dist/ssr/CaretRight";
 import CardActions from "@mui/material/CardActions";
+import Box from "@mui/material/Box";
 
 export interface MyEarnedBadgesProps {
   userBadgeProgression?: UserBadgeProgression[];
@@ -41,21 +42,23 @@ export function MyBadgeProgress({ userBadgeProgression = [], sx }: MyEarnedBadge
         <InfoIcon fontSize="var(--icon-fontSize-sm)" style={{ marginLeft: '0px', cursor: 'pointer', color: 'var(--mui-palette-neutral-500)', marginTop: '16px'}} />
       </Tooltip>
       </Stack>
-      <CardContent sx={{ height: "100%"}}>
+      <CardContent sx={{ height: "100%", py:1, pb:0}}>
         <Stack
           direction="column"
           justifyContent="space-evenly"
           alignItems="center"
-          spacing={1}
+          spacing={2}
           height="100%"
-          px={2}
+          px={1}
         >
         {userBadgeProgression.map((aUserBadgeProgression) => (
-          <Stack alignItems="center" direction="row" spacing={3} key={aUserBadgeProgression.badge_id}>
+          <Stack alignItems="center" direction="row" key={aUserBadgeProgression.badge_id} justifyContent="center" width="100%">
             <Tooltip title={`${aUserBadgeProgression.badge_name} Badge`} placement="top">
-             <Avatar src={`assets/${aUserBadgeProgression.badge_filename}`} sx={{cursor: 'pointer'}}/>
+              <Box component="img" src={`assets/${aUserBadgeProgression.badge_filename}`} sx={{ cursor: 'pointer', width: 34 }} />
             </Tooltip>
-            <BadgeChart aUserBadgeProgression={aUserBadgeProgression} maxCount={badgeCounts} />
+            <Box sx={{ flexGrow: 1 }}>
+              <BadgeChart aUserBadgeProgression={aUserBadgeProgression} maxCount={badgeCounts} />
+            </Box>
           </Stack>
         ))}
         </Stack>
