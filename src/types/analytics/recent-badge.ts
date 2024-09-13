@@ -1,12 +1,18 @@
-import type { UserQuestBadge } from "@/types/user-quest-badge";
-import type { UserCourseBadge } from "@/types/user-course-badge";
+import type { EduquestUser } from "@/types/eduquest-user";
+import type { Badge } from "@/types/badge";
+import type { Course } from "@/types/course";
+import type { Quest } from "@/types/quest";
 
-export interface ExtendedUserCourseBadge extends UserCourseBadge {
-  user_id: number;
-  nickname: string;
-}
 
-export interface ExtendedUserQuestBadge extends UserQuestBadge {
-  user_id: number;
-  nickname: string;
+export interface RecentBadge {
+  record_id: number;
+  user_id: EduquestUser['id'],
+  nickname: EduquestUser['nickname'],
+  badge_name: Badge['name'],
+  awarded_date: string,
+  course_id: Course['id'],
+  course_code: Course['code'],
+  course_name: Course['name'],
+  quest_id: Quest['id'] | null,
+  quest_name: Quest['name'] | null,
 }

@@ -10,7 +10,7 @@ import { MyCourseProgress } from "@/components/dashboard/overview/my-course-prog
 import { MyBadgeProgress } from "@/components/dashboard/overview/my-badge-progress";
 import { RecentAchievements } from "@/components/dashboard/overview/recent-achievements";
 import { TopCollectors } from "@/components/dashboard/overview/top-collectors";
-import { type ExtendedUserCourseBadge, type ExtendedUserQuestBadge } from "@/types/analytics/recent-badge";
+import {type ExtendedUserCourseBadge, type ExtendedUserQuestBadge, RecentBadge} from "@/types/analytics/recent-badge";
 import { type TopCollector } from "@/types/analytics/top-collector";
 import { type UserCourseProgression } from "@/types/analytics/user-course-progression";
 import { type UserBadgeProgression } from "@/types/analytics/user-badge-progression";
@@ -52,7 +52,7 @@ export interface AnalyticsPartTwo {
 
 export interface AnalyticsPartThree {
   top_users_with_most_badges: TopCollector[];
-  recent_badge_awards: (ExtendedUserCourseBadge | ExtendedUserQuestBadge)[];
+  recent_badge_awards: RecentBadge[];
 }
 
 export default function Page(): React.JSX.Element {
@@ -284,7 +284,7 @@ export default function Page(): React.JSX.Element {
         </Grid>
 
 
-        <Grid lg={7} md={6} xs={12}>
+        <Grid lg={7} md={6} sm={12} xs={12}>
           {analyticsPartThreeLoading ? <SkeletonRecentAchievements /> :
             (analyticsPartThree.recent_badge_awards ?
                 <RecentAchievements recentBadges={analyticsPartThree.recent_badge_awards} /> : null

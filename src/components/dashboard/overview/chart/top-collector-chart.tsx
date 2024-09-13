@@ -10,31 +10,29 @@ export interface TopCollectorsProps {
 }
 
 export function TopCollectorChart({ topCollectors = [] }: TopCollectorsProps): React.JSX.Element {
-  // Sort topCollectors by the number of badges in descending order
-  const sortedtopCollectors = [...topCollectors].sort((a, b) => b.badge_count - a.badge_count);
+  // Sort topUsersWithMostBadges by the number of badges in descending order
+  const sortedTopUsers = [...topCollectors].sort((a, b) => b.badge_count - a.badge_count);
 
   // Extract nicknames and badge counts
-  const nicknames = sortedtopCollectors.map(user => user.nickname);
-  const badgeCounts = sortedtopCollectors.map(user => user.badge_count);
-  const badgeDetails = sortedtopCollectors.map(user => {
+  const nicknames = sortedTopUsers.map(user => user.nickname);
+  const badgeCounts = sortedTopUsers.map(user => user.badge_count);
+  const badgeDetails = sortedTopUsers.map(user => {
     const badgeMap: Record<string, { count: number, image: string }> = {};
 
     // Process quest badges
     user.quest_badges.forEach(questBadge => {
-      const badge = questBadge.badge;
-      if (!badgeMap[badge.name]) {
-        badgeMap[badge.name] = { count: 0, image: `assets/${badge.image.filename}` };
+      if (!badgeMap[questBadge.badge_name]) {
+        badgeMap[questBadge.badge_name] = { count: 0, image: `assets/${questBadge.badge_filename}` };
       }
-      badgeMap[badge.name].count += 1;
+      badgeMap[questBadge.badge_name].count += questBadge.count;
     });
 
     // Process course badges
     user.course_badges.forEach(courseBadge => {
-      const badge = courseBadge.badge;
-      if (!badgeMap[badge.name]) {
-        badgeMap[badge.name] = { count: 0, image: `assets/${badge.image.filename}` };
+      if (!badgeMap[courseBadge.badge_name]) {
+        badgeMap[courseBadge.badge_name] = { count: 0, image: `assets/${courseBadge.badge_filename}` };
       }
-      badgeMap[badge.name].count += 1;
+      badgeMap[courseBadge.badge_name].count += courseBadge.count;
     });
 
     return badgeMap;
