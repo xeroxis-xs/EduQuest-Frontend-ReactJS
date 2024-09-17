@@ -7,7 +7,6 @@ import { XCircle as XCircleIcon } from '@phosphor-icons/react/dist/ssr/XCircle';
 import apiService from "@/api/api-service";
 import {AxiosError, type AxiosResponse} from "axios";
 import { logger } from '@/lib/default-logger'
-import { authClient } from "@/lib/auth/client";
 import type { Quest } from '@/types/quest';
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
@@ -31,22 +30,28 @@ import FormLabel from "@mui/material/FormLabel";
 import {useTheme} from "@mui/material/styles";
 import Tooltip from "@mui/material/Tooltip";
 import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
+import {getImages} from "@/api/services/image";
+import {CourseGroup} from "@/types/course-group";
+import {getCourseGroups} from "@/api/services/course-group";
+import {deleteQuest, updateQuest} from "@/api/services/quest";
+import {User as UserIcon} from "@phosphor-icons/react/dist/ssr/User";
 
 interface QuestEditFormProps {
   quest: Quest
-  courses: Course[]
   setSubmitStatus: React.Dispatch<React.SetStateAction<{ type: 'success' | 'error'; message: string } | null>>;
   toggleForm: () => void;
   onUpdateSuccess: () => void;
   onStatusChange: (status: string) => void;
 }
 
-export default function QuestEditForm( {quest, courses, toggleForm, setSubmitStatus, onUpdateSuccess } : QuestEditFormProps ): React.JSX.Element {
+export default function QuestEditForm( {quest, toggleForm, setSubmitStatus, onUpdateSuccess } : QuestEditFormProps ): React.JSX.Element {
   const router = useRouter();
   const { eduquestUser } = useUser();
   const theme = useTheme();
   const [images, setImages] = React.useState<Image[]>();
-  const [selectedCourse, setSelectedCourse] = React.useState<Course | null>(null);
+  const [courseGroups, setCourseGroups] = React.useState<CourseGroup[]>();
+
+  const [selectedCourseGroup, setSelectedCourseGroup] = React.useState<CourseGroup | null>(null);
   const [selectedImage, setSelectedImage] = React.useState<Image | null>(null);
 
   const questTypeRef = React.useRef<HTMLInputElement>(null);
@@ -56,57 +61,40 @@ export default function QuestEditForm( {quest, courses, toggleForm, setSubmitSta
   const questStatusRef = React.useRef<HTMLInputElement>(null);
   const questExpirationDateRef = React.useRef<HTMLInputElement>(null);
   const questTutorialDateRef = React.useRef<HTMLInputElement>(null);
-  const questCourseIdRef = React.useRef<HTMLInputElement>(null);
   const questImageIdRef = React.useRef<HTMLInputElement>(null);
 
 
-  const getImages = async (): Promise<void> => {
+  const fetchImages = async (): Promise<void> => {
     try {
-      const response: AxiosResponse<Image[]> = await apiService.get<Image[]>(`/api/Image/`);
-      const data: Image[] = response.data;
-      setImages(data);
-      logger.debug('images', data);
+      const response = await getImages()
+      setImages(response);
     } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-      }
-      logger.error('Failed to fetch data', error);
+      logger.error('Failed to fetch images', error);
     }
-  };
+  }
 
-  const handleCourseChange = (event: SelectChangeEvent<number>): void => {
-    // Since the value is now explicitly a number, ensure that the state and logic that depend on this value are correctly typed and implemented.
-    const courseId = Number(event.target.value); // Convert the value to a number
-    const newCourse = courses?.find(c => c.id === courseId);
-    if (newCourse) {
-      setSelectedCourse({
-        id: newCourse.id,
-        name: newCourse.name,
-        code: newCourse.code,
-        group: newCourse.group,
-        description: newCourse.description,
-        status: newCourse.status,
-        type: newCourse.type,
-        term: newCourse.term,
-        enrolled_users: newCourse.enrolled_users,
-        image: newCourse.image,
-      });
+  const fetchCourseGroups = async (): Promise<void> => {
+    try {
+      const response = await getCourseGroups()
+      setCourseGroups(response);
+    } catch (error: unknown) {
+      logger.error('Failed to fetch course groups', error);
     }
+  }
+
+
+  const handleCourseGroupChange = (event: SelectChangeEvent<number>): void => {
+    const courseGroupId = Number(event.target.value);
+    const newCourseGroup = courseGroups?.find(cg => cg.id === courseGroupId) || null;
+    setSelectedCourseGroup(newCourseGroup);
   };
 
   const handleImageChange = (event: SelectChangeEvent<number>): void => {
-    const imageId = Number(event.target.value); // Convert the value to a number
-    const image = images?.find(i => i.id === imageId);
-    if (image) {
-      setSelectedImage({
-        id: image.id,
-        name: image.name,
-        filename: image.filename
-      });
-    }
+    const imageId = Number(event.target.value);
+    const newImage = images?.find(i => i.id === imageId) || null;
+    setSelectedImage(newImage);
   };
+
 
   const handleQuestSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
@@ -121,47 +109,38 @@ export default function QuestEditForm( {quest, courses, toggleForm, setSubmitSta
       tutorial_date: questTutorialDateRef.current?.value
         ? new Date(questTutorialDateRef.current.value).toISOString()
         : null,
-      max_attempts: questMaxAttemptsRef.current?.value,
-      from_course: selectedCourse || quest?.from_course,
-      image: selectedImage || quest?.image
+      max_attempts: questMaxAttemptsRef.current?.value as unknown as number,
+      course_group_id: selectedCourseGroup?.id as unknown as number,
+      image_id: selectedImage?.id as unknown as number
     };
 
     try {
-      const response: AxiosResponse<Quest> = await apiService.patch(`/api/Quest/${quest.id.toString()}/`, updatedQuest);
-      logger.debug('Update Success:', response.data);
+      await updateQuest(quest.id.toString(), updatedQuest);
+      // logger.debug('Update Success:', response);
       setSubmitStatus({ type: 'success', message: 'Update Successful' });
       toggleForm();
       onUpdateSuccess();
     } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-        logger.error('Submit Error:', error);
-        setSubmitStatus({type: 'error', message: 'Update Failed. Please try again.'});
-      }
+      logger.error('Submit Error:', error);
+      setSubmitStatus({type: 'error', message: 'Update Failed. Please try again.'});
     }
-
   };
+
 
   const handleDeleteQuest = async (): Promise<void> => {
     try {
-      await apiService.delete(`/api/Quest/${quest.id.toString()}`);
+      await deleteQuest(quest.id.toString());
       router.push(paths.dashboard.quest.all as string);
     } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
         logger.error('Failed to delete the quest', error);
         setSubmitStatus({type: 'error', message: 'Delete Failed. Please try again.'});
-      }
     }
   };
 
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
-      await getImages();
+      await fetchImages();
+      await fetchCourseGroups();
     };
 
     fetchData().catch((error: unknown) => {
@@ -368,19 +347,18 @@ export default function QuestEditForm( {quest, courses, toggleForm, setSubmitSta
 
             <Divider sx={{my: 4}}/>
 
-            <Typography sx={{my: 3}} variant="h6">Associated Course</Typography>
-            {courses ?
+            <Typography sx={{my: 3}} variant="h6">Associated Course Group</Typography>
+            {courseGroups ?
               <Grid container spacing={3}>
                 <Grid container md={6} xs={12}>
                   <Grid md={6} xs={12}>
                     <FormControl required>
-                      <FormLabel htmlFor="course id">Course ID</FormLabel>
-                      <Select defaultValue={quest.from_course.id ?? ""} onChange={handleCourseChange}
-                              inputRef={questCourseIdRef}
-                              label="Course ID" variant="outlined" type="number" size="small">
-                        {courses.map((option) => (
+                      <FormLabel htmlFor="group-id">Group ID</FormLabel>
+                      <Select defaultValue={quest.course_group.id ?? ""} onChange={handleCourseGroupChange}
+                              label="Group ID" variant="outlined" type="number" size="small">
+                        {courseGroups.map((option) => (
                           <MenuItem key={option.id} value={option.id}>
-                            {option.id} - [{option.group}] {option.code} {option.name}
+                            {option.id} - {option.name}
                           </MenuItem>
                         ))}
                       </Select>
@@ -388,46 +366,25 @@ export default function QuestEditForm( {quest, courses, toggleForm, setSubmitSta
                   </Grid>
                   <Grid md={6} xs={12} sx={{display: {xs: 'none', md: 'block'}}}/>
                   <Grid md={6} xs={12}>
-                    <Typography variant="overline" color="text.secondary">Course Code</Typography>
-                    <Typography variant="body2">{selectedCourse?.code || quest.from_course.code}</Typography>
-                  </Grid>
-                  <Grid md={6} xs={6}>
-                    <Typography variant="overline" color="text.secondary">Course Name</Typography>
-                    <Typography variant="body2">{selectedCourse?.name || quest.from_course.name}</Typography>
+                    <Typography variant="overline" color="text.secondary">Group Name</Typography>
+                    <Typography variant="body2">{selectedCourseGroup?.name || quest.course_group.name}</Typography>
                   </Grid>
                   <Grid md={6} xs={12}>
-                    <Typography variant="overline" color="text.secondary">Course Group</Typography>
-                    <Typography variant="body2">{selectedCourse?.group || quest.from_course.group}</Typography>
+                    <Typography variant="overline" color="text.secondary">Group Session Day</Typography>
+                    <Typography variant="body2">{selectedCourseGroup?.session_day || quest.course_group.session_day}</Typography>
                   </Grid>
+                  <Grid md={6} xs={12}>
+                    <Typography variant="overline" color="text.secondary">Group Session Time</Typography>
+                    <Typography variant="body2">{selectedCourseGroup?.session_time || quest.course_group.session_time}</Typography>
+                  </Grid>
+                  <Grid md={6} xs={12}>
+                    <Typography variant="overline" color="text.secondary">Instructor</Typography>
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      <UserIcon size={18}/>
+                      <Typography variant="body2">{selectedCourseGroup?.instructor.nickname || quest.course_group.instructor.nickname}</Typography>
+                    </Stack>
 
-                  <Grid md={6} xs={12}>
-                    <Typography variant="overline" color="text.secondary">Course Year / Term</Typography>
-                    <Typography variant="body2">
-                      AY {selectedCourse?.term.academic_year.start_year || quest.from_course.term.academic_year.start_year}-{selectedCourse?.term.academic_year.end_year || quest.from_course.term.academic_year.end_year}
-                      / {selectedCourse?.term.name || quest.from_course.term.name}
-                    </Typography>
                   </Grid>
-                  <Grid md={6} xs={12}>
-                    <Typography variant="overline" color="text.secondary">Course Duration</Typography>
-                    <Typography variant="body2">
-                      From {selectedCourse?.term.start_date || quest.from_course.term.start_date} to {selectedCourse?.term.end_date || quest.from_course.term.end_date}
-                    </Typography>
-                  </Grid>
-                  <Grid xs={12}>
-                    <Typography variant="overline" color="text.secondary">Course Description</Typography>
-                    <Typography
-                      variant="body2">{selectedCourse?.description || quest.from_course.description}</Typography>
-                  </Grid>
-                </Grid>
-
-                <Grid md={6} xs={12}>
-                  <Typography variant="overline" color="text.secondary">Course Thumbnail</Typography>
-                  <CardMedia
-                    component="img"
-                    alt={selectedCourse?.image.name || courses[0]?.image.name}
-                    image={`/assets/${selectedCourse?.image.filename || courses[0]?.image.filename}`}
-                    sx={{ height: 160, objectFit: 'contain', p: 4, mt:1, backgroundColor: theme.palette.background.level1, border: `1px solid ${theme.palette.neutral[200]}`, borderRadius: '8px' }}
-                  />
                 </Grid>
               </Grid> : null}
 

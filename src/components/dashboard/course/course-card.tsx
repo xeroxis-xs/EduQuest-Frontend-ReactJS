@@ -43,31 +43,31 @@ export function CourseCard({ rows = [], onEnrolledSuccess }: CourseCardProps): R
   const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number): void => {
     setPage(newPage);
   };
-
-  const handleEnroll = async (courseId:number): Promise<void> => {
-    try {
-      const data = {
-        user: {
-          id: eduquestUser?.id
-        },
-        course: {
-          id: courseId
-        }
-      }
-      const response = await apiService.post(`/api/UserCourse/`, data);
-      if (response.status === 201) {
-        logger.debug('Enrolled successfully');
-        onEnrolledSuccess();
-      }
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-      }
-      logger.error('Error enrolling: ', error);
-    }
-  }
+  //
+  // const handleEnroll = async (courseId:number): Promise<void> => {
+  //   try {
+  //     const data = {
+  //       user: {
+  //         id: eduquestUser?.id
+  //       },
+  //       course: {
+  //         id: courseId
+  //       }
+  //     }
+  //     const response = await apiService.post(`/api/UserCourse/`, data);
+  //     if (response.status === 201) {
+  //       logger.debug('Enrolled successfully');
+  //       onEnrolledSuccess();
+  //     }
+  //   } catch (error: unknown) {
+  //     if (error instanceof AxiosError) {
+  //       if (error.response?.status === 401) {
+  //         await authClient.signInWithMsal();
+  //       }
+  //     }
+  //     logger.error('Error enrolling: ', error);
+  //   }
+  // }
 
   return (
     <Box>
@@ -78,9 +78,9 @@ export function CourseCard({ rows = [], onEnrolledSuccess }: CourseCardProps): R
 
       {currentCourses.map((course) => (
         <Grid key={course.id} lg={4} md={6} xs={12} >
-          <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+          <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', hover: 'pointer' }}>
             <CardActionArea href={`/dashboard/course/${course.id.toString()}` } sx={{ height: '100%', borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }} component={RouterLink}>
-              <CardHeader title={`${course.code} ${course.name}`} subheader={`Group: ${course.group}`}/>
+              <CardHeader title={`${course.code} ${course.name}`}/>
               <CardMedia
                 component="img"
                 alt={course.image.name}
@@ -111,22 +111,22 @@ export function CourseCard({ rows = [], onEnrolledSuccess }: CourseCardProps): R
             </CardActionArea>
             <Box>
               <CardActions sx={{ justifyContent: 'space-between'}}>
-                <Box sx={{ mx: '16px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <Box sx={{ mx: 2, display: 'flex', justifyContent: 'center', alignItems: 'center', my: 1 }}>
                   <UsersIcon size={20}/>
                   <Typography sx={{ marginLeft: '10px' }} variant="body1">
-                    {course.enrolled_users.length.toString()}
+                    {course.total_students_enrolled}
                   </Typography>
                 </Box>
-                {eduquestUser && course.enrolled_users.includes(eduquestUser?.id.toString()) ? (
-                  <Button endIcon={<CheckIcon/>} disabled>Enrolled</Button>
-                ) : course.type === 'System-enroll' ?
-                  <Button startIcon={<SignInIcon/>} disabled>Enroll</Button>
-                  : course.status === 'Expired' ?
-                  <Button startIcon={<CalendarXIcon/>} disabled>Expired</Button>
-                  : (
-                  <Button endIcon={<SignInIcon/>} onClick={() => handleEnroll(course.id)}>Enroll</Button>
+                {/*{eduquestUser && course.enrolled_users.includes(eduquestUser?.id.toString()) ? (*/}
+                {/*  <Button endIcon={<CheckIcon/>} disabled>Enrolled</Button>*/}
+                {/*) : course.type === 'System-enroll' ?*/}
+                {/*  <Button startIcon={<SignInIcon/>} disabled>Enroll</Button>*/}
+                {/*  : course.status === 'Expired' ?*/}
+                {/*  <Button startIcon={<CalendarXIcon/>} disabled>Expired</Button>*/}
+                {/*  : (*/}
+                {/*  <Button endIcon={<SignInIcon/>} onClick={() => handleEnroll(course.id)}>Enroll</Button>*/}
 
-                )}
+                {/*)}*/}
 
               </CardActions>
             </Box>

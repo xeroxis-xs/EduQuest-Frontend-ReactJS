@@ -3,3 +3,13 @@ export interface AcademicYear {
   start_year: number;
   end_year: number;
 }
+
+export interface AcademicYearNewForm {
+  start_year: number;
+  end_year: number;
+}
+
+export interface AcademicYearUpdateForm {
+  start_year?: number;
+  end_year?: number;
+}

@@ -34,6 +34,14 @@ import FormLabel from "@mui/material/FormLabel";
 import {useTheme} from "@mui/material/styles";
 import Tooltip from "@mui/material/Tooltip";
 import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
+import {getNonPrivateTerms} from "@/api/services/term";
+import {getAdminEduquestUsers} from "@/api/services/eduquest-user";
+import {getImages} from "@/api/services/image";
+import type {EduquestUser} from "@/types/eduquest-user";
+import {updateCourse} from "@/api/services/course";
+import OutlinedInput from "@mui/material/OutlinedInput";
+import Box from "@mui/material/Box";
+import {User as UserIcon} from "@phosphor-icons/react/dist/ssr/User";
 
 
 interface CourseFormProps {
@@ -47,113 +55,117 @@ export function CourseEditForm({ setSubmitStatus, course, toggleForm, onUpdateSu
   const router = useRouter();
   const { eduquestUser } = useUser();
   const theme = useTheme();
+
   const courseCodeRef = React.useRef<HTMLInputElement>(null);
-  const courseGroupRef = React.useRef<HTMLInputElement>(null);
   const courseNameRef = React.useRef<HTMLInputElement>(null);
   const courseDescriptionRef = React.useRef<HTMLInputElement>(null);
   const courseStatusRef = React.useRef<HTMLInputElement>(null);
   const courseTypeRef = React.useRef<HTMLInputElement>(null);
   const courseTermIdRef = React.useRef<HTMLInputElement>(null);
   const courseImageIdRef = React.useRef<HTMLInputElement>(null);
-  const [terms, setTerms] = React.useState<Term[]>();
+
   const [images, setImages] = React.useState<Image[]>();
+  const [terms, setTerms] = React.useState<Term[]>();
+  const [coordinators, setCoordinators] = React.useState<EduquestUser[]>();
+
   const [selectedTerm, setSelectedTerm] = React.useState<Term | null>(null);
   const [selectedImage, setSelectedImage] = React.useState<Image | null>(null);
-  const [loadingImages, setLoadingImages] = React.useState(true);
-  const [loadingTerms, setLoadingTerms] = React.useState(true);
+  const [selectedCoordinators, setSelectedCoordinators] = React.useState<EduquestUser[]>([]);
 
-  const getTerms = async (): Promise<void> => {
+  const [isCoordinatorsLoading, setIsCoordinatorsLoading] = React.useState<boolean>(true);
+  const [isTermsLoading, setIsTermsLoading] = React.useState<boolean>(true);
+  const [isImagesLoading, setIsImagesLoading] = React.useState<boolean>(true);
+
+  const fetchTerms = async (): Promise<void> => {
     try {
-      const response: AxiosResponse<Term[]> = await apiService.get<Term[]>(`/api/Term/`);
-      const data: Term[] = response.data;
-      const filteredData = data.filter((term) => term.name !== 'Private Term' && term.academic_year.start_year !== 0);
-      setTerms(filteredData);
-      logger.debug('Filtered Terms:', filteredData);
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-      }
-      logger.error('Failed to fetch data', error);
-    } finally {
-      setLoadingTerms(false);
+      const response = await getNonPrivateTerms();
+      setTerms(response);
     }
-  };
+    catch (error: unknown) {
+      logger.error('Failed to fetch terms', error);
+    }
+    finally {
+      setIsTermsLoading(false);
+    }
+  }
 
-  const getImages = async (): Promise<void> => {
+  const fetchCoordinators = async (): Promise<void> => {
     try {
-      const response: AxiosResponse<Image[]> = await apiService.get<Image[]>(`/api/Image/`);
-      const data: Image[] = response.data;
-      setImages(data);
-      logger.debug('images', data);
+      const response = await getAdminEduquestUsers();
+      setCoordinators(response);
     } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-      }
-      logger.error('Failed to fetch data', error);
+      logger.error('Failed to fetch coordinators', error);
     } finally {
-      setLoadingImages(false);
+      setIsCoordinatorsLoading(false);
     }
-  };
+  }
 
+  const fetchImages = async (): Promise<void> => {
+    try {
+      const response = await getImages();
+      setImages(response);
+    } catch (error: unknown) {
+      logger.error('Failed to fetch images', error);
+    } finally {
+      setIsImagesLoading(false);
+    }
+  }
+
+  // Handle Term Change
   const handleTermChange = (event: SelectChangeEvent<number>): void => {
-    // Since the value is now explicitly a number, ensure that the state and logic that depend on this value are correctly typed and implemented.
-    const termId = Number(event.target.value); // Convert the value to a number
-    const term = terms?.find(t => t.id === termId);
-    if (term) {
-      setSelectedTerm({
-        id: term.id,
-        name: term.name,
-        start_date: term.start_date,
-        end_date: term.end_date,
-        academic_year: {
-          id: term.academic_year.id,
-          start_year: term.academic_year.start_year,
-          end_year: term.academic_year.end_year
-        }
-      });
-    }
+    const termId = Number(event.target.value);
+    const term = terms?.find(t => t.id === termId) || null;
+    setSelectedTerm(term);
   };
 
+  // Handle Image Change
   const handleImageChange = (event: SelectChangeEvent<number>): void => {
-    const imageId = Number(event.target.value); // Convert the value to a number
-    const image = images?.find(i => i.id === imageId);
-    if (image) {
-      setSelectedImage({
-        id: image.id,
-        name: image.name,
-        filename: image.filename
-      });
-    }
+    const imageId = Number(event.target.value);
+    const image = images?.find(i => i.id === imageId) || null;
+    setSelectedImage(image);
+  };
+
+  // Handle Coordinators Change
+  const handleCoordinatorsChange = (event: SelectChangeEvent<number[]>): void => {
+    const {
+      target: { value },
+    } = event;
+
+    // Map the selected values back to the corresponding coordinators
+    const selectedCoordinatorIds = typeof value === 'string' ? value.split(',').map(Number) : value;
+    const selectedCoordinatorObjects = coordinators?.filter(coordinator => selectedCoordinatorIds.includes(coordinator.id)) || [];
+
+    setSelectedCoordinators(selectedCoordinatorObjects);
   };
 
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
-    const updatedCourse = {
-      code: courseCodeRef.current?.value,
-      name: courseNameRef.current?.value,
-      type: courseTypeRef.current?.value,
-      group: courseGroupRef.current?.value,
-      description: courseDescriptionRef.current?.value,
-      status: courseStatusRef.current?.value,
-      term: selectedTerm || course?.term,
-      image: selectedImage || course?.image
-    };
-
-    try {
-      const response: AxiosResponse<Course> = await apiService.patch(`/api/Course/${course.id.toString()}/`, updatedCourse);
-      logger.debug('Update Success:', response.data);
-      setSubmitStatus({ type: 'success', message: 'Update Successful' });
-      toggleForm();
-      onUpdateSuccess();
-    } catch (error) {
-      logger.error('Submit Error:', error);
-      setSubmitStatus({ type: 'error', message: 'Update Failed. Please try again.' });
+    if (selectedCoordinators.length > 0) {
+      const updatedCourse = {
+        code: courseCodeRef.current?.value.trim(),
+        name: courseNameRef.current?.value.trim(),
+        type: courseTypeRef.current?.value.trim(),
+        description: courseDescriptionRef.current?.value.trim(),
+        status: courseStatusRef.current?.value.trim(),
+        term_id: selectedTerm?.id, // Ensure this is a number
+        image_id: selectedImage?.id, // Ensure this is a number
+        coordinators: selectedCoordinators.map((coordinator) => coordinator.id)
+      };
+      try {
+        await updateCourse(course.id.toString(), updatedCourse);
+        setSubmitStatus({ type: 'success', message: 'Update Successful' });
+        toggleForm();
+        onUpdateSuccess();
+      } catch (error: unknown) {
+        logger.error('Failed to update the course', error);
+        setSubmitStatus({ type: 'error', message: 'Update Failed. Please try again.' });
+      }
+    } else {
+      logger.error('At least one coordinator is required');
+      setSubmitStatus({ type: 'error', message: 'At least one coordinator is required' });
     }
+
   };
 
   const handleDeleteCourse = async (): Promise<void> => {
@@ -169,14 +181,27 @@ export function CourseEditForm({ setSubmitStatus, course, toggleForm, onUpdateSu
 
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
-      await getTerms();
-      await getImages();
+      await fetchTerms();
+      await fetchCoordinators();
+      await fetchImages();
     };
 
     fetchData().catch((error: unknown) => {
       logger.error('Failed to fetch data', error);
     });
   }, []);
+
+  // sets selectedCoordinators based on course.coordinators_summary
+  // once the coordinators data is fetched
+  React.useEffect(() => {
+    if (coordinators && course.coordinators_summary) {
+      const initialSelected = coordinators.filter(c =>
+        course.coordinators_summary.some(cs => cs.id === c.id)
+      );
+      setSelectedCoordinators(initialSelected);
+    }
+  }, [coordinators, course.coordinators_summary]);
+
 
   return (
     <form onSubmit={handleSubmit}>
@@ -224,18 +249,6 @@ export function CourseEditForm({ setSubmitStatus, course, toggleForm, onUpdateSu
             </Grid>
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
-                <FormLabel htmlFor="course group">Course Group</FormLabel>
-                <TextField
-                  defaultValue={course.group}
-                  placeholder="The student group / session of the course"
-                  variant='outlined'
-                  size='small'
-                  inputRef={courseGroupRef}
-                />
-              </FormControl>
-            </Grid>
-            <Grid md={6} xs={12}>
-              <FormControl fullWidth required>
                 <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
                   <FormLabel htmlFor="course type">Course Type</FormLabel>
                   <Tooltip title={
@@ -278,13 +291,57 @@ export function CourseEditForm({ setSubmitStatus, course, toggleForm, onUpdateSu
                 />
               </FormControl>
             </Grid>
+            <Grid xs={12}>
+              <FormControl fullWidth required>
+                <FormLabel htmlFor="course-coordinators">Course Coordinators</FormLabel>
+                <Select
+                  labelId="coordinators-label"
+                  id="course-coordinators"
+                  size='small'
+                  multiple
+                  value={selectedCoordinators.map((coordinator) => coordinator.id)}                  onChange={handleCoordinatorsChange}
+                  input={<OutlinedInput label="Course Coordinators" />} // Corrected input component
+                  renderValue={(selected) => (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                      {selected.map((value) => {
+                        const coordinator = coordinators?.find(c => c.id === value);
+                        return (
+                          <Chip
+                            icon={<UserIcon size={14} />} // Ensure UserIcon is imported
+                            key={value}
+                            label={coordinator ? coordinator.nickname : value}
+                          />
+                        );
+                      })}
+                    </Box>
+                  )}
+                  required
+                >
+                  {isCoordinatorsLoading ? (
+                    <MenuItem disabled>
+                      <Skeleton variant="text" width="100%" />
+                    </MenuItem>
+                  ) : coordinators && coordinators.length > 0 ? (
+                    coordinators.map((coordinator) => (
+                      <MenuItem key={coordinator.id} value={coordinator.id}>
+                        {coordinator.id} ({coordinator.nickname})
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled>No Coordinators Available</MenuItem>
+                  )}
+                </Select>
+              </FormControl>
+            </Grid>
+
+
 
           </Grid>
 
           <Divider sx={{my: 4}}/>
 
           <Typography sx={{my: 3}} variant="h6">Term</Typography>
-          {loadingTerms ? <Skeleton variant="rectangular" height={100}  />
+          {isTermsLoading ? <Skeleton variant="rectangular" height={100}  />
             : terms ?
             <Grid container spacing={3}>
 
@@ -330,7 +387,7 @@ export function CourseEditForm({ setSubmitStatus, course, toggleForm, onUpdateSu
 
           <Typography sx={{my: 3}} variant="h6">Thumbnail</Typography>
 
-          {loadingImages ? <Skeleton variant="rectangular" height={100}  />
+          {isImagesLoading ? <Skeleton variant="rectangular" height={100}  />
             : images ?
             <Grid container spacing={3} >
               <Grid container md={6} xs={12} alignItems="flex-start">

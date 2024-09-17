@@ -1,12 +1,18 @@
-import type { Quest } from "@/types/quest";
-import type { Answer } from "@/types/answer";
+import { Answer } from "@/types/answer";
+
 
 export interface Question {
   id: number;
   number: number;
-  from_quest: Quest['id'];
   text: string;
-  correct_answer: string;
+  max_score: number;
+  answers: Answer[];
+}
+
+export interface QuestionMultipleNewForm {
+  quest_id: number;
+  text: string;
+  number: number;
   max_score: number;
   answers: Answer[];
 }

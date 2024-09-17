@@ -1,0 +1,45 @@
+import apiService from "@/api/api-service";
+import type {
+  UserQuestAttempt,
+  UserQuestAttemptMultipleUpdateForm,
+  UserQuestAttemptNewForm, UserQuestAttemptUpdateForm
+} from "@/types/user-quest-attempt";
+
+export const getUserQuestAttempts = async (): Promise<UserQuestAttempt[]> => {
+  const response = await apiService.get<UserQuestAttempt[]>('/api/user-quest-attempts/');
+  return response.data;
+}
+
+export const getUserQuestAttempt = async (id: string): Promise<UserQuestAttempt> => {
+  const response = await apiService.get<UserQuestAttempt>(`/api/user-quest-attempts/${id}/`);
+  return response.data;
+}
+
+export const getUserQuestAttemptsByUserAndQuest = async (userId: string, questId: string): Promise<UserQuestAttempt[]> => {
+  const response = await apiService.get<UserQuestAttempt[]>(`/api/user-quest-attempts/by_user_quest/?user_id=${userId}&quest_id=${questId}`);
+  return response.data;
+}
+
+export const getUserQuestAttemptsByQuest = async (questId: string): Promise<UserQuestAttempt[]> => {
+  const response = await apiService.get<UserQuestAttempt[]>(`/api/user-quest-attempts/by_quest/?quest_id=${questId}`);
+  return response.data;
+}
+
+export const createUserQuestAttempt = async (userQuestAttempt: UserQuestAttemptNewForm): Promise<UserQuestAttempt> => {
+  const response = await apiService.post<UserQuestAttempt>('/api/user-quest-attempts/', userQuestAttempt);
+  return response.data;
+}
+
+export const updateUserQuestAttempt = async (id: string, userQuestAttempt: UserQuestAttemptUpdateForm): Promise<UserQuestAttempt> => {
+  const response = await apiService.patch<UserQuestAttempt>(`/api/user-quest-attempts/${id}/`, userQuestAttempt);
+  return response.data;
+}
+
+export const updateMultipleUserQuestAttempts = async (userQuestAttempts: UserQuestAttemptMultipleUpdateForm[]): Promise<UserQuestAttempt[]> => {
+  const response = await apiService.patch<UserQuestAttempt[]>('/api/user-quest-attempts/bulk-update/', userQuestAttempts);
+  return response.data;
+}
+
+export const deleteUserQuestAttempt = async (id: string): Promise<void> => {
+  await apiService.delete(`/api/user-quest-attempts/${id}/`);
+}

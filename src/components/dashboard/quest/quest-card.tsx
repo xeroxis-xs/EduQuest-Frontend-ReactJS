@@ -64,11 +64,12 @@ export function QuestCard({ rows = [], onQuestDeleteSuccess }: QuestCardProps): 
         <Grid key={quest.id} lg={4} md={6} xs={12} >
           <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <CardActionArea sx={{ height: '100%', borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }} href={`/dashboard/quest/${quest.id.toString()}`} component={RouterLink}>
-            <CardHeader title={quest.name} subheader={`[${quest.from_course.group}] ${quest.from_course.code} ${quest.from_course.name}`}/>
+            <CardHeader title={quest.name} subheader={quest.course_group.name}/>
               <CardMedia
                 component="img"
                 alt="Multiple Choice"
                 image={`/assets/${quest.image.filename}`}
+                sx={{ margin: 0 }}
               />
               <CardContent>
 
@@ -82,12 +83,6 @@ export function QuestCard({ rows = [], onQuestDeleteSuccess }: QuestCardProps): 
                 <Chip variant="outlined" label={quest.status} sx={{ mb: 1.5 }} color={
                     quest.status === 'Active' ? 'success' : 'secondary'
                 } size="small"/>
-
-                {quest.type !=='Private' && (
-                  <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                    AY{quest.from_course.term.academic_year.start_year}-{quest.from_course.term.academic_year.end_year} {quest.from_course.term.name}
-                  </Typography>
-                )}
 
                 <Typography variant="body2">
                   {quest.description}

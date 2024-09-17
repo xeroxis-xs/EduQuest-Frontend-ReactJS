@@ -10,13 +10,8 @@ import Divider from '@mui/material/Divider';
 import FormControl from '@mui/material/FormControl';
 import FormLabel from '@mui/material/FormLabel';
 import Grid from '@mui/material/Unstable_Grid2';
-import type { Course } from "@/types/course";
-import apiService from "@/api/api-service";
-import {authClient} from "@/lib/auth/client";
 import {logger} from "@/lib/default-logger";
 import Typography from "@mui/material/Typography";
-import {AxiosError} from "axios";
-import type {AxiosResponse} from "axios";
 import type {Term} from "@/types/term";
 import Select, { type SelectChangeEvent} from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
@@ -29,7 +24,16 @@ import Skeleton from "@mui/material/Skeleton";
 import {useTheme} from "@mui/material/styles";
 import Tooltip from "@mui/material/Tooltip";
 import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
+import {getNonPrivateTerms} from "@/api/services/term";
+import {getImages} from "@/api/services/image";
+import {createCourse} from "@/api/services/course";
+import {getAdminEduquestUsers} from "@/api/services/eduquest-user";
+import type {EduquestUser} from "@/types/eduquest-user";
+import Box from "@mui/material/Box";
+import OutlinedInput from "@mui/material/OutlinedInput";
 import Stack from "@mui/material/Stack";
+import {User as UserIcon} from "@phosphor-icons/react/dist/ssr/User";
+import {Check as CheckIcon} from "@phosphor-icons/react/dist/ssr/Check";
 
 interface CourseFormProps {
   onFormSubmitSuccess: () => void;
@@ -39,133 +43,136 @@ export function CourseNewForm({ onFormSubmitSuccess }: CourseFormProps): React.J
   const theme = useTheme();
   const courseCodeRef = React.useRef<HTMLInputElement>(null);
   const courseNameRef = React.useRef<HTMLInputElement>(null);
-  const courseGroupRef = React.useRef<HTMLInputElement>(null);
   const courseDescriptionRef = React.useRef<HTMLInputElement>(null);
   const courseStatusRef = React.useRef<HTMLInputElement>(null);
   const courseTypeRef = React.useRef<HTMLInputElement>(null);
   const courseTermIdRef = React.useRef<HTMLInputElement>(null);
   const courseImageIdRef = React.useRef<HTMLInputElement>(null);
+
   const [images, setImages] = React.useState<Image[]>();
   const [terms, setTerms] = React.useState<Term[]>();
+  const [coordinators, setCoordinators] = React.useState<EduquestUser[]>();
+
+  const [isCoordinatorsLoading, setIsCoordinatorsLoading] = React.useState<boolean>(true);
   const [isTermsLoading, setIsTermsLoading] = React.useState<boolean>(true);
   const [isImagesLoading, setIsImagesLoading] = React.useState<boolean>(true);
+
   const [selectedTerm, setSelectedTerm] = React.useState<Term | null>(null);
   const [selectedImage, setSelectedImage] = React.useState<Image | null>(null);
+  const [selectedCoordinators, setSelectedCoordinators] = React.useState<EduquestUser[]>([]);
+
   const [submitStatus, setSubmitStatus] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
-  const getTerms = async (): Promise<void> => {
+  const fetchTerms = async (): Promise<void> => {
     try {
-      const response: AxiosResponse<Term[]> = await apiService.get<Term[]>(`/api/Term/`);
-      const data: Term[] = response.data;
-      const filteredData = data.filter((term) => term.name !== 'Private Term' && term.academic_year.start_year !== 0);
-      setTerms(filteredData);
-      logger.debug('Filtered Terms', filteredData);
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-        else {
-          logger.error('Code: ', error.response?.status);
-          logger.error('Message: ', error.response?.data);
-        }
-      }
-      logger.error('Failed to fetch data', error);
-    } finally {
+      const response = await getNonPrivateTerms();
+      setTerms(response);
+    }
+    catch (error: unknown) {
+      logger.error('Failed to fetch terms', error);
+    }
+    finally {
       setIsTermsLoading(false);
     }
-  };
+  }
 
-  const getImages = async (): Promise<void> => {
+  const fetchCoordinators = async (): Promise<void> => {
     try {
-      const response: AxiosResponse<Image[]> = await apiService.get<Image[]>(`/api/Image/`);
-      const data: Image[] = response.data;
-      setImages(data);
-      logger.debug('images', data);
+      const response = await getAdminEduquestUsers();
+      setCoordinators(response);
     } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-        else {
-          logger.error('Code: ', error.response?.status);
-          logger.error('Message: ', error.response?.data);
-        }
-      }
-      logger.error('Failed to fetch data', error);
+      logger.error('Failed to fetch coordinators', error);
+    } finally {
+      setIsCoordinatorsLoading(false);
+    }
+  }
+
+  const fetchImages = async (): Promise<void> => {
+    try {
+      const response = await getImages();
+      setImages(response);
+    } catch (error: unknown) {
+      logger.error('Failed to fetch images', error);
     } finally {
       setIsImagesLoading(false);
     }
   }
 
-  const handleImageChange = (event: SelectChangeEvent<number>): void => {
-    const imageId = Number(event.target.value); // Convert the value to a number
-    const image = images?.find(i => i.id === imageId);
-    if (image) {
-      setSelectedImage({
-        id: image.id,
-        name: image.name,
-        filename: image.filename
-      });
-    }
+
+  // Handle Term Change
+  const handleTermChange = (event: SelectChangeEvent<number>): void => {
+    const termId = Number(event.target.value);
+    const term = terms?.find(t => t.id === termId) || null;
+    setSelectedTerm(term);
   };
 
-  const handleTermChange = (event: SelectChangeEvent<number>): void => {
-    const termId = Number(event.target.value); // Convert the value to a number
-    const term = terms?.find(t => t.id === termId);
-    if (term) {
-      setSelectedTerm({
-        id: term.id,
-        name: term.name,
-        start_date: term.start_date,
-        end_date: term.end_date,
-        academic_year: {
-          id: term.academic_year.id,
-          start_year: term.academic_year.start_year,
-          end_year: term.academic_year.end_year
-        }
-      });
-    }
+  // Handle Image Change
+  const handleImageChange = (event: SelectChangeEvent<number>): void => {
+    const imageId = Number(event.target.value);
+    const image = images?.find(i => i.id === imageId) || null;
+    setSelectedImage(image);
   };
+
+  // Handle Coordinators Change
+  const handleCoordinatorsChange = (event: SelectChangeEvent<number[]>): void => {
+    const {
+      target: { value },
+    } = event;
+
+    // Map the selected values back to the corresponding coordinators
+    const selectedCoordinatorIds = typeof value === 'string' ? value.split(',').map(Number) : value;
+    const selectedCoordinatorObjects = coordinators?.filter(coordinator => selectedCoordinatorIds.includes(coordinator.id)) || [];
+
+    setSelectedCoordinators(selectedCoordinatorObjects);
+  };
+
+
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
-    const newCourse = {
-      code: courseCodeRef.current?.value,
-      name: courseNameRef.current?.value,
-      group: courseGroupRef.current?.value,
-      description: courseDescriptionRef.current?.value,
-      status: courseStatusRef.current?.value,
-      type: courseTypeRef.current?.value,
-      term: selectedTerm || terms?.[0],
-      image: selectedImage || images?.[0]
-    };
 
-    try {
-      const response: AxiosResponse<Course> = await apiService.post(`/api/Course/`, newCourse);
-      onFormSubmitSuccess();
-      logger.debug('New Course has been created successfully:', response.data);
-      setSubmitStatus({type: 'success', message: 'Create Successful'});
-    }
-    catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-        else {
-          logger.error('Code: ', error.response?.status);
-          logger.error('Message: ', error.response?.data);
-        }
+    if (
+      courseCodeRef.current &&
+      courseNameRef.current &&
+      courseDescriptionRef.current &&
+      courseStatusRef.current &&
+      courseTypeRef.current &&
+      selectedTerm &&
+      selectedImage &&
+      selectedCoordinators.length > 0
+    ) {
+      const newCourse = {
+        code: courseCodeRef.current.value.trim(),
+        name: courseNameRef.current.value.trim(),
+        description: courseDescriptionRef.current.value.trim(),
+        status: courseStatusRef.current.value.trim(),
+        type: courseTypeRef.current.value.trim(),
+        term_id: selectedTerm.id, // Ensure this is a number
+        image_id: selectedImage.id, // Ensure this is a number
+        coordinators: selectedCoordinators.map((coordinator) => coordinator.id)
+      };
+      try {
+        const response = await createCourse(newCourse);
+        onFormSubmitSuccess();
+        logger.debug('New Course has been created successfully:', response);
+        setSubmitStatus({ type: 'success', message: 'Create Successful' });
       }
-      setSubmitStatus({ type: 'error', message: 'Create Failed. Please try again.' });
+      catch (error: unknown) {
+        logger.error('Failed to create new course', error);
+        setSubmitStatus({ type: 'error', message: 'Create Failed. Please try again.' });
+      }
     }
-
+    else {
+      logger.error('One or more form fields are missing.');
+      setSubmitStatus({ type: 'error', message: 'All fields are required.' });
+    }
   };
 
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
-      await getTerms();
-      await getImages();
+      await fetchCoordinators();
+      await fetchTerms();
+      await fetchImages();
     };
 
     fetchData().catch((error: unknown) => {
@@ -179,88 +186,170 @@ export function CourseNewForm({ onFormSubmitSuccess }: CourseFormProps): React.J
     }
   }, [terms]);
 
+  React.useEffect(() => {
+    if (images && images.length > 0) {
+      setSelectedImage(images[0]);
+    }
+  }, [images]);
+
+
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} noValidate>
       <Card>
         <CardHeader subheader="Add new course to the system" title="New Course" />
         <Divider />
         <CardContent>
           <Grid container spacing={3}>
+            {/* Course Name */}
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
-                <FormLabel htmlFor="course name">Course Name</FormLabel>
+                <FormLabel htmlFor="course-name">Course Name</FormLabel>
                 <TextField
+                  id="course-name"
                   inputRef={courseNameRef}
                   placeholder="The title of the course"
                   variant='outlined'
                   size='small'
-                />
-              </FormControl>
-            </Grid>
-            <Grid md={6} xs={12}>
-              <FormControl fullWidth required>
-                <FormLabel htmlFor="course code">Course Code</FormLabel>
-                <TextField
-                  inputRef={courseCodeRef}
-                  placeholder="The code of the course"
-                  variant='outlined'
-                  size='small'
-                />
-              </FormControl>
-            </Grid>
-            <Grid md={6} xs={12}>
-              <FormControl fullWidth required>
-                <FormLabel htmlFor="course group">Course Group</FormLabel>
-                <TextField
-                  inputRef={courseGroupRef}
-                  placeholder="The student group / session of the course"
-                  variant='outlined'
-                  size='small'
+                  required
                 />
               </FormControl>
             </Grid>
 
+            {/* Course Code */}
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
-                <Stack direction="row" sx={{ alignItems: 'center' }} spacing={1}>
-                  <FormLabel htmlFor="course type">Course Type</FormLabel>
-                  <Tooltip title={
-                    <Typography variant="inherit">
-                      <strong>System-enroll:</strong> User are not allowed to self-enroll.<br />
-                      <strong>Self-enroll:</strong> User are free to self-enroll.<br />
-                      <strong>Private:</strong> Used for personal quest generation.
-                    </Typography>
-                  } placement="top">
-                    <InfoIcon fontSize="var(--icon-fontSize-sm)" style={{ marginBottom: '8px', cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />
+                <FormLabel htmlFor="course-code">Course Code</FormLabel>
+                <TextField
+                  id="course-code"
+                  inputRef={courseCodeRef}
+                  placeholder="The code of the course"
+                  variant='outlined'
+                  size='small'
+                  required
+                />
+              </FormControl>
+            </Grid>
+
+            {/* Course Type */}
+            <Grid md={6} xs={12}>
+              <FormControl fullWidth required>
+                <Stack direction="row" alignItems="center" spacing={1}>
+                  <FormLabel htmlFor="course-type">Course Type</FormLabel>
+                  <Tooltip
+                    title={
+                      <Typography variant="inherit">
+                        <strong>System-enroll:</strong> Users are not allowed to self-enroll.<br />
+                        <strong>Self-enroll:</strong> Users are free to self-enroll.<br />
+                        <strong>Private:</strong> Used for personal quest generation.
+                      </Typography>
+                    }
+                    placement="top"
+                  >
+
+                    <InfoIcon
+                      fontSize="var(--icon-fontSize-sm)"
+                      style={{ marginBottom: '8px', cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }}
+                    />
                   </Tooltip>
                 </Stack>
-                <Select defaultValue="System-enroll" size='small' label="Course Type" inputRef={courseTypeRef} name="type">
-                  <MenuItem value="System-enroll"><Chip variant="outlined" label="System-enroll" color="primary" size="small"/></MenuItem>
-                  <MenuItem value="Self-enroll"><Chip variant="outlined" label="Self-enroll" color="success" size="small"/></MenuItem>
-                  <MenuItem value="Private"><Chip variant="outlined" label="Private" color="secondary" size="small"/></MenuItem>
+                <Select
+                  id="course-type"
+                  defaultValue="System-enroll"
+                  size='small'
+                  label="Course Type"
+                  inputRef={courseTypeRef}
+                  name="type"
+                  required
+                >
+                  <MenuItem value="System-enroll">
+                    <Chip variant="outlined" label="System-enroll" color="primary" size="small" />
+                  </MenuItem>
+                  <MenuItem value="Self-enroll">
+                    <Chip variant="outlined" label="Self-enroll" color="success" size="small" />
+                  </MenuItem>
+                  <MenuItem value="Private">
+                    <Chip variant="outlined" label="Private" color="secondary" size="small" />
+                  </MenuItem>
                 </Select>
               </FormControl>
             </Grid>
+
+            {/* Course Status */}
             <Grid md={6} xs={12}>
               <FormControl fullWidth required>
-                <FormLabel htmlFor="course status">Course Status</FormLabel>
-                <Select defaultValue="Active" size='small' label="Course Status" inputRef={courseStatusRef} name="type">
-                  <MenuItem value="Active"><Chip variant="outlined" label="Active" color="success" size="small"/></MenuItem>
-                  <MenuItem value="Expired"><Chip variant="outlined" label="Expired" color="secondary" size="small"/></MenuItem>
+                <FormLabel htmlFor="course-status">Course Status</FormLabel>
+                <Select
+                  id="course-status"
+                  defaultValue="Active"
+                  size='small'
+                  label="Course Status"
+                  inputRef={courseStatusRef}
+                  name="status"
+                  required
+                >
+                  <MenuItem value="Active">
+                    <Chip variant="outlined" label="Active" color="success" size="small" />
+                  </MenuItem>
+                  <MenuItem value="Expired">
+                    <Chip variant="outlined" label="Expired" color="secondary" size="small" />
+                  </MenuItem>
                 </Select>
               </FormControl>
             </Grid>
+
+            {/* Course Description */}
             <Grid xs={12}>
               <FormControl fullWidth required>
-                <FormLabel htmlFor="course description">Course Description</FormLabel>
+                <FormLabel htmlFor="course-description">Course Description</FormLabel>
                 <TextField
+                  id="course-description"
                   inputRef={courseDescriptionRef}
                   placeholder="The description of the course"
                   variant='outlined'
                   multiline
                   size="medium"
                   rows={3}
+                  required
                 />
+              </FormControl>
+            </Grid>
+
+            {/* Coordinators Selection */}
+            <Grid xs={12}>
+              <FormControl fullWidth required>
+                <FormLabel htmlFor="course-coordinators">Course Coordinators</FormLabel>
+                <Select
+                  labelId="coordinators-label"
+                  id="course-coordinators"
+                  size='small'
+                  multiple
+                  value={selectedCoordinators.map(coordinator => coordinator.id)} // Pass only the IDs for the value
+                  onChange={handleCoordinatorsChange}
+                  input={<OutlinedInput label="Course Coordinators" />}
+                  renderValue={(selected) => (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                      {selected.map((value) => {
+                        const coordinator = coordinators?.find(c => c.id === value);
+                        return <Chip icon={<UserIcon size={14}/>} key={value} label={coordinator ? coordinator.nickname : value} />;
+                      })}
+                    </Box>
+                  )}
+                  required
+                >
+                  {isCoordinatorsLoading ? (
+                    <MenuItem disabled>
+                      <Skeleton variant="text" width="100%" />
+                    </MenuItem>
+                  ) : coordinators && coordinators.length > 0 ? (
+                    coordinators.map((coordinator) => (
+                      <MenuItem key={coordinator.id} value={coordinator.id}>
+                        {coordinator.id} ({coordinator.nickname})
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem disabled>No Coordinators Available</MenuItem>
+                  )}
+                </Select>
               </FormControl>
             </Grid>
 
@@ -364,15 +453,22 @@ export function CourseNewForm({ onFormSubmitSuccess }: CourseFormProps): React.J
         </CardContent>
 
         <CardActions sx={{ justifyContent: 'flex-end' }}>
-          <Button startIcon={<FilePlusIcon fontSize="var(--icon-fontSize-md)"/>} type="submit" variant="contained">Add</Button>
+          <Button
+            startIcon={<FilePlusIcon fontSize="var(--icon-fontSize-md)" />}
+            type="submit"
+            variant="contained"
+          >
+            Add
+          </Button>
         </CardActions>
-
       </Card>
-      {submitStatus ?
+
+      {/* Submission Status */}
+      {submitStatus && (
         <Alert severity={submitStatus.type} sx={{ marginTop: 2 }}>
           {submitStatus.message}
-        </Alert> : null}
-
+        </Alert>
+      )}
     </form>
   );
 }

@@ -4,7 +4,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { CaretLeft as CaretLeftIcon } from "@phosphor-icons/react/dist/ssr/CaretLeft";
 import { Pen as PenIcon } from "@phosphor-icons/react/dist/ssr/Pen";
-import type { Course } from '@/types/course';
+import type {Course} from '@/types/course';
 import type { Quest } from '@/types/quest';
 import apiService from "@/api/api-service";
 import type { AxiosResponse } from "axios";
@@ -24,10 +24,10 @@ import Chip from "@mui/material/Chip";
 import {QuestCard} from "@/components/dashboard/quest/quest-card";
 import {useUser} from "@/hooks/use-user";
 import {CardMedia} from "@mui/material";
-import {Check as CheckIcon} from "@phosphor-icons/react/dist/ssr/Check";
-import {SignIn as SignInIcon} from "@phosphor-icons/react/dist/ssr/SignIn";
+// import {Check as CheckIcon} from "@phosphor-icons/react/dist/ssr/Check";
+// import {SignIn as SignInIcon} from "@phosphor-icons/react/dist/ssr/SignIn";
 import Box from "@mui/material/Box";
-import {Users as UsersIcon} from "@phosphor-icons/react/dist/ssr/Users";
+import {User as UserIcon} from "@phosphor-icons/react/dist/ssr/User";
 import IconButton, { type IconButtonProps } from '@mui/material/IconButton';
 import { CaretDown as CaretDownIcon } from "@phosphor-icons/react/dist/ssr/CaretDown";
 import {styled} from '@mui/material/styles';
@@ -41,9 +41,16 @@ import {QuestNewForm} from "@/components/dashboard/quest/quest-new-form";
 import {useState} from "react";
 import {IOSSwitch} from "@/components/dashboard/misc/buttons";
 import {CourseExpiresDialog} from "@/components/dashboard/dialog/course-expires-dialog";
-import {CalendarX as CalendarXIcon} from "@phosphor-icons/react/dist/ssr/CalendarX";
+// import {CalendarX as CalendarXIcon} from "@phosphor-icons/react/dist/ssr/CalendarX";
 import {Upload as UploadIcon} from "@phosphor-icons/react/dist/ssr/Upload";
-
+import {getCourse, updateCourse} from "@/api/services/course";
+import {getCourseGroupsByCourse} from "@/api/services/course-group";
+import {CourseGroupCard} from "@/components/dashboard/course-group/course-group-card";
+import {getQuests, getQuestsByCourseGroup} from "@/api/services/quest";
+import {CourseNewGroupForm} from "@/components/dashboard/course-group/course-group-new-form";
+import type {CourseGroup} from "@/types/course-group";
+import {getUserCourseGroupEnrollmentsByCourseAndUser} from "@/api/services/user-course-group-enrollment";
+import type {UserCourseGroupEnrollment} from "@/types/user-course-group-enrollment";
 
 
 interface ExpandMoreProps extends IconButtonProps {
@@ -63,28 +70,44 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
 }));
 
 
+
 export default function Page({ params }: { params: { courseId: string } }) : React.JSX.Element {
   const { eduquestUser } = useUser();
   const [course, setCourse] = React.useState<Course>();
+  const [courseGroups, setCourseGroups] = React.useState<CourseGroup[]>();
+  const [userCourseGroupEnrollments, setUserCourseGroupEnrollments] = React.useState<UserCourseGroupEnrollment[]>();
   const [quests, setQuests] = React.useState<Quest[]>();
-  const [showEditForm, setShowEditForm] = React.useState(false);
-  const [showCreateForm, setShowCreateForm] = React.useState(false);
+  const [showEditCourseForm, setShowEditCourseForm] = React.useState(false);
+  const [showCreateQuestForm, setShowCreateQuestForm] = React.useState(false);
+  const [showCreateCourseGroupForm, setShowCreateCourseGroupForm] = React.useState(false);
   const [expanded, setExpanded] = React.useState(false);
-  const [loadingQuests, setLoadingQuests] = React.useState(true);
+  const [loadingQuests, setLoadingQuests] = React.useState(false);
   const [loadingCourse, setLoadingCourse] = React.useState(true);
+  const [loadingCourseGroups, setLoadingCourseGroups] = React.useState(true);
+  const [loadingUserCourseGroupEnrollments, setLoadingUserCourseGroupEnrollments] = React.useState(true);
   const [submitStatus, setSubmitStatus] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
+  const [selectedCourseGroup, setSelectedCourseGroup] = React.useState<string | null>(null);
 
   const handleExpandClick = (): void => {
     setExpanded(!expanded);
   };
 
-  const toggleCreateForm = (): void => {
-    setShowCreateForm(!showCreateForm);
+  const handleCourseGroupSelect = async(courseGroupId: string): Promise<void> => {
+    setSelectedCourseGroup(courseGroupId);
+    await fetchQuestsByCourseGroup(courseGroupId);
   };
 
-  const toggleEditForm = (): void => {
-    setShowEditForm(!showEditForm);
+  const toggleCreateQuestForm = (): void => {
+    setShowCreateQuestForm(!showCreateQuestForm);
+  };
+
+  const toggleCreateCourseGroupForm = (): void => {
+    setShowCreateCourseGroupForm(!showCreateCourseGroupForm);
+  }
+
+  const toggleEditCourseForm = (): void => {
+    setShowEditCourseForm(!showEditCourseForm);
   };
 
   const handleDialogOpen = (): void => {
@@ -100,91 +123,110 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
     await handleStatusChange(status);
   };
 
-  const handleStatusChange = async (status : string): Promise<void> => {
+  const handleStatusChange = async (status: 'Active' | 'Expired'): Promise<void> => {
     try {
-      const data = {status}
-      const response : AxiosResponse<Course> = await apiService.patch(`/api/Course/${params.courseId}/`, data);
+      const response = await updateCourse(params.courseId, { status });
       setSubmitStatus({ type: 'success', message: `Course has been set to '${status}'` });
-      setCourse(response.data);
+      setCourse(response);
     } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-        logger.error('Failed to expire course', error);
-        setSubmitStatus({type: 'error', message: 'Failed to change course status. Please try again.'});
-      }
+      logger.error('Failed to expire course', error);
+      setSubmitStatus({type: 'error', message: 'Failed to change course status. Please try again.'});
     }
   }
 
-  const getCourse = async (): Promise<void> => {
+  const fetchCourse = async (): Promise<void> => {
     try {
-      const response: AxiosResponse<Course> = await apiService.get<Course>(`/api/Course/${params.courseId}`);
-      const data: Course = response.data;
-      setCourse(data);
-      // setUserCourse(data.enrolled_users.find(user => user.user === eduquestUser?.id.toString()));
-      logger.debug('course', data);
+      const response = await getCourse(params.courseId);
+      setCourse(response);
+      // logger.debug('Course details', response);
     } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-      }
-      logger.error('Failed to fetch data', error);
+      logger.error('Failed to fetch course', error);
     } finally {
       setLoadingCourse(false);
     }
   };
 
-
-  const getQuests = async (): Promise<void> => {
-    try {
-      const response: AxiosResponse<Quest[]> = await apiService.get<Quest[]>(`/api/Quest/by-course/${params.courseId}`);
-      const data: Quest[] = response.data;
-      setQuests(data);
-      logger.debug('quests', data);
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
+  const fetchMyCourseGroups = async (): Promise<void> => {
+    if (eduquestUser) {
+      try {
+        const response = await getUserCourseGroupEnrollmentsByCourseAndUser(params.courseId, eduquestUser?.id.toString());
+        setUserCourseGroupEnrollments(response);
+        logger.debug('My course groups', response);
+      } catch (error: unknown) {
+        logger.error('Failed to fetch course group enrollments', error);
+      } finally {
+        setLoadingUserCourseGroupEnrollments(false);
       }
-      logger.error('Failed to fetch data', error);
+    }
+  }
+
+  const fetchCourseGroups = async (): Promise<void> => {
+    try {
+      const response = await getCourseGroupsByCourse(params.courseId);
+      setCourseGroups(response);
+      logger.debug('All course groups', response);
+    } catch (error: unknown) {
+      logger.error('Failed to fetch course groups', error);
+    } finally {
+      setLoadingCourseGroups(false);
+    }
+  }
+
+  const fetchQuestsByCourseGroup = async (courseGroupId: string): Promise<void> => {
+    try {
+      setLoadingQuests(true)
+      const response = await getQuestsByCourseGroup(courseGroupId);
+      setQuests(response);
+      logger.debug('My quests', response);
+    } catch (error: unknown) {
+      logger.error('Failed to fetch quests', error);
     } finally {
       setLoadingQuests(false);
     }
   };
 
 
-  const handleEnroll = async (): Promise<void> => {
+  const fetchQuests = async (): Promise<void> => {
     try {
-      const data = {
-        user: { id: eduquestUser?.id },
-        course: { id: params.courseId }
-      }
-      const response = await apiService.post(`/api/UserCourse/`, data);
-      if (response.status === 201) {
-        logger.debug('Enrolled successfully');
-        await getCourse();
-      }
+      const response = await getQuests();
+      setQuests(response);
+      // logger.debug('quests', response);
     } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-      }
-      logger.error('Error enrolling: ', error);
+      logger.error('Failed to fetch quests', error);
+    } finally {
+      setLoadingQuests(false);
     }
-  }
+  };
+
+
+  // const handleEnroll = async (): Promise<void> => {
+  //   try {
+  //     const data = {
+  //       user: { id: eduquestUser?.id },
+  //       course: { id: params.courseId }
+  //     }
+  //     const response = await apiService.post(`/api/UserCourse/`, data);
+  //     if (response.status === 201) {
+  //       logger.debug('Enrolled successfully');
+  //       await getCourse();
+  //     }
+  //   } catch (error: unknown) {
+  //     if (error instanceof AxiosError) {
+  //       if (error.response?.status === 401) {
+  //         await authClient.signInWithMsal();
+  //       }
+  //     }
+  //     logger.error('Error enrolling: ', error);
+  //   }
+  // }
 
 
 
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
-      await getCourse();
-      // await getTerms();
-      // await getImages();
-      await getQuests();
+      await fetchMyCourseGroups();
+      await fetchCourse();
+      await fetchCourseGroups();
     };
 
     fetchData().catch((error: unknown) => {
@@ -200,7 +242,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
 
       </Stack>
 
-      {!showEditForm && (
+      {!showEditCourseForm && (
         loadingCourse ? (
           <SkeletonCourseDetailCard />
         ) : (
@@ -223,7 +265,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
                       {course.status === 'Active' ? 'Active' : 'Expired'}
                     </Typography>
                   </Stack>
-                  <Button startIcon={<PenIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleEditForm}>
+                  <Button startIcon={<PenIcon fontSize="var(--icon-fontSize-md)" />} variant="contained" onClick={toggleEditCourseForm}>
                     Edit Course
                   </Button>
                 </Stack> : null
@@ -250,10 +292,6 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
                   <Typography variant="body2">{course.name}</Typography>
                 </Grid>
                 <Grid md={6} xs={12}>
-                  <Typography variant="overline" color="text.secondary">Group</Typography>
-                  <Typography variant="body2">{course.group}</Typography>
-                </Grid>
-                <Grid md={6} xs={12}>
                   <Typography variant="overline" color="text.secondary" display="block">Type</Typography>
                   <Chip label={course.type} color={
                     course.type === 'System-enroll' ? 'primary' :
@@ -267,6 +305,17 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
                     course.status === 'Active' ? 'success' : 'secondary'
                   } size="small" variant="outlined"/>
 
+                </Grid>
+                <Grid md={6} xs={12}>
+                  <Typography variant="overline" color="text.secondary" display="block">Coordinators</Typography>
+                  <Stack direction="row" spacing={2}>
+                    {course.coordinators_summary.map((coordinator) => (
+                      <Stack direction="row" spacing={1} key={coordinator.id} alignItems="center">
+                        <UserIcon size={18}/>
+                        <Typography variant="body2">{coordinator.nickname}</Typography>
+                      </Stack>
+                    ))}
+                  </Stack>
                 </Grid>
                 <Grid xs={12}>
                   <Typography variant="overline" color="text.secondary">Description</Typography>
@@ -321,22 +370,22 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
             </Collapse>
           </CardContent>
           <CardActions sx={{ justifyContent: 'space-between'}}>
-            <Box sx={{ mx: '16px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <UsersIcon size={20}/>
+            <Box sx={{ mx: '16px', display: 'flex', justifyContent: 'center', alignItems: 'center', my:1 }}>
+              <UserIcon size={20}/>
               <Typography sx={{ marginLeft: '10px' }} variant="body1">
-                {course.enrolled_users.length.toString()}
+                {course.total_students_enrolled}
               </Typography>
             </Box>
-            {eduquestUser && course.enrolled_users.includes(eduquestUser?.id.toString()) ? (
-              <Button endIcon={<CheckIcon/>} disabled>Enrolled</Button>
-            ) : course.type === 'System-enroll' ?
-              <Button startIcon={<SignInIcon/>} disabled>Enroll</Button>
-              : course.status === 'Expired' ?
-                <Button startIcon={<CalendarXIcon/>} disabled>Expired</Button>
-                : (
-                  <Button endIcon={<SignInIcon/>} onClick={() => handleEnroll()}>Enroll</Button>
+            {/*{eduquestUser && course.enrolled_users.includes(eduquestUser?.id.toString()) ? (*/}
+            {/*  <Button endIcon={<CheckIcon/>} disabled>Enrolled</Button>*/}
+            {/*) : course.type === 'System-enroll' ?*/}
+            {/*  <Button startIcon={<SignInIcon/>} disabled>Enroll</Button>*/}
+            {/*  : course.status === 'Expired' ?*/}
+            {/*    <Button startIcon={<CalendarXIcon/>} disabled>Expired</Button>*/}
+            {/*    : (*/}
+            {/*      <Button endIcon={<SignInIcon/>} onClick={() => handleEnroll()}>Enroll</Button>*/}
 
-                )}
+            {/*    )}*/}
           </CardActions>
 
           <CourseExpiresDialog
@@ -353,12 +402,12 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
         )
       )}
 
-      { showEditForm && course ?
+      { showEditCourseForm && course ?
         <CourseEditForm
           setSubmitStatus={setSubmitStatus}
           course={course}
-          toggleForm={toggleEditForm}
-          onUpdateSuccess={getCourse}
+          toggleForm={toggleEditCourseForm}
+          onUpdateSuccess={fetchCourse}
         />
         : null }
 
@@ -368,38 +417,83 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
         </Alert>
       ) : null}
 
+
       <Stack direction="row" sx={{justifyContent: 'space-between', alignItems: 'center', verticalAlign: 'center', pt:3}}>
         <Box>
-          <Typography variant="h5">Quests</Typography>
-          <Typography variant="body2" color="text.secondary">Quests available for this course.</Typography>
+          <Typography variant="h5">Groups</Typography>
+          <Typography variant="body2" color="text.secondary">Groups available for this course</Typography>
         </Box>
         { eduquestUser?.is_staff ?
           <Stack direction='row' spacing={1}>
-            <Button startIcon={<UploadIcon/>} variant="contained" color="primary" component={RouterLink} href={`${paths.dashboard.import}/${params.courseId.toString()}`}>
-              Import
-            </Button>
             <Button
-              startIcon={showCreateForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PlusIcon fontSize="var(--icon-fontSize-md)" />}
-              variant={showCreateForm ? 'text' : 'contained'}
-              color={showCreateForm ? 'error' : 'primary'}
-              onClick={toggleCreateForm}
+              startIcon={showCreateCourseGroupForm ? <XCircleIcon/> : <PlusIcon />}
+              variant={showCreateCourseGroupForm ? 'text' : 'contained'}
+              color={showCreateCourseGroupForm ? 'error' : 'primary'}
+              onClick={toggleCreateCourseGroupForm}
             >
-              {showCreateForm ? 'Cancel' : 'Create Quest'}
+              {showCreateCourseGroupForm ? 'Cancel' : 'Create Group'}
             </Button>
           </Stack>
           : null }
       </Stack>
 
-      {showCreateForm && course ? <QuestNewForm onFormSubmitSuccess={getQuests} courseId={course.id}/> : null}
+      {showCreateCourseGroupForm && courseGroups ?
+        <CourseNewGroupForm
+          onFormSubmitSuccess={fetchCourseGroups}
+          courseId={params.courseId}
+        /> : null}
+
+
+      {loadingCourseGroups || loadingUserCourseGroupEnrollments ? (
+        <SkeletonQuestCard />
+      ) : courseGroups && userCourseGroupEnrollments && courseGroups.length > 0 ? (
+        <CourseGroupCard
+          rows={courseGroups}
+          userCourseGroupEnrollments={userCourseGroupEnrollments}
+          handleCourseGroupSelect={handleCourseGroupSelect}
+        />
+      ) : (
+        <Typography variant="body1">No groups available for this course</Typography>
+      )}
+
+
+      <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', verticalAlign: 'center', pt: 3 }}>
+        <Box>
+          <Typography variant="h5">Quests</Typography>
+          <Typography variant="body2" color="text.secondary">Quests available for this group</Typography>
+        </Box>
+        {eduquestUser?.is_staff ? (
+          <Stack direction="row" spacing={1}>
+            <Button startIcon={<UploadIcon />} variant="contained" color="primary" component={RouterLink} href={`${paths.dashboard.import}/${params.courseId.toString()}`}>
+              Import
+            </Button>
+            <Button
+              startIcon={showCreateQuestForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PlusIcon fontSize="var(--icon-fontSize-md)" />}
+              variant={showCreateQuestForm ? 'text' : 'contained'}
+              color={showCreateQuestForm ? 'error' : 'primary'}
+              onClick={toggleCreateQuestForm}
+            >
+              {showCreateQuestForm ? 'Cancel' : 'Create Quest'}
+            </Button>
+          </Stack>
+        ) : null}
+      </Stack>
+
+
+
+      {showCreateQuestForm && course ?
+        <QuestNewForm onFormSubmitSuccess={fetchQuests} courseId={course.id}/> : null}
 
       {loadingQuests ? (
         <SkeletonQuestCard />
-      ) : (
+      ) : selectedCourseGroup ? (
         quests && quests.length > 0 ? (
-          <QuestCard rows={quests} onQuestDeleteSuccess={getQuests}/>
+          <QuestCard rows={quests} onQuestDeleteSuccess={fetchQuests} />
         ) : (
-          <Typography variant="body1">No quests available for this course.</Typography>
+          <Typography variant="body1">No quests available for this group</Typography>
         )
+      ) : (
+        <Typography variant="body1">Select a course group to view the quests</Typography>
       )}
 
     </Stack>

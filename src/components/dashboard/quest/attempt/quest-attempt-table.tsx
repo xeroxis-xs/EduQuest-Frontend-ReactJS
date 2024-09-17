@@ -65,8 +65,8 @@ export function UserQuestAttemptTable({ questId = '0', rows = [], totalMaxScore 
                   <TableCell>{row.id}</TableCell>
                   <TableCell>
                     <Typography variant="body2">
-                      { row.first_attempted_on === null || row.first_attempted_on === "" ? "Not Available"
-                        : new Date(row.first_attempted_on).toLocaleTimeString("en-SG", {
+                      { row.first_attempted_date === null || row.first_attempted_date === "" ? "Not Available"
+                        : new Date(row.first_attempted_date).toLocaleTimeString("en-SG", {
                           hour: '2-digit',
                           minute: '2-digit',
                           second: '2-digit'
@@ -74,8 +74,8 @@ export function UserQuestAttemptTable({ questId = '0', rows = [], totalMaxScore 
                       }
                     </Typography>
                     <Typography variant="body2">
-                      { row.first_attempted_on === null || row.first_attempted_on === "" ? null
-                        : new Date(row.first_attempted_on).toLocaleDateString("en-SG", {
+                      { row.first_attempted_date === null || row.first_attempted_date === "" ? null
+                        : new Date(row.first_attempted_date).toLocaleDateString("en-SG", {
                           day: "2-digit",
                           month: "short",
                           year: "numeric"
@@ -85,8 +85,8 @@ export function UserQuestAttemptTable({ questId = '0', rows = [], totalMaxScore 
                   </TableCell>
                   <TableCell>
                     <Typography variant="body2">
-                      { row.last_attempted_on === null || row.last_attempted_on === "" ? "Not Available"
-                        : new Date(row.last_attempted_on).toLocaleTimeString("en-SG", {
+                      { row.last_attempted_date === null || row.last_attempted_date === "" ? "Not Available"
+                        : new Date(row.last_attempted_date).toLocaleTimeString("en-SG", {
                           hour: '2-digit',
                           minute: '2-digit',
                           second: '2-digit'
@@ -95,8 +95,8 @@ export function UserQuestAttemptTable({ questId = '0', rows = [], totalMaxScore 
 
                     </Typography>
                     <Typography variant="body2">
-                      { row.last_attempted_on === null || row.last_attempted_on === "" ? null
-                        : new Date(row.last_attempted_on).toLocaleDateString("en-SG", {
+                      { row.last_attempted_date === null || row.last_attempted_date === "" ? null
+                        : new Date(row.last_attempted_date).toLocaleDateString("en-SG", {
                           day: "2-digit",
                           month: "short",
                           year: "numeric"
