@@ -2,22 +2,26 @@ import * as React from 'react';
 import { alpha, useTheme } from '@mui/material/styles';
 import type { ApexOptions } from 'apexcharts';
 import { Chart } from '@/components/core/chart';
-import type { UserCourseProgression, QuestScore } from "@/types/analytics/user-course-progression";
+import type { UserCourseProgression, QuestScore } from "@/types/analytics/analytics-two";
+import {logger} from "@/lib/default-logger";
 
-export interface CourseChartProps {
+export interface QuestScoreChartProps {
   aUserCourseProgression: UserCourseProgression;
 }
 
-export function QuestChart({ aUserCourseProgression }: CourseChartProps): React.JSX.Element {
+export function QuestScoreChart({ aUserCourseProgression }: QuestScoreChartProps): React.JSX.Element {
   const questNames = aUserCourseProgression.quest_scores.map((quest: QuestScore) => quest.quest_name);
-  const chartOptions = useChartOptions(questNames, aUserCourseProgression);
+  const chartOptions = useChartOptions(questNames);
 
   const questScores: { name: string; highest_score: number; not_scored: number }[] =
     aUserCourseProgression.quest_scores.map((quest: QuestScore) => ({
+      key: quest.quest_id, // Ensure unique keys
       name: quest.quest_name,
       highest_score: quest.highest_score,
       not_scored: quest.max_score - quest.highest_score,
     }));
+
+  logger.debug('Quest Scores:', questScores);
 
   return (
     <Chart
@@ -34,7 +38,7 @@ export function QuestChart({ aUserCourseProgression }: CourseChartProps): React.
   );
 }
 
-function useChartOptions(labels: string[], aUserCourseProgression:UserCourseProgression): ApexOptions {
+function useChartOptions(labels: string[]): ApexOptions {
   const theme = useTheme();
   return {
     chart: {
@@ -111,16 +115,6 @@ function useChartOptions(labels: string[], aUserCourseProgression:UserCourseProg
         fontFamily: theme.typography.fontFamily,
       }
     },
-    // title: {
-    //   text: `${aUserCourseProgression.course_code} ${aUserCourseProgression.course_name}`,
-    //   align: 'center',
-    //   style: {
-    //     fontFamily: theme.typography.fontFamily,
-    //     fontSize: '16px',
-    //     fontWeight: 500,
-    //   },
-    //   margin: 0
-    // },
     grid: {
       show: false,
       padding: {  top: -20, bottom: -10 },

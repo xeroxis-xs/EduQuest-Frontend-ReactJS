@@ -1,9 +1,9 @@
 import type { Badge } from "@/types/badge";
-import type { UserQuestAttempt } from "@/types/user-quest-attempt";
+import {type UserQuestAttemptSummary} from "@/types/user-quest-attempt";
 
 export interface UserQuestBadge {
   id: number;
   badge: Badge;
-  quest_attempted: UserQuestAttempt;
+  user_quest_attempt: UserQuestAttemptSummary;
   awarded_date: string; // ISO 8601 datetime string
 }

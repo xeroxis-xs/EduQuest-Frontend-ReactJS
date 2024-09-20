@@ -5,14 +5,9 @@ import Typography from '@mui/material/Typography';
 import { CaretLeft as CaretLeftIcon } from "@phosphor-icons/react/dist/ssr/CaretLeft";
 import { Pen as PenIcon } from "@phosphor-icons/react/dist/ssr/Pen";
 import { GameController as GameControllerIcon } from "@phosphor-icons/react/dist/ssr/GameController";
-import type { Course } from '@/types/course';
 import type { Quest } from '@/types/quest';
 import type { UserQuestAttempt } from '@/types/user-quest-attempt';
-import apiService from "@/api/api-service";
-import type { AxiosResponse } from "axios";
-import { AxiosError } from "axios";
 import { logger } from '@/lib/default-logger'
-import { authClient } from "@/lib/auth/client";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
 import CardContent from "@mui/material/CardContent";
@@ -21,7 +16,6 @@ import CardActions from "@mui/material/CardActions";
 import { default as RouterLink } from "next/link";
 import Alert from "@mui/material/Alert";
 import Stack from "@mui/material/Stack";
-import {useRouter} from "next/navigation";
 import {ListChecks  as ListChecksIcon} from "@phosphor-icons/react/dist/ssr/ListChecks";
 import Chip from "@mui/material/Chip";
 import {useUser} from "@/hooks/use-user";
@@ -37,30 +31,61 @@ import Tooltip from "@mui/material/Tooltip";
 import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
 import {QuestExpiresDialog} from "@/components/dashboard/dialog/quest-expires-dialog";
 import Points from "../../../../../public/assets/point.svg";
-import {getQuest, getNonPrivateQuests, updateQuest} from "@/api/services/quest";
-import {getNonPrivateCourses} from "@/api/services/course";
+import {getQuest, updateQuest} from "@/api/services/quest";
 import {getUserCourseGroupEnrollmentsByCourseAndUser} from "@/api/services/user-course-group-enrollment";
-import {UserCourseGroupEnrollment} from "@/types/user-course-group-enrollment";
+import {type UserCourseGroupEnrollment} from "@/types/user-course-group-enrollment";
 import {createUserQuestAttempt, getUserQuestAttemptsByUserAndQuest} from "@/api/services/user-quest-attempt";
 import {User as UserIcon} from "@phosphor-icons/react/dist/ssr/User";
-
+import {getUserAnswerAttemptByUserQuestAttempt} from "@/api/services/user-answer-attempt";
+import {type UserAnswerAttempt} from "@/types/user-answer-attempt";
+import {AnswerAttemptCard} from "@/components/dashboard/quest/question/attempt/answer-attempt-card";
+import Box from "@mui/material/Box";
 
 
 export default function Page({ params }: { params: { questId: string } }) : React.JSX.Element {
-  const router = useRouter();
   const { eduquestUser } = useUser();
 
   const [courseEnrollments, setCourseEnrollments] = React.useState<UserCourseGroupEnrollment[]>();
   const [quest, setQuest] = React.useState<Quest>();
   const [userQuestAttempts, setUserQuestAttempts] = React.useState<UserQuestAttempt[]>();
+  const [userAnswerAttempts, setUserAnswerAttempts] = React.useState<UserAnswerAttempt[]>([]);
+  const [userAnswerAttemptIdAndStatus, setUserAnswerAttemptIdAndStatus] = React.useState<{ attemptId: string; submitted: boolean } | null>(null);
 
+  const [showAnswerAttemptsMode, setShowAnswerAttemptsMode] = React.useState(false);
   const [submitStatus, setSubmitStatus] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [showEditQuestForm, setShowEditQuestForm] = React.useState(false);
   const [showNewQuestionForm, setShowNewQuestionForm] = React.useState(false);
+
   const [loadingCourseEnrollments, setLoadingCourseEnrollments] = React.useState(true);
   const [loadingQuest, setLoadingQuest] = React.useState(true);
   const [loadingQuestAttemptTable, setLoadingQuestAttemptTable] = React.useState(true);
+  const [loadingUserAnswerAttempts, setLoadingUserAnswerAttempts] = React.useState(false);
   const [openDialog, setOpenDialog] = useState(false);
+
+  const handleViewAnswerAttempts = async ({ attemptId, submitted }: { attemptId: string; submitted: boolean }): Promise<void> => {
+    try {
+      setLoadingUserAnswerAttempts(true);
+      setUserAnswerAttemptIdAndStatus({ attemptId, submitted });
+      toggleAnswerAttemptMode();
+      // Fetch the selected user answer attempts
+      const response = await getUserAnswerAttemptByUserQuestAttempt(attemptId);
+      setUserAnswerAttempts(response);
+    } catch (error: unknown) {
+      logger.error('Failed to fetch user answer attempts', error);
+    } finally {
+      setLoadingUserAnswerAttempts(false);
+    }
+  }
+
+  const handleAnswerSubmit = async (): Promise<void> => {
+    // Refresh the quest attempts table
+    await fetchMyQuestAttempts();
+    toggleAnswerAttemptMode()
+  }
+
+  const toggleAnswerAttemptMode = (): void => {
+    setShowAnswerAttemptsMode(!showAnswerAttemptsMode);
+  }
 
   const toggleEditQuestForm = (): void => {
     setShowEditQuestForm(!showEditQuestForm);
@@ -87,7 +112,8 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
     try {
       const response = await getQuest(params.questId);
       setQuest(response);
-      return response.course_group.course_id.toString();
+      // logger.debug('Quest fetched:', response);
+      return response.course_group.course.id.toString();
     } catch (error: unknown) {
       logger.error('Failed to fetch quest', error);
     } finally {
@@ -97,8 +123,9 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
 
   const fetchEnrollment = async (userId: string, courseId: string): Promise<void> => {
     try {
-      const response = await getUserCourseGroupEnrollmentsByCourseAndUser(userId, courseId);
+      const response = await getUserCourseGroupEnrollmentsByCourseAndUser(courseId, userId);
       setCourseEnrollments(response);
+      // logger.debug('My Course enrollments fetched:', response);
     } catch (error: unknown) {
       logger.error('Failed to fetch course enrollments', error);
     } finally {
@@ -119,6 +146,16 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
     }
   }
 
+  const onAnswerChange = (attemptId: number, answerId: number, isChecked: boolean): void => {
+    setUserAnswerAttempts(prevData =>
+      prevData.map(attempt => {
+        if (attempt.id === attemptId && attempt.answer.id === answerId) {
+          return { ...attempt, is_selected: isChecked };
+        }
+        return attempt;
+      })
+    );
+  };
 
   const handleNewAttempt = async (): Promise<void> => {
     if (eduquestUser) {
@@ -129,8 +166,14 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
           quest_id: params.questId as unknown as number,
           first_attempted_date: dateString,
         };
-        const response = await createUserQuestAttempt(newAttempt)
-        router.push(`/dashboard/quest/${params.questId}/quest-attempt/${response.id.toString()}`);
+        // Create a new quest attempt, backend will create an empty set of user answer attempts
+        const userQuestAttempt = await createUserQuestAttempt(newAttempt)
+
+        // Refresh the quest attempts table
+        await fetchMyQuestAttempts();
+
+        // Redirect to the new attempt component
+        await handleViewAnswerAttempts({ attemptId: userQuestAttempt.id.toString(), submitted: false });
       } catch (error: unknown) {
         logger.error('Failed to create a new attempt', error);
         setSubmitStatus({type: 'error', message: 'Failed to create a new attempt. Please try again.'});
@@ -172,11 +215,40 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
 
   return (
     <Stack spacing={3}>
-      {quest ? <Stack direction="row" sx={{justifyContent: 'space-between'}}>
-        <Button startIcon={<CaretLeftIcon fontSize="var(--icon-fontSize-md)"/>} component={RouterLink} href={`/dashboard/course/${quest?.course_group.course_id.toString()}`}>View other Quests</Button>
+      <Stack direction="row" sx={{ justifyContent: 'space-between' }}>
+        {showAnswerAttemptsMode ? (
+          <Button startIcon={<CaretLeftIcon />} onClick={toggleAnswerAttemptMode}>
+            Return to Quest
+          </Button>
+        ) : (
+          quest ? (
+            <Button startIcon={<CaretLeftIcon />} component={RouterLink} href={`/dashboard/course/${quest?.course_group.course.id.toString()}`}>
+              View other Quests
+            </Button>
+          ) : null
+        )}
+      </Stack>
 
-      </Stack> : null
-      }
+      {showAnswerAttemptsMode ? (
+        loadingUserAnswerAttempts ? (
+          <SkeletonQuestAttemptTable />
+        ) : (
+          userAnswerAttempts && userAnswerAttemptIdAndStatus ? (
+            <AnswerAttemptCard
+              data={userAnswerAttempts}
+              userQuestAttemptId={userAnswerAttemptIdAndStatus.attemptId}
+              submitted={userAnswerAttemptIdAndStatus.submitted}
+              onAnswerChange={onAnswerChange}
+              onAnswerSubmit={handleAnswerSubmit}
+              onAnswerSave={fetchMyQuestAttempts}
+            />
+          ) : null
+        )
+      )
+
+        :
+
+      <Box>
 
       {!showEditQuestForm && !showNewQuestionForm && (
         loadingQuest && loadingCourseEnrollments ? (
@@ -354,32 +426,34 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
           <CardActions sx={{ justifyContent: 'center' }}>
 
             {courseEnrollments && eduquestUser && userQuestAttempts ? (
-              quest.total_questions === 0 ? (
-                eduquestUser.is_staff ? (
-                  <Button startIcon={<ListChecksIcon/>} variant='contained' onClick={toggleNewQuestionForm}>
-                    Create New Questions
+              courseEnrollments.some(enrollment => enrollment.course_group.id === quest.course_group.id) ? (
+                quest.total_questions === 0 ? (
+                  eduquestUser.is_staff ? (
+                    <Button startIcon={<ListChecksIcon/>} variant='contained' onClick={toggleNewQuestionForm}>
+                      Create New Questions
+                    </Button>
+                  ) : null
+                ) : quest.status === 'Expired' ? (
+                  <Button disabled variant='contained'>
+                    Quest has Expired
                   </Button>
-                ) : null
-              ) : quest.status === 'Expired' ? (
-                <Button disabled variant='contained'>
-                  Quest has Expired
-                </Button>
-              ) : userQuestAttempts.length >= quest.max_attempts ? (
-                <Button disabled variant='contained'>
-                  No more attempts available
-                </Button>
-              ) : courseEnrollments?.some(enrollment => enrollment.course_group_id === quest.course_group.id) ? (
-                <Button startIcon={<GameControllerIcon fontSize="var(--icon-fontSize-md)"/>}
-                        variant='contained'
-                        onClick={handleNewAttempt}
-                >
-                  Start New Attempt
-                </Button>
+                ) : userQuestAttempts.length >= quest.max_attempts ? (
+                  <Button disabled variant='contained'>
+                    No more attempts available
+                  </Button>
+                ) : (
+                  <Button startIcon={<GameControllerIcon fontSize="var(--icon-fontSize-md)"/>}
+                          variant='contained'
+                          onClick={handleNewAttempt}
+                  >
+                    Start New Attempt
+                  </Button>
+                )
               ) : (
                 <Button startIcon={<CaretLeftIcon fontSize="var(--icon-fontSize-md)" />}
                         variant='outlined'
                         component={RouterLink}
-                        href={`/dashboard/course/${quest.course_group.course_id.toString()}`}
+                        href={`/dashboard/course/${quest.course_group.course.id.toString()}`}
                 >
                   You are not enrolled in this group
                 </Button>
@@ -429,7 +503,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
       {submitStatus ? <Alert severity={submitStatus.type} sx={{marginTop: 2}}>
         {submitStatus.message}
       </Alert> : null}
-      <Typography variant="h6">My Attempts</Typography>
+      <Typography variant="h5" sx={{ mt:4, mb:2 }}>My Attempts</Typography>
 
       {loadingQuestAttemptTable ? (
         <SkeletonQuestAttemptTable />
@@ -440,13 +514,14 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
             questId={params.questId}
             totalMaxScore={quest?.total_max_score}
             questStatus={quest?.status}
+            handleViewAnswerAttempts={handleViewAnswerAttempts}
           />
         ) : (
           <Typography variant="body1">You have not attempted this quest yet.</Typography>
         )
       )}
-
-
+      </Box>
+      }
 
 
     </Stack>

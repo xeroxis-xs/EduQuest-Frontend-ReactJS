@@ -2,7 +2,7 @@ import * as React from 'react';
 import {alpha, useTheme} from '@mui/material/styles';
 import type { ApexOptions } from 'apexcharts';
 import { Chart } from '@/components/core/chart';
-import type { UserCourseProgression } from "@/types/analytics/user-course-progression";
+import type {UserCourseProgression} from "@/types/analytics/analytics-two";
 
 
 export interface CourseChartProps {
@@ -13,7 +13,6 @@ export function CourseChart({ aUserCourseProgression }: CourseChartProps): React
 
   const chartOptions = useChartOptions1(
     ["Progress"],
-    aUserCourseProgression.course_code,
   );
 
   return (
@@ -214,7 +213,7 @@ export function CourseChart({ aUserCourseProgression }: CourseChartProps): React
 //   };
 // }
 
-function useChartOptions1(labels: string[], courseCode: string): ApexOptions {
+function useChartOptions1(labels: string[]): ApexOptions {
   const theme = useTheme();
 
   return {
@@ -319,45 +318,3 @@ function useChartOptions1(labels: string[], courseCode: string): ApexOptions {
     // }
   };
 }
-
-var options2 = {
-  chart: {
-    height: 280,
-    type: "radialBar",
-  },
-  series: [67],
-  colors: ["#20E647"],
-  plotOptions: {
-    radialBar: {
-      startAngle: -90,
-      endAngle: 90,
-      track: {
-        background: '#333',
-        startAngle: -90,
-        endAngle: 90,
-      },
-      dataLabels: {
-        name: {
-          show: false,
-        },
-        value: {
-          fontSize: "30px",
-          show: true
-        }
-      }
-    }
-  },
-  fill: {
-    type: "gradient",
-    gradient: {
-      shade: "dark",
-      type: "horizontal",
-      gradientToColors: ["#87D4F9"],
-      stops: [0, 100]
-    }
-  },
-  stroke: {
-    lineCap: "round"
-  },
-  labels: ["Progress"]
-};

@@ -1,5 +1,6 @@
 import apiService from "@/api/api-service";
 import type { Quest, QuestNewForm, QuestUpdateForm } from "@/types/quest";
+import type {Question} from "@/types/question";
 
 
 export const getQuests = async (): Promise<Quest[]> => {
@@ -22,7 +23,7 @@ export const getMyPrivateQuests = async (): Promise<Quest[]> => {
   return response.data;
 }
 
-export const getQuestsByEnrolledUser = async(id: string): Promise<Quest[]> => {
+export const getMyQuests = async(id: string): Promise<Quest[]> => {
   const response = await apiService.get<Quest[]>(`/api/quests/by_enrolled_user/?user_id=${id}`);
   return response.data;
 }
@@ -34,6 +35,15 @@ export const getQuestsByCourseGroup = async(id: string): Promise<Quest[]> => {
 
 export const createQuest = async (questNewForm: QuestNewForm): Promise<Quest> => {
   const response = await apiService.post<Quest>('/api/quests/', questNewForm);
+  return response.data;
+}
+
+export const importQuest = async (questImportFormData: FormData): Promise<Question[]> => {
+  const response = await apiService.post<Question[]>(`/api/quests/import_quest/`, questImportFormData, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  });
   return response.data;
 }
 

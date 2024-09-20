@@ -11,12 +11,12 @@ import CardActions from "@mui/material/CardActions";
 import { Users as UsersIcon } from "@phosphor-icons/react/dist/ssr/Users";
 import { User as UserIcon } from "@phosphor-icons/react/dist/ssr/User";
 import { Check as CheckIcon } from "@phosphor-icons/react/dist/ssr/Check";
-import type {CourseGroup} from "@/types/course-group";
-import {useTheme} from "@mui/material/styles";
-import useMediaQuery from '@mui/material/useMediaQuery';
-import {UserCourseGroupEnrollment} from "@/types/user-course-group-enrollment";
 import Chip from "@mui/material/Chip";
 import Stack from "@mui/material/Stack";
+import { useTheme } from "@mui/material/styles";
+import useMediaQuery from '@mui/material/useMediaQuery';
+import type { CourseGroup } from "@/types/course-group";
+import { type UserCourseGroupEnrollment } from "@/types/user-course-group-enrollment";
 
 interface CourseGroupCardProps {
   rows?: CourseGroup[];
@@ -55,6 +55,9 @@ export function CourseGroupCard({ rows = [], userCourseGroupEnrollments, handleC
   // State to track the current page
   const [page, setPage] = React.useState(1);
 
+  // State to track the selected card
+  const [selectedCard, setSelectedCard] = React.useState<string | null>(null);
+
   // Determine the items to display on the current page
   const currentCourseGroups = React.useMemo(() => {
     const start = (page - 1) * rowsPerPage;
@@ -65,6 +68,12 @@ export function CourseGroupCard({ rows = [], userCourseGroupEnrollments, handleC
   // Handle page change
   const handleChangePage = (event: React.ChangeEvent<unknown>, newPage: number): void => {
     setPage(newPage);
+  };
+
+  // Handle card selection
+  const handleCardSelect = (courseGroupId: string): void => {
+    setSelectedCard(courseGroupId);
+    handleCourseGroupSelect(courseGroupId);
   };
 
   return (
@@ -95,6 +104,7 @@ export function CourseGroupCard({ rows = [], userCourseGroupEnrollments, handleC
                 justifyContent: 'space-between',
                 textAlign: 'center',
                 cursor: 'pointer',
+                border: selectedCard === courseGroup.id.toString() ? `2px solid ${theme.palette.primary.main}` : `1px solid ${theme.palette.divider}`,
               }}
             >
               <CardActionArea
@@ -103,7 +113,7 @@ export function CourseGroupCard({ rows = [], userCourseGroupEnrollments, handleC
                   borderBottomLeftRadius: 0,
                   borderBottomRightRadius: 0,
                 }}
-                onClick={() => { handleCourseGroupSelect(courseGroup.id.toString()); }}
+                onClick={() => { handleCardSelect(courseGroup.id.toString()); }}
               >
                 {/* Card Header */}
                 <CardHeader title={courseGroup.name} />
@@ -150,11 +160,9 @@ export function CourseGroupCard({ rows = [], userCourseGroupEnrollments, handleC
                     }}
                   >
                     {/* Check if the user is enrolled in the course group */}
-                    {userCourseGroupEnrollments.some((enrollment) => enrollment.course_group_id === courseGroup.id) && (
-                      // <CheckCircleIcon size={20} weight="fill" color={theme.palette.success.main} />
-                      <Chip icon={<CheckIcon size={14}/>} label="Enrolled" color="success" size="small"/>
-
-                  )}
+                    {userCourseGroupEnrollments.some((enrollment) => enrollment.course_group.id === courseGroup.id) && (
+                      <Chip icon={<CheckIcon size={16} weight="bold"/>} label="Enrolled" color="success" />
+                    )}
                   </Box>
                 </CardActions>
               </CardActionArea>

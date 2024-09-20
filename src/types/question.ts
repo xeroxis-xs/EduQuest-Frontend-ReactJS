@@ -1,7 +1,8 @@
-import { Answer } from "@/types/answer";
+import {type Answer, type AnswerNewForm} from "@/types/answer";
 
 
 export interface Question {
+  quest_id: number;
   id: number;
   number: number;
   text: string;
@@ -14,5 +15,11 @@ export interface QuestionMultipleNewForm {
   text: string;
   number: number;
   max_score: number;
-  answers: Answer[];
+  answers: AnswerNewForm[];
+}
+
+export interface GeneratedQuestion {
+  number: number;
+  text: string;
+  answers: AnswerNewForm[];
 }

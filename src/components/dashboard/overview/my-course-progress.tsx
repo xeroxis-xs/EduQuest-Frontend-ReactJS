@@ -10,7 +10,7 @@ import {CaretRight as CaretRightIcon} from "@phosphor-icons/react/dist/ssr/Caret
 import {CaretLeft as CaretLeftIcon} from "@phosphor-icons/react/dist/ssr/CaretLeft";
 import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
 import Stack from "@mui/material/Stack";
-import type { UserCourseProgression } from "@/types/analytics/user-course-progression";
+import type { UserCourseProgression } from "@/types/analytics/analytics-two";
 import Typography from "@mui/material/Typography";
 import CardContent from "@mui/material/CardContent";
 import Grid from "@mui/material/Unstable_Grid2";

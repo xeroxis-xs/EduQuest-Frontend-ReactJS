@@ -4,8 +4,6 @@ import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { XCircle as XCircleIcon } from '@phosphor-icons/react/dist/ssr/XCircle';
-import apiService from "@/api/api-service";
-import {AxiosError, type AxiosResponse} from "axios";
 import { logger } from '@/lib/default-logger'
 import type { Quest } from '@/types/quest';
 import Card from "@mui/material/Card";
@@ -24,14 +22,13 @@ import {FloppyDisk as FloppyDiskIcon} from "@phosphor-icons/react/dist/ssr/Flopp
 import {paths} from "@/paths";
 import {useRouter} from "next/navigation";
 import {useUser} from "@/hooks/use-user";
-import type {Course} from "@/types/course";
 import type {Image} from "@/types/image";
 import FormLabel from "@mui/material/FormLabel";
 import {useTheme} from "@mui/material/styles";
 import Tooltip from "@mui/material/Tooltip";
 import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
 import {getImages} from "@/api/services/image";
-import {CourseGroup} from "@/types/course-group";
+import {type CourseGroup} from "@/types/course-group";
 import {getCourseGroups} from "@/api/services/course-group";
 import {deleteQuest, updateQuest} from "@/api/services/quest";
 import {User as UserIcon} from "@phosphor-icons/react/dist/ssr/User";
@@ -358,7 +355,7 @@ export default function QuestEditForm( {quest, toggleForm, setSubmitStatus, onUp
                               label="Group ID" variant="outlined" type="number" size="small">
                         {courseGroups.map((option) => (
                           <MenuItem key={option.id} value={option.id}>
-                            {option.id} - {option.name}
+                            {`${option.id.toString()} - [${option.name}] ${option.course.code} ${option.course.name}`}
                           </MenuItem>
                         ))}
                       </Select>

@@ -57,8 +57,7 @@ export default function Page(): React.JSX.Element {
             List of all courses available on the platform.
           </Typography>
         </Stack>
-        {eduquestUser?.is_staff && (
-          <Stack direction="row" sx={{ alignItems: 'center' }}>
+        {eduquestUser?.is_staff ? <Stack direction="row" sx={{ alignItems: 'center' }}>
             <Button
               startIcon={showForm ? <XCircleIcon fontSize="var(--icon-fontSize-md)" /> : <PlusIcon fontSize="var(--icon-fontSize-md)" />}
               variant={showForm ? 'text' : 'contained'}
@@ -67,10 +66,9 @@ export default function Page(): React.JSX.Element {
             >
               {showForm ? 'Cancel' : 'Create'}
             </Button>
-          </Stack>
-        )}
+          </Stack> : null}
       </Stack>
-      {showForm && <CourseNewForm onFormSubmitSuccess={fetchCourses} />}
+      {showForm ? <CourseNewForm onFormSubmitSuccess={fetchCourses} /> : null}
       {loading ? (
         <SkeletonCourseCard />
       ) : courses.length === 0 ? (
@@ -78,7 +76,7 @@ export default function Page(): React.JSX.Element {
           No data available.
         </Typography>
       ) : (
-        <CourseCard rows={courses} onEnrolledSuccess={fetchCourses} />
+        <CourseCard rows={courses}/>
       )}
     </Stack>
   );

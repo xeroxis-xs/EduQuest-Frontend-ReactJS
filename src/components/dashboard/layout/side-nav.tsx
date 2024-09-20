@@ -209,7 +209,7 @@ function NavItem({ disabled, external, href, icon, matcher, pathname, title, ite
           borderLeftStyle: 'solid',
           borderLeftColor: 'var(--NavItem-icon-color)',
           pl: 2, ml: '26px' }}>
-          {renderNavItems({ items: items, pathname })}
+          {renderNavItems({ items, pathname })}
         </Box> : null}
     </li>
   );

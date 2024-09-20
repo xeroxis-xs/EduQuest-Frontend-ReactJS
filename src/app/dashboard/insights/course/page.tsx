@@ -2,49 +2,32 @@
 import * as React from 'react';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import apiService from "@/api/api-service";
-import {AxiosError, type AxiosResponse} from "axios";
 import { logger } from '@/lib/default-logger'
-import {authClient} from "@/lib/auth/client";
 import {CourseTable} from "@/components/dashboard/insights/course/course-table";
-import type {Course} from "@/types/course";
+import {getAnalyticsPartFour} from "@/api/services/analytics";
+import type {AnalyticsPartFour, CourseGroup} from "@/types/analytics/analytics-four";
+import {CourseGroupInfoCard} from "@/components/dashboard/insights/course/course-group-info-card";
 
 export default function Page(): React.JSX.Element {
-  const [courses, setCourses] = React.useState<Course[]>([]);
+  const [analyticsPartFour, setAnalyticsPartFour] = React.useState<AnalyticsPartFour[]>([]);
+  const [courseGroupAnalytics, setCourseGroupAnalytics] = React.useState<CourseGroup | null>(null);
 
-  const getCourses = async (): Promise<void> => {
+  const fetchAnalyticsPartFour = async (): Promise<void> => {
     try {
-      const response: AxiosResponse<Course[]> = await apiService.get<Course[]>('/api/Course/non-private');
-      const data: Course[] = response.data;
-      setCourses(data);
+      const response = await getAnalyticsPartFour();
+      setAnalyticsPartFour(response);
     } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-      }
-      logger.error('Error getting courses: ', error);
+      logger.error('Failed to fetch analytics part four', error);
     }
   }
 
-  const getCourseInsights = async (id: number): Promise<void> => {
-    try {
-      const response = await apiService.get<Course>(`/api/Course/${id.toString()}`);
-      const data: Course = response.data;
-      logger.debug('response', data);
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-      }
-      logger.error('Failed to load course insights', error);
-    }
-  };
+  const handleCourseGroupSelect = (group: CourseGroup): void => {
+    setCourseGroupAnalytics(group);
+  }
 
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
-      await getCourses();
+      await fetchAnalyticsPartFour();
     };
 
     fetchData().catch((error: unknown) => {
@@ -56,10 +39,14 @@ export default function Page(): React.JSX.Element {
     <Stack spacing={3}>
       <Stack spacing={1}>
           <Typography variant="h4">Course Insights</Typography>
-          <Typography variant="body1">Course Insights</Typography>
+          <Typography variant="body2" color="text.secondary">The following table shows the list of courses and their progress.</Typography>
+
       </Stack>
 
-      <CourseTable rows={courses} getCourseInsights={getCourseInsights}/>
+      <CourseTable rows={analyticsPartFour} onCourseGroupSelect={handleCourseGroupSelect}/>
+
+      <CourseGroupInfoCard groupProgress={courseGroupAnalytics}/>
+
     </Stack>
   );
 }

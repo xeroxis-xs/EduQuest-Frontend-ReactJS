@@ -10,18 +10,7 @@ import { MyCourseProgress } from "@/components/dashboard/overview/my-course-prog
 import { MyBadgeProgress } from "@/components/dashboard/overview/my-badge-progress";
 import { RecentAchievements } from "@/components/dashboard/overview/recent-achievements";
 import { TopCollectors } from "@/components/dashboard/overview/top-collectors";
-import {type ExtendedUserCourseBadge, type ExtendedUserQuestBadge, RecentBadge} from "@/types/analytics/recent-badge";
-import { type TopCollector } from "@/types/analytics/top-collector";
-import { type UserCourseProgression } from "@/types/analytics/user-course-progression";
-import { type UserBadgeProgression } from "@/types/analytics/user-badge-progression";
-import { type UserStats } from "@/types/analytics/user-stats";
-import { type CourseEnrollmentStats } from "@/types/analytics/course-enrollment-stats";
-import { type QuestAttemptStats } from "@/types/analytics/quest-attempt-stats";
-import { type ShortestTimeUser } from "@/types/analytics/shortest-time-user";
-import { AxiosError, type AxiosResponse } from "axios";
-import apiService from "@/api/api-service";
 import { logger } from "@/lib/default-logger";
-import { authClient } from "@/lib/auth/client";
 import { SkeletonTopCollector } from "@/components/dashboard/skeleton/analytics/skeleton-top-collector";
 import { SkeletonRecentAchievements } from "@/components/dashboard/skeleton/analytics/skeleton-recent-achievements";
 import {useUser} from "@/hooks/use-user";
@@ -36,24 +25,12 @@ import {LiveIndicator} from "@/components/dashboard/overview/chart/live-indicato
 import Typography from "@mui/material/Typography";
 import {MyQuestScores} from "@/components/dashboard/overview/my-quest-scores";
 import {SkeletonMyQuestScores} from "@/components/dashboard/skeleton/analytics/skeleton-my-quest-scores";
+import {AnalyticsPartThree} from "@/types/analytics/analytics-three";
+import {AnalyticsPartTwo, UserCourseProgression} from "@/types/analytics/analytics-two";
+import {AnalyticsPartOne} from "@/types/analytics/analytics-one";
+import {getAnalyticsPartOne, getAnalyticsPartThree, getAnalyticsPartTwo} from "@/api/services/analytics";
 
 
-export interface AnalyticsPartOne {
-  user_stats: UserStats;
-  course_enrollment_stats: CourseEnrollmentStats;
-  quest_attempt_stats: QuestAttemptStats;
-  shortest_time_user: ShortestTimeUser | null;
-}
-
-export interface AnalyticsPartTwo {
-  user_course_progression: UserCourseProgression[];
-  user_badge_progression: UserBadgeProgression[];
-}
-
-export interface AnalyticsPartThree {
-  top_users_with_most_badges: TopCollector[];
-  recent_badge_awards: RecentBadge[];
-}
 
 export default function Page(): React.JSX.Element {
   const { eduquestUser } = useUser();
@@ -86,61 +63,44 @@ export default function Page(): React.JSX.Element {
     recent_badge_awards: [],
   });
 
-  const getAnalyticsPartOne = async (): Promise<void> => {
+
+  const fetchAnalyticsPartOne = async (): Promise<void> => {
     try {
-      const response: AxiosResponse<AnalyticsPartOne> = await apiService.get<AnalyticsPartOne>('/api/Analytics/part-one');
-      const data: AnalyticsPartOne = response.data;
-      logger.debug('Analytics Part One', data);
-      setAnalyticsPartOne(data);
+      const response = await getAnalyticsPartOne()
+      // logger.debug('Analytics Part One', response);
+      setAnalyticsPartOne(response);
     } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-      }
-      logger.error('Error: ', error);
+      logger.error('Error fetching analytics part one', error);
     } finally {
       setAnalyticsPartOneLoading(false);
     }
   }
 
-  const getAnalyticsPartTwo = async (): Promise<void> => {
+  const fetchAnalyticsPartTwo = async (): Promise<void> => {
     if (eduquestUser) {
       try {
-        const response: AxiosResponse<AnalyticsPartTwo> = await apiService.get<AnalyticsPartTwo>(`/api/Analytics/part-two/${eduquestUser.id.toString()}`);
-        const data: AnalyticsPartTwo = response.data;
-        logger.debug('Analytics Part Two', data);
-        setAnalyticsPartTwo(data);
+        const response = await getAnalyticsPartTwo(eduquestUser.id, 'both');
+        logger.debug('Analytics Part Two', response);
+        setAnalyticsPartTwo(response);
       } catch (error: unknown) {
-        if (error instanceof AxiosError) {
-          if (error.response?.status === 401) {
-            await authClient.signInWithMsal();
-          }
-        }
-        logger.error('Error: ', error);
+        logger.error('Error fetching analytics part two', error);
       } finally {
         setAnalyticsPartTwoLoading(false);
       }
     }
   }
 
-  const getAnalyticsPartThree = async (): Promise<void> => {
+  const fetchAnalyticsPartThree = async (): Promise<void> => {
     try {
-      const response: AxiosResponse<AnalyticsPartThree> = await apiService.get<AnalyticsPartThree>('/api/Analytics/part-three/');
-      const data: AnalyticsPartThree = response.data;
-      logger.debug('Analytics Part Three', data);
-      setAnalyticsPartThree(data);
+      const response = await getAnalyticsPartThree()
+      // logger.debug('Analytics Part Three', response);
+      setAnalyticsPartThree(response);
     } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-      }
-      logger.error('Error: ', error);
+      logger.error('Error fetching analytics part three', error);
     } finally {
       setAnalyticsPartThreeLoading(false);
     }
-  };
+  }
 
   const handleOnClick = (aUserCourseProgression: UserCourseProgression ) => {
     setUserCourseProgression(aUserCourseProgression);
@@ -148,9 +108,9 @@ export default function Page(): React.JSX.Element {
 
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
-      await getAnalyticsPartOne();
-      await getAnalyticsPartTwo();
-      await getAnalyticsPartThree();
+      await fetchAnalyticsPartOne();
+      await fetchAnalyticsPartTwo();
+      await fetchAnalyticsPartThree();
     };
 
     fetchData().catch((error: unknown) => {

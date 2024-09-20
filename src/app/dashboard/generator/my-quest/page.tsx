@@ -5,18 +5,14 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { MagicWand as MagicWandIcon } from '@phosphor-icons/react/dist/ssr/MagicWand';
 import { XCircle as XCircleIcon } from '@phosphor-icons/react/dist/ssr/XCircle';
-import apiService from "@/api/api-service";
-import {AxiosError, type AxiosResponse} from "axios";
 import { logger } from '@/lib/default-logger'
-import { authClient } from "@/lib/auth/client";
 import { QuestCard } from "@/components/dashboard/quest/quest-card";
 import type { Quest } from '@/types/quest';
 import { SkeletonQuestCard } from "@/components/dashboard/skeleton/skeleton-quest-card";
 import {GenerateQuestForm} from "@/components/dashboard/generator/generate-quest-form";
-import {useUser} from "@/hooks/use-user";
+import {getMyPrivateQuests} from "@/api/services/quest";
 
 export default function Page(): React.JSX.Element {
-  const { eduquestUser } = useUser();
   const [quests, setQuests] = React.useState<Quest[]>([]);
   const [showForm, setShowForm] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
@@ -26,29 +22,21 @@ export default function Page(): React.JSX.Element {
     setShowForm(!showForm);
   };
 
-  const getPrivateQuests = async (): Promise<void> => {
-    if (eduquestUser) {
-      try {
-        const response: AxiosResponse<Quest[]> = await apiService.get<Quest[]>(`/api/Quest/private/by-user/${eduquestUser.id.toString()}/`);
-        const data: Quest[] = response.data;
-        setQuests(data);
-        logger.debug('Private Quests', data);
-      } catch (error: unknown) {
-        if (error instanceof AxiosError) {
-          if (error.response?.status === 401) {
-            await authClient.signInWithMsal();
-          }
-        }
-        logger.error('Error: ', error);
-      } finally {
-        setLoading(false);
-      }
+  const fetchPrivateQuests = async (): Promise<void> => {
+    try {
+      const response = await getMyPrivateQuests()
+      setQuests(response);
+      // logger.debug('Private Quests', response);
+    } catch (error: unknown) {
+      logger.error('Error fetching private quests', error);
+    } finally {
+      setLoading(false);
     }
   };
 
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
-      await getPrivateQuests();
+      await fetchPrivateQuests();
     };
 
     fetchData().catch((error: unknown) => {
@@ -77,14 +65,14 @@ export default function Page(): React.JSX.Element {
 
         </Stack>
       </Stack>
-      {showForm ? <GenerateQuestForm onFormSubmitSuccess={getPrivateQuests} /> : null}
+      {showForm ? <GenerateQuestForm onFormSubmitSuccess={fetchPrivateQuests} /> : null}
       {loading ? (
         <SkeletonQuestCard />
       ) : (
         quests.length === 0 ? (
           <Typography variant="body1">You have not generated any quest yet.</Typography>
         ) : (
-          <QuestCard rows={quests} onQuestDeleteSuccess={getPrivateQuests} />
+          <QuestCard rows={quests} onQuestDeleteSuccess={fetchPrivateQuests} />
         )
       )}
     </Stack>

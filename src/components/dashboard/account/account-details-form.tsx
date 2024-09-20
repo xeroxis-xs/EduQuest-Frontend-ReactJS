@@ -50,17 +50,19 @@ export function AccountDetailsForm(): React.JSX.Element {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
-    const updatedNickname = {
-      nickname: nicknameRef.current?.value,
-    };
-    if (eduquestUser) {
-      try {
-        const response = await updateEduquestUser(eduquestUser.id, updatedNickname);
-        logger.debug('Update Success:', response);
-        setSubmitStatus({ type: 'success', message: 'Update Successful' });
-        await refreshUser();
-      } catch (error) {
-        logger.error('Update Failed:', error);
+    if (nicknameRef.current?.value) {
+      const updatedNickname = {
+        nickname: nicknameRef.current?.value,
+      };
+      if (eduquestUser) {
+        try {
+          const response = await updateEduquestUser(eduquestUser.id.toString(), updatedNickname);
+          logger.debug('Update Success:', response);
+          setSubmitStatus({ type: 'success', message: 'Update Successful' });
+          await refreshUser();
+        } catch (error) {
+          logger.error('Update Failed:', error);
+        }
       }
     }
   };

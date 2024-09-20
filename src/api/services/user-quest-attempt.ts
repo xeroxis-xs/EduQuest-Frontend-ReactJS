@@ -35,6 +35,10 @@ export const updateUserQuestAttempt = async (id: string, userQuestAttempt: UserQ
   return response.data;
 }
 
+export const updateUserQuestAttemptByQuestAsSubmitted = async (questId: string): Promise<void> => {
+  await apiService.post(`/api/user-quest-attempts/set_all_attempts_submitted_by_quest/?quest_id=${questId}`);
+}
+
 export const updateMultipleUserQuestAttempts = async (userQuestAttempts: UserQuestAttemptMultipleUpdateForm[]): Promise<UserQuestAttempt[]> => {
   const response = await apiService.patch<UserQuestAttempt[]>('/api/user-quest-attempts/bulk-update/', userQuestAttempts);
   return response.data;

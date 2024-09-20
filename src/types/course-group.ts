@@ -1,14 +1,20 @@
 import type { EduquestUserSummary } from './eduquest-user';
-import type { Course } from './course';
+import type {Course, CourseSummary} from './course';
 
 export interface CourseGroup {
-  course_id: Course['id']
+  course: CourseSummary
   instructor: EduquestUserSummary
   id: number
   name: string
   session_day: string
   session_time: string
   total_students_enrolled: number
+}
+
+export interface CourseGroupSummary {
+  course: CourseSummary
+  id: number
+  name: string
 }
 
 export interface CourseGroupNewForm {

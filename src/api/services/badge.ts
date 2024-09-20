@@ -13,7 +13,17 @@ export const getUserQuestBadges = async (): Promise<UserQuestBadge[]> => {
   return response.data;
 }
 
+export const getUserQuestBadgesByUser = async (userId: string): Promise<UserQuestBadge[]> => {
+  const response = await apiService.get<UserQuestBadge[]>(`/api/user-quest-badges/by_user/?user_id=${userId}`);
+  return response.data;
+}
+
 export const getUserCourseBadges = async (): Promise<UserCourseBadge[]> => {
   const response = await apiService.get<UserCourseBadge[]>('/api/user-course-badges/');
+  return response.data;
+}
+
+export const getUserCourseBadgesByUser = async (userId: string): Promise<UserCourseBadge[]> => {
+  const response = await apiService.get<UserCourseBadge[]>(`/api/user-course-badges/by_user/?user_id=${userId}`);
   return response.data;
 }

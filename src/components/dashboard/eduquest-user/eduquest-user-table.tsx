@@ -75,8 +75,8 @@ export function EduquestUserTable({
               <TableCell>ID</TableCell>
               <TableCell>Email</TableCell>
               <TableCell>Username</TableCell>
-              <TableCell>First Name</TableCell>
-              <TableCell>Last Name</TableCell>
+              <TableCell>Last Login</TableCell>
+              <TableCell>Total Points</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -100,8 +100,15 @@ export function EduquestUserTable({
                   <TableCell>{row.id}</TableCell>
                   <TableCell>{row.email}</TableCell>
                   <TableCell>{row.username}</TableCell>
-                  <TableCell>{row.first_name}</TableCell>
-                  <TableCell>{row.last_name}</TableCell>
+                  <TableCell>{row.last_login ? new Date(row.last_login).toLocaleDateString("en-SG", {
+                      day: "2-digit",
+                      month: "short",
+                      year: "numeric",
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit'
+                    }) : 'Not Available'}</TableCell>
+                  <TableCell>{row.total_points.toFixed(2)}</TableCell>
                 </TableRow>
               );
             })}

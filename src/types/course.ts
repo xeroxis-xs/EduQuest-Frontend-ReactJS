@@ -16,6 +16,14 @@ export interface Course {
   total_students_enrolled: number;
 }
 
+export interface CourseSummary {
+  id: number;
+  name: string;
+  code: string;
+  term: Term['id'];
+  status: string;
+}
+
 export interface CourseNewForm {
   term_id: Term['id'];
   image_id: Image['id'];

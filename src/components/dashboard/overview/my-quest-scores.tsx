@@ -8,9 +8,9 @@ import {Sword as SwordIcon} from "@phosphor-icons/react/dist/ssr/Sword";
 import Tooltip from "@mui/material/Tooltip";
 import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
 import Stack from "@mui/material/Stack";
-import type { UserCourseProgression } from "@/types/analytics/user-course-progression";
+import type { UserCourseProgression } from "@/types/analytics/analytics-two";
 import Typography from "@mui/material/Typography";
-import {QuestChart} from "@/components/dashboard/overview/chart/quest-chart";
+import {QuestScoreChart} from "@/components/dashboard/overview/chart/quest-score-chart";
 import CardContent from "@mui/material/CardContent";
 
 export interface MyEnrolledCoursesProps {
@@ -46,7 +46,7 @@ export function MyQuestScores({ userCourseProgression, sx, title, prompt, toolti
             <Typography variant="body2" align="center">
               {userCourseProgression.course_code} {userCourseProgression.course_name}
             </Typography>
-            <QuestChart aUserCourseProgression={userCourseProgression} />
+            <QuestScoreChart aUserCourseProgression={userCourseProgression} />
           </Stack>
         ) :  userCourseProgression ?
             <Typography variant="body2" align="center" pb={3}>This course does not have any quest setup yet</Typography>

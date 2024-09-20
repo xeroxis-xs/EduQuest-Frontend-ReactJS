@@ -88,6 +88,7 @@ export function CourseNewGroupForm({ onFormSubmitSuccess, courseId }: CourseGrou
     });
   }, []);
 
+  // Pre-select the first instructor
   React.useEffect(() => {
     if (instructors && instructors.length > 0) {
       setSelectedInstructor(instructors[0]);

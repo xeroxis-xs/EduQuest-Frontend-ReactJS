@@ -12,6 +12,11 @@ export const getNonPrivateCourses = async (): Promise<Course[]> => {
   return response.data;
 }
 
+export const getMyCourses = async (userId: string): Promise<Course[]> => {
+  const response = await apiService.get<Course[]>(`/api/courses/by_enrolled_user/?user_id=${userId}`);
+  return response.data;
+}
+
 export const getCourse = async (id: string): Promise<Course> => {
   const response = await apiService.get<Course>(`/api/courses/${id}/`);
   return response.data;

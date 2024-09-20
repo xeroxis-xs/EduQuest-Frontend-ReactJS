@@ -1,5 +1,5 @@
 import type {Image} from "@/types/image";
-import type {CourseGroup} from "@/types/course-group";
+import type {CourseGroup, CourseGroupSummary} from "@/types/course-group";
 import type {EduquestUserSummary, EduquestUser} from "@/types/eduquest-user";
 
 
@@ -17,6 +17,12 @@ export interface Quest {
   max_attempts: number;
   total_max_score: number;
   total_questions: number;
+}
+
+export interface QuestSummary {
+  course_group: CourseGroupSummary;
+  id: number;
+  name: string;
 }
 
 export interface QuestNewForm {

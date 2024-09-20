@@ -33,7 +33,6 @@ import Box from "@mui/material/Box";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import Stack from "@mui/material/Stack";
 import {User as UserIcon} from "@phosphor-icons/react/dist/ssr/User";
-import {Check as CheckIcon} from "@phosphor-icons/react/dist/ssr/Check";
 
 interface CourseFormProps {
   onFormSubmitSuccess: () => void;
@@ -180,12 +179,14 @@ export function CourseNewForm({ onFormSubmitSuccess }: CourseFormProps): React.J
     });
   }, []);
 
+  // Pre-select the first term
   React.useEffect(() => {
     if (terms && terms.length > 0) {
       setSelectedTerm(terms[0]);
     }
   }, [terms]);
 
+  // Pre-select the first image
   React.useEffect(() => {
     if (images && images.length > 0) {
       setSelectedImage(images[0]);
@@ -338,7 +339,7 @@ export function CourseNewForm({ onFormSubmitSuccess }: CourseFormProps): React.J
                 >
                   {isCoordinatorsLoading ? (
                     <MenuItem disabled>
-                      <Skeleton variant="text" width="100%" />
+                      <Skeleton variant="text" width="100%"/>
                     </MenuItem>
                   ) : coordinators && coordinators.length > 0 ? (
                     coordinators.map((coordinator) => (
@@ -378,11 +379,11 @@ export function CourseNewForm({ onFormSubmitSuccess }: CourseFormProps): React.J
                 </Grid>
                 <Grid md={6} xs={12}>
                   <Typography variant="overline" color="text.secondary">Thumbnail Name</Typography>
-                  <Typography variant="body2">{selectedImage?.name || images[0].name}</Typography>
+                  <Typography variant="body2">{selectedImage?.name}</Typography>
                 </Grid>
                 <Grid md={6} xs={12}>
                   <Typography variant="overline" color="text.secondary">Thumbnail Filename</Typography>
-                  <Typography variant="body2">{selectedImage?.filename || images[0].filename}</Typography>
+                  <Typography variant="body2">{selectedImage?.filename}</Typography>
                 </Grid>
               </Grid>
 
@@ -390,8 +391,8 @@ export function CourseNewForm({ onFormSubmitSuccess }: CourseFormProps): React.J
                 <Typography variant="overline" color="text.secondary">Thumbnail Preview</Typography>
                 <CardMedia
                   component="img"
-                  alt={selectedImage?.name || images[0].name}
-                  image={`/assets/${selectedImage?.filename || images[0].filename}`}
+                  alt={selectedImage?.name}
+                  image={`/assets/${selectedImage?.filename ?? ''}`}
                   sx={{ backgroundColor: theme.palette.background.level1, border: `1px solid ${theme.palette.neutral[200]}`, borderRadius: '8px' }}
                 />
               </Grid>
@@ -407,7 +408,7 @@ export function CourseNewForm({ onFormSubmitSuccess }: CourseFormProps): React.J
                 <FormControl required>
                   <FormLabel htmlFor="term id">Term ID</FormLabel>
                   <Select
-                    defaultValue={terms[0].id}
+                    defaultValue={terms[0]?.id}
                     onChange={handleTermChange}
                     inputRef={courseTermIdRef}
                     label="Term ID"
@@ -426,27 +427,27 @@ export function CourseNewForm({ onFormSubmitSuccess }: CourseFormProps): React.J
               <Grid md={6} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
               <Grid md={3} xs={6}>
                 <Typography variant="overline" color="text.secondary">Term Name</Typography>
-                <Typography variant="body2">{selectedTerm?.name || terms?.[0]?.name}</Typography>
+                <Typography variant="body2">{selectedTerm?.name}</Typography>
               </Grid>
               <Grid md={3} xs={6}>
                 <Typography variant="overline" color="text.secondary">Term Start Date</Typography>
-                <Typography variant="body2">{selectedTerm?.start_date ?? null}</Typography>
+                <Typography variant="body2">{selectedTerm?.start_date}</Typography>
               </Grid>
               <Grid md={3} xs={6}>
                 <Typography variant="overline" color="text.secondary">Term End Date</Typography>
-                <Typography variant="body2">{selectedTerm?.end_date ?? null}</Typography>
+                <Typography variant="body2">{selectedTerm?.end_date}</Typography>
               </Grid>
               <Grid md={3} xs={6}>
                 <Typography variant="overline" color="text.secondary">Academic Year ID</Typography>
-                <Typography variant="body2">{selectedTerm?.academic_year.id || terms?.[0]?.academic_year.id}</Typography>
+                <Typography variant="body2">{selectedTerm?.academic_year.id}</Typography>
               </Grid>
               <Grid md={3} xs={6}>
                 <Typography variant="overline" color="text.secondary">Start Year</Typography>
-                <Typography variant="body2">{selectedTerm?.academic_year.start_year ?? null}</Typography>
+                <Typography variant="body2">{selectedTerm?.academic_year.start_year}</Typography>
               </Grid>
               <Grid md={3} xs={6}>
                 <Typography variant="overline" color="text.secondary">End Year</Typography>
-                <Typography variant="body2">{selectedTerm?.academic_year.end_year ?? null}</Typography>
+                <Typography variant="body2">{selectedTerm?.academic_year.end_year}</Typography>
               </Grid>
             </Grid> : null}
 

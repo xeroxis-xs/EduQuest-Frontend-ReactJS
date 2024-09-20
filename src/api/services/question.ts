@@ -12,7 +12,7 @@ export const getQuestionAndAnswers = async (id: string): Promise<Question> => {
   return response.data;
 }
 
-export const createQuestionsAndAnswers = async (questionsAndAnswers: QuestionMultipleNewForm): Promise<Question> => {
+export const createQuestionsAndAnswers = async (questionsAndAnswers: QuestionMultipleNewForm[]): Promise<Question> => {
   const response = await apiService.post<Question>('/api/questions/', questionsAndAnswers);
   return response.data;
 }

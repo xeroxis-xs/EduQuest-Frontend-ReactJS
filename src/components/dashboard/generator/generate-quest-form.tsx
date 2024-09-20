@@ -9,7 +9,6 @@ import CardHeader from '@mui/material/CardHeader';
 import Divider from '@mui/material/Divider';
 import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Unstable_Grid2';
-import apiService from "@/api/api-service";
 import microService from "@/api/micro-service";
 import {authClient} from "@/lib/auth/client";
 import {logger} from "@/lib/default-logger";
@@ -19,8 +18,7 @@ import type {AxiosResponse} from "axios";
 import Select, { type SelectChangeEvent} from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
 import Alert from "@mui/material/Alert";
-import type { Course } from "@/types/course";
-import type { Quest } from "@/types/quest";
+import type {QuestNewForm} from "@/types/quest";
 import { useUser } from "@/hooks/use-user";
 import { MagicWand as MagicWandIcon } from '@phosphor-icons/react/dist/ssr/MagicWand';
 import { CaretRight as CaretRightIcon } from '@phosphor-icons/react/dist/ssr/CaretRight';
@@ -28,34 +26,24 @@ import {TextField, Stack } from "@mui/material";
 import type {Image} from "@/types/image";
 import Chip from "@mui/material/Chip";
 import type { Document } from "@/types/document";
-import type { GeneratedQuestion } from "@/types/generated-question";
-import type { GeneratedQuestions } from "@/types/generated-questions";
-import type { EduquestUser } from "@/types/eduquest-user";
 import Box from '@mui/material/Box';
 import Avatar from '@mui/material/Avatar';
 import { LinearProgressWithLabel } from '@/components/dashboard/misc/linear-progress-with-label';
 import { paths } from '@/paths';
 import RouterLink from 'next/link';
 import FormLabel from "@mui/material/FormLabel";
+import {getImages} from "@/api/services/image";
+import {type CourseGroup} from "@/types/course-group";
+import {getPrivateCourseGroups} from "@/api/services/course-group";
+import {getMyDocuments} from "@/api/services/document";
+import {createQuest} from "@/api/services/quest";
+import {createQuestionsAndAnswers} from "@/api/services/question";
+import type { GeneratedQuestion } from "@/types/question"
 
 
 interface CourseFormProps {
   onFormSubmitSuccess: () => void;
 }
-
-interface NewQuestType {
-  type: string | undefined;
-  name: string | undefined;
-  description: string | undefined;
-  status: string | undefined;
-  max_attempts: number | undefined;
-  from_course: Course | undefined;
-  organiser: EduquestUser | null;
-  image: Image | undefined;
-}
-
-
-
 export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React.JSX.Element {
   const { eduquestUser} = useUser();
   const questTypeRef = React.useRef<HTMLInputElement>(null);
@@ -66,57 +54,40 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
   const questMaxAttemptsRef = React.useRef<HTMLInputElement>(null);
   const numQuestionsRef = React.useRef<HTMLInputElement>(null);
   const difficultyRef = React.useRef<HTMLInputElement>(null);
-  const [courses, setCourses] = React.useState<Course[]>();
+
+  const [courseGroups, setCourseGroups] = React.useState<CourseGroup[]>();
   const [documents, setDocuments] = React.useState<Document[]>();
   const [images, setImages] = React.useState<Image[]>();
+
   const [selectedDocument, setSelectedDocument] = React.useState<Document | null>(null);
   const [submitStatus, setSubmitStatus] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [progress, setProgress] = React.useState(0);
   const [progressStatus, setProgressStatus] = React.useState<string>(''); // New state for progress status message
   const [showProgress, setShowProgress] = React.useState(false); // State to control progress bar visibility
 
-  const getImages = async (): Promise<void> => {
+  const fetchImages = async (): Promise<void> => {
     try {
-      const response: AxiosResponse<Image[]> = await apiService.get<Image[]>(`/api/Image/`);
-      const data: Image[] = response.data;
-      const filteredData = data.filter(image => image.name === 'Private Quest');
-      setImages(filteredData);
-      logger.debug('Private Quest Image', filteredData);
+      const response = await getImages();
+      const privateQuestImages = response.filter(image => image.name === 'Private Quest');
+      setImages(privateQuestImages);
     } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-        else {
-          logger.error("Error getting images", error.response?.data);
-        }
-      }
-      logger.error('Failed to fetch data', error);
+      logger.error('Failed to fetch images', error);
     }
-  };
+  }
 
-  const getMyCourses = async (): Promise<void> => {
+  const fetchPrivateCourseGroups = async (): Promise<void> => {
     if (eduquestUser) {
       try {
-        const response: AxiosResponse<Course[]> = await apiService.get<Course[]>(`/api/Course/by-user/${eduquestUser?.id.toString()}/`);
-        const data: Course[] = response.data;
-        const filteredData = data.filter(course => course.code === `PRIVATE ${eduquestUser?.id.toString()}`);
-        setCourses(filteredData);
-        logger.debug('My Private Course', filteredData);
+        const response = await getPrivateCourseGroups()
+        setCourseGroups(response);
+        logger.debug('Course groups from private course', response);
       } catch (error: unknown) {
-        if (error instanceof AxiosError) {
-          if (error.response?.status === 401) {
-            await authClient.signInWithMsal();
-          }
-          else {
-            logger.error("Error getting courses", error.response?.data);
-          }
-        }
-        logger.error('Failed to fetch data', error);
+        logger.error('Failed to fetch course groups', error);
       }
     }
   };
 
+  // Handle document change
   const handleDocumentChange = (event: SelectChangeEvent<number>): void => {
     const documentId = Number(event.target.value);
     const document = documents?.find(d => d.id === documentId);
@@ -131,20 +102,15 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
       });
     }
   };
-  const getMyDocuments = async (): Promise<void> => {
+
+  const fetchMyDocuments = async (): Promise<void> => {
     if (eduquestUser) {
       try {
-        const response: AxiosResponse<Document[]> = await apiService.get<Document[]>(`/api/Document/by-user/${eduquestUser?.id.toString()}/`);
-        const data: Document[] = response.data;
-        setDocuments(data);
-        logger.debug('Documents', data);
+        const response = await getMyDocuments(eduquestUser.id.toString());
+        setDocuments(response);
+        logger.debug('Documents', response);
       } catch (error: unknown) {
-        if (error instanceof AxiosError) {
-          if (error.response?.status === 401) {
-            await authClient.signInWithMsal();
-          }
-        }
-        logger.error("Error getting documents", error);
+        logger.error('Failed to fetch documents', error);
       }
     }
   }
@@ -156,21 +122,34 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
     setProgressStatus('Creating a new Quest'); // Initial progress status
     setShowProgress(true); // Show progress bar
 
-    const newQuest: NewQuestType = {
-      type: questTypeRef.current?.value,
-      name: questNameRef.current?.value,
-      description: questDescriptionRef.current?.value,
-      status: questStatusRef.current?.value,
-      max_attempts: Number(questMaxAttemptsRef.current?.value),
-      from_course: courses?.[0],
-      organiser: eduquestUser,
-      image: images?.[0]
-    };
+    if (
+      images &&
+      courseGroups &&
+      eduquestUser &&
+      questTypeRef.current &&
+      questNameRef.current &&
+      questDescriptionRef.current &&
+      questStatusRef.current &&
+      questMaxAttemptsRef.current
+    ) {
+      const newQuest = {
+        type: questTypeRef.current?.value,
+        name: questNameRef.current?.value,
+        description: questDescriptionRef.current?.value,
+        status: questStatusRef.current?.value,
+        max_attempts: Number(questMaxAttemptsRef.current?.value),
+        expiration_date: null,
+        tutorial_date: null,
+        course_group_id: courseGroups?.[0].id,
+        organiser_id: eduquestUser?.id,
+        image_id: images?.[0].id
+      };
 
     const filename = selectedDocument?.file || documents?.[0].file;
-    const createdQuestId = await createQuest(newQuest);
+    const newQuestId = await createNewQuest(newQuest);
 
-    if (createdQuestId) {
+
+    if (newQuestId) {
       setProgress(40); // Progress after quest creation
       setProgressStatus('Generating Questions from Document'); // Progress status after quest creation
       logger.debug('Calling generateQuestions');
@@ -188,7 +167,7 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
         setProgress(70); // Progress after questions generation
         setProgressStatus('Importing Questions generated'); // Progress status after questions generation
         logger.debug('Generated questions is an array');
-        await bulkCreateQuestions(generatedQuestions, createdQuestId);
+        await bulkCreateQuestions(generatedQuestions, newQuestId);
         setProgress(100); // Final progress
         setProgressStatus('Completed'); // Final progress status
       } else {
@@ -196,31 +175,27 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
         setSubmitStatus({ type: 'error', message: 'Generate Failed. Please try again.' });
         setProgressStatus('Generation failed'); // Progress status on failure
       }
-    } else {
-      setSubmitStatus({ type: 'error', message: 'Quest creation failed. Please try again.' });
-      setProgressStatus('Quest creation failed'); // Progress status on failure
-    }
+      } else {
+        setSubmitStatus({ type: 'error', message: 'Quest creation failed. Please try again.' });
+        setProgressStatus('Quest creation failed'); // Progress status on failure
+      }
 
+    } else {
+      setSubmitStatus({ type: 'error', message: 'Please fill in all required fields.' });
+      setProgressStatus('Quest creation failed'); // Progress status
+    }
     setShowProgress(false); // Hide progress bar after submission
   };
 
 
-  const createQuest = async (newQuest: NewQuestType): Promise<number | null> => {
+  const createNewQuest = async (newQuest: QuestNewForm): Promise<number | null> => {
     try {
-      const response: AxiosResponse<Quest> = await apiService.post(`/api/Quest/`, newQuest);
-      const createdQuest: Quest = response.data;
-      logger.debug('Quest Create Success:', createdQuest);
-      return createdQuest.id;
+      const response = await createQuest(newQuest);
+      // logger.debug('Quest Create Success:', response);
+      return response.id;
     }
     catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-        else {
-          logger.error("Error creating quest: ", error.response?.data);
-        }
-      }
+      logger.error('Failed to create quest', error);
       setSubmitStatus({ type: 'error', message: 'Create Failed. Please try again.' });
       return null;
     }
@@ -228,14 +203,13 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
 
   const generateQuestions = async (filename: string, numQuestions: number, difficulty: string): Promise<GeneratedQuestion[] | null> => {
     try {
-      logger.debug('Entering generateQuestions');
-      const response: AxiosResponse<GeneratedQuestions> = await microService.post(`/generate_questions_from_document`, {
+      const response: AxiosResponse<GeneratedQuestion[]> = await microService.post(`/generate_questions_from_document`, {
         document_id: filename,
         num_questions: numQuestions,
         difficulty
       });
-      logger.debug('Generate Questions Success:', response.data.questions);
-      return response.data.questions;
+      logger.debug('Generate Questions Success:', response.data);
+      return response.data;
     } catch (error: unknown) {
       logger.error('Error in generateQuestions:', error);
       setSubmitStatus({ type: 'error', message: 'Generate Failed. Please try again.' });
@@ -251,9 +225,9 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
       const updatedQuestions = generatedQuestions.map(question => ({
         ...question,
         max_score: 10,
-        from_quest: createdQuestId
+        quest_id: createdQuestId
       }));
-      await apiService.post(`/api/Question/bulk-create/`, updatedQuestions);
+      await createQuestionsAndAnswers(updatedQuestions);
       setSubmitStatus({ type: 'success', message: 'Questions Created Successfully' });
       onFormSubmitSuccess();
     }
@@ -271,9 +245,9 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
 
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
-      await getImages();
-      await getMyCourses();
-      await getMyDocuments();
+      await fetchImages();
+      await fetchPrivateCourseGroups();
+      await fetchMyDocuments();
     };
 
     fetchData().catch((error: unknown) => {

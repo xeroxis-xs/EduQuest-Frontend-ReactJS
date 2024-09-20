@@ -12,11 +12,7 @@ import MenuItem from "@mui/material/MenuItem";
 import Button from "@mui/material/Button";
 import {CaretRight as CaretRightIcon} from "@phosphor-icons/react/dist/ssr/CaretRight";
 import { FileXls as FileXlsIcon } from "@phosphor-icons/react/dist/ssr/FileXls";
-import {AxiosError, type AxiosResponse} from "axios";
-import type {Course} from "@/types/course";
-import apiService from "@/api/api-service";
 import {logger} from "@/lib/default-logger";
-import {authClient} from "@/lib/auth/client";
 import type {Image} from "@/types/image";
 import type {Question} from "@/types/question";
 import {styled, useTheme} from "@mui/material/styles";
@@ -29,6 +25,11 @@ import FormLabel from "@mui/material/FormLabel";
 import Stack from "@mui/material/Stack";
 import Tooltip from "@mui/material/Tooltip";
 import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
+import {getImages} from "@/api/services/image";
+import {getCourseGroup, getCourseGroups} from "@/api/services/course-group";
+import {type CourseGroup} from "@/types/course-group";
+import {importQuest} from "@/api/services/quest";
+import {User as UserIcon} from "@phosphor-icons/react/dist/ssr/User";
 
 
 
@@ -46,76 +47,62 @@ const VisuallyHiddenInput = styled('input')({
 
 interface ImportCardProps {
   onImportSuccess: (questions : Question[]) => void;
-  courseId: string | null;
+  courseGroupId: string | null;
 }
 
 
-export function ImportCard({ onImportSuccess, courseId }: ImportCardProps): React.JSX.Element {
+export function ImportCard({ onImportSuccess, courseGroupId }: ImportCardProps): React.JSX.Element {
   const { eduquestUser} = useUser();
   const theme = useTheme();
+
   const questTypeRef = React.useRef<HTMLInputElement>(null);
   const questNameRef = React.useRef<HTMLInputElement>(null);
   const questDescriptionRef = React.useRef<HTMLInputElement>(null);
   const questTutorialDateRef = React.useRef<HTMLInputElement>(null);
-  const questCourseIdRef = React.useRef<HTMLInputElement>(null);
   const questImageIdRef = React.useRef<HTMLInputElement>(null);
+
   const [isProcessing, setIsProcessing] = React.useState(false);
-  const [isCoursesLoading, setIsCoursesLoading] = React.useState(true);
+  const [isCourseGroupsLoading, setIsCourseGroupsLoading] = React.useState(true);
   const [isImagesLoading, setIsImagesLoading] = React.useState(true);
-  const [courses, setCourses] = React.useState<Course[]>([]);
-  const [images, setImages] = React.useState<Image[]>([]);
   const [isDragging, setIsDragging] = React.useState(false);
-  const [selectedCourse, setSelectedCourse] = React.useState<Course | null>(null);
+
+  const [courseGroups, setCourseGroups] = React.useState<CourseGroup[]>([]);
+  const [images, setImages] = React.useState<Image[]>([]);
+
+  const [selectedCourseGroup, setSelectedCourseGroup] = React.useState<CourseGroup | null>(null);
   const [selectedImage, setSelectedImage] = React.useState<Image | null>(null);
   const [selectedFile, setSelectedFile] = React.useState<File | null>(null);
   const [submitStatus, setSubmitStatus] = React.useState< { type: 'success' | 'error'; message: unknown } | null>(null);
 
 
-  const getCourses = async (): Promise<void> => {
+  const fetchImages = async (): Promise<void> => {
     try {
-      const response: AxiosResponse<Course[]> = await apiService.get<Course[]>('/api/Course/non-private');
-      const data: Course[] = response.data;
-      if (courseId) {
-        const course = data.find(c => c.id === Number(courseId));
-        if (course) {
-          setCourses([course]);
-        }
-      } else {
-        setCourses(data);
-      }
-      logger.debug('Filtered Courses', data);
+      const response = await getImages();
+      setImages(response);
     } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-      }
-      logger.error('Error: ', error);
-    } finally {
-      setIsCoursesLoading(false);
-    }
-  }
-
-
-  const getImages = async (): Promise<void> => {
-    try {
-      const response: AxiosResponse<Image[]> = await apiService.get<Image[]>('/api/Image/');
-      const data: Image[] = response.data;
-      setImages(data);
-      logger.debug('Images', data);
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-      }
-      logger.error('Error: ', error);
+      logger.error('Failed to fetch images', error);
     } finally {
       setIsImagesLoading(false);
     }
   }
 
-
+  const fetchCourseGroups = async (): Promise<void> => {
+    try {
+      if (courseGroupId) {
+        // If courseGroupId is provided, filter the data to only show the selected group
+        // This will be set to disabled and selected by default
+        const response = await getCourseGroup(courseGroupId);
+        setCourseGroups([response]);
+      } else {
+        const response = await getCourseGroups();
+        setCourseGroups(response);
+      }
+    } catch (error: unknown) {
+      logger.error('Failed to fetch course groups', error);
+    } finally {
+      setIsCourseGroupsLoading(false);
+    }
+  }
 
   const handleDragOver = (event: React.DragEvent<HTMLDivElement>): void => {
     event.preventDefault();
@@ -127,64 +114,31 @@ export function ImportCard({ onImportSuccess, courseId }: ImportCardProps): Reac
     setIsDragging(false);
     const file = event.dataTransfer.files ? event.dataTransfer.files[0] : null;
     setSelectedFile(file);
-    logger.debug('Dropped File:', file);
+    // logger.debug('Dropped File:', file);
   };
 
   const handleDragLeave = (): void => {
     setIsDragging(false);
   };
 
-
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
     const file = event.target.files ? event.target.files[0] : null;
     setSelectedFile(file);
-    logger.debug('Selected File:', file);
+    // logger.debug('Selected File:', file);
   };
 
-
+  // Handle Image Change
   const handleImageChange = (event: SelectChangeEvent<number>): void => {
-    const imageId = Number(event.target.value); // Convert the value to a number
-    const image = images?.find(i => i.id === imageId);
-    if (image) {
-      setSelectedImage({
-        id: image.id,
-        name: image.name,
-        filename: image.filename
-      });
-    }
+    const imageId = Number(event.target.value);
+    const image = images?.find(i => i.id === imageId) || null;
+    setSelectedImage(image);
   };
 
+  // Handle Course Change
   const handleCourseChange = (event: SelectChangeEvent<number>): void => {
-    const cId = Number(event.target.value); // Convert the value to a number
-    const course = courses?.find(c => c.id === cId);
-    if (course) {
-      setSelectedCourse({
-        id: course.id,
-        code: course.code,
-        group: course.group,
-        name: course.name,
-        description: course.description,
-        status: course.status,
-        type: course.type,
-        term: {
-          id: course.term.id,
-          name: course.term.name,
-          start_date: course.term.start_date,
-          end_date: course.term.end_date,
-          academic_year: {
-            id: course.term.academic_year.id,
-            start_year: course.term.academic_year.start_year,
-            end_year: course.term.academic_year.end_year
-          }
-        },
-        image: {
-          id: course.image.id,
-          name: course.image.name,
-          filename: course.image.filename
-        },
-        enrolled_users: course.enrolled_users
-      });
-    }
+    const cId = Number(event.target.value);
+    const course = courseGroups?.find(c => c.id === cId) || null;
+    setSelectedCourseGroup(course);
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
@@ -195,56 +149,58 @@ export function ImportCard({ onImportSuccess, courseId }: ImportCardProps): Reac
         : null;
     // Create FormData
     const formData = new FormData();
-    // Append other data as needed
-    formData.append('type', questTypeRef.current?.value || '');
-    formData.append('name', questNameRef.current?.value || '');
-    formData.append('description', questDescriptionRef.current?.value || '');
-    formData.append('tutorial_date', tutorialDate || '');
-    formData.append('status', 'Active');
-    formData.append('max_attempts', '1');
-    // Assuming selectedCourse and selectedImage are objects, you might need to stringify them or just append their IDs
-    formData.append('from_course', JSON.stringify(selectedCourse || courses?.[0]));
-    formData.append('organiser', JSON.stringify(eduquestUser));
-    formData.append('image', JSON.stringify(selectedImage || images?.[0]));
+
+    if (
+      selectedCourseGroup &&
+      eduquestUser &&
+      selectedImage &&
+      questTypeRef.current &&
+      questNameRef.current &&
+      questDescriptionRef.current &&
+      questTutorialDateRef.current
+    ) {
+      // Append other data as needed
+      formData.append('type', questTypeRef.current?.value || '');
+      formData.append('name', questNameRef.current?.value || '');
+      formData.append('description', questDescriptionRef.current?.value || '');
+      formData.append('tutorial_date', tutorialDate || '');
+      formData.append('status', 'Active');
+      formData.append('max_attempts', '1');
+      formData.append('course_group_id', selectedCourseGroup.id.toString() );
+      formData.append('organiser_id', eduquestUser.id.toString() );
+      formData.append('image_id', selectedImage.id.toString() );
+      // logger.debug('Form Data:', Array.from(formData.entries()));
+    } else {
+      logger.error('Missing required fields');
+      setSubmitStatus({ type: 'error', message: 'Missing required fields' });
+      setIsProcessing(false);
+      return
+    }
 
     if (selectedFile) {
-      formData.append('file', selectedFile);
-
       try {
-        const response: AxiosResponse<Question[]> = await apiService.post(`/api/Quest/import/`, formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        });
-        logger.debug('Upload Success, Question data: ', response.data);
-        setSubmitStatus({ type: 'success', message: 'Quest Import Successful' });
-        onImportSuccess(response.data);
+        formData.append('file', selectedFile);
+        const response = await importQuest(formData);
+        logger.debug('Upload Success, Question data: ', response);
+        setSubmitStatus({type: 'success', message: 'Quest Import Successful'});
+        onImportSuccess(response);
+      } catch (error: unknown) {
+        logger.error('Failed to import quest', error);
+        setSubmitStatus({type: 'error', message: 'Failed to import quest'});
+      } finally {
+        setIsProcessing(false);
       }
-      catch (error: unknown) {
-        if (error instanceof AxiosError) {
-          if (error.response?.status === 401) {
-            await authClient.signInWithMsal();
-          }
-          else {
-            logger.error('Code: ', error.response?.status);
-            logger.error('Message: ', error.response?.data);
-          }
-          setSubmitStatus({ type: 'error', message: JSON.stringify(error.response?.data) });
-        }
-      }
-    }
-    else {
+    } else {
       logger.error('No file selected');
-      setSubmitStatus({ type: 'error', message: 'No file selected' });
+      setSubmitStatus({type: 'error', message: 'No file selected'});
+      setIsProcessing(false);
     }
-    setIsProcessing(false);
-
   };
 
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
-      await getImages();
-      await getCourses();
+      await fetchImages();
+      await fetchCourseGroups();
     };
 
     fetchData().catch((error: unknown) => {
@@ -252,9 +208,19 @@ export function ImportCard({ onImportSuccess, courseId }: ImportCardProps): Reac
     });
   }, []);
 
-  // React.useEffect(() => {
-  //   console.log('isCoursesLoading', isCoursesLoading);
-  // }, [isCoursesLoading]);
+  // Pre-select the first image
+  React.useEffect(() => {
+    if (images && images.length > 0) {
+      setSelectedImage(images[0]);
+    }
+  }, [images]);
+
+  // Pre-select the first course group
+  React.useEffect(() => {
+    if (courseGroups && courseGroups.length > 0) {
+      setSelectedCourseGroup(courseGroups[0]);
+    }
+  }, [courseGroups]);
 
   return (
     <form onSubmit={handleSubmit}>
@@ -385,11 +351,11 @@ export function ImportCard({ onImportSuccess, courseId }: ImportCardProps): Reac
               </Grid>
               <Grid md={6} xs={12}>
                 <Typography variant="overline" color="text.secondary">Thumbnail Name</Typography>
-                <Typography variant="body2">{selectedImage?.name || images[0].name}</Typography>
+                <Typography variant="body2">{selectedImage?.name}</Typography>
               </Grid>
               <Grid md={6} xs={12}>
                 <Typography variant="overline" color="text.secondary">Thumbnail Filename</Typography>
-                <Typography variant="body2">{selectedImage?.filename || images[0].filename}</Typography>
+                <Typography variant="body2">{selectedImage?.filename}</Typography>
               </Grid>
             </Grid>
 
@@ -397,7 +363,7 @@ export function ImportCard({ onImportSuccess, courseId }: ImportCardProps): Reac
               <Typography variant="overline" color="text.secondary">Thumbnail Preview</Typography>
               <CardMedia
                 component="img"
-                alt={selectedImage?.name || images[0].name}
+                alt={selectedImage?.name}
                 image={`/assets/${selectedImage?.filename || images[0].filename}`}
                 sx={{ backgroundColor: theme.palette.background.level1, border: `1px solid ${theme.palette.neutral[200]}`, borderRadius: '8px' }}
               />
@@ -407,70 +373,47 @@ export function ImportCard({ onImportSuccess, courseId }: ImportCardProps): Reac
     </Card>
 
       <Card sx={{mt: 6}}>
-        <CardHeader title="Associated Course" subheader="Select an associated course for this quest"/>
+        <CardHeader title="Associated Course Group" subheader="Select an associated course group for this quest"/>
         <Divider/>
         <CardContent sx={{pb:'16px'}}>
-          {isCoursesLoading ? <Skeleton variant="rectangular" height={160} width='100%'/>
-            : courses.length > 0 ?
-            <Grid container spacing={3} >
-              <Grid container md={6} xs={12} alignItems="flex-start">
-                <Grid md={6} xs={12}>
-                  <FormControl required>
-                    <FormLabel htmlFor="course id">Course Group - Course Name</FormLabel>
-                    <Select defaultValue={courses[0]?.id} onChange={handleCourseChange} inputRef={questCourseIdRef}
-                            label="Course Group - Course Name" variant="outlined" type="number" size="small"
-                            disabled={Boolean(courseId)}>
-                      {courses.map((option) => (
-                        <MenuItem key={option.id} value={option.id}>
-                          {option.id} - [{option.group}] {option.code} {option.name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
+          {isCourseGroupsLoading ? <Skeleton variant="rectangular" height={50}/>
+            : courseGroups ?
+              <Grid container spacing={3} >
+                <Grid container xs={12} alignItems="flex-start">
+                  <Grid xs={12}>
+                    <FormControl required>
+                      <FormLabel htmlFor="course id">Group ID</FormLabel>
+                      <Select defaultValue={courseGroups[0]?.id} onChange={handleCourseChange}
+                              label="Course ID" variant="outlined" type="number" disabled={Boolean(courseGroupId)} size="small">
+                        {courseGroups.map((option) => (
+                          <MenuItem key={option.id} value={option.id}>
+                            {`${option.id.toString()} - [${option.name}] ${option.course.code} ${option.course.name}`}
+                          </MenuItem>
+                        ))}
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                  <Grid md={3} xs={12}>
+                    <Typography variant="overline" color="text.secondary">Group Name</Typography>
+                    <Typography variant="body2">{selectedCourseGroup?.name}</Typography>
+                  </Grid>
+                  <Grid md={3} xs={12}>
+                    <Typography variant="overline" color="text.secondary">Group Session Day</Typography>
+                    <Typography variant="body2">{selectedCourseGroup?.session_day}</Typography>
+                  </Grid>
+                  <Grid md={3} xs={12}>
+                    <Typography variant="overline" color="text.secondary">Group Session Time</Typography>
+                    <Typography variant="body2">{selectedCourseGroup?.session_time}</Typography>
+                  </Grid>
+                  <Grid md={3} xs={12}>
+                    <Typography variant="overline" color="text.secondary">Instructor</Typography>
+                    <Stack direction="row" spacing={1} alignItems="center">
+                      <UserIcon size={18}/>
+                      <Typography variant="body2">{selectedCourseGroup?.instructor.nickname}</Typography>
+                    </Stack>
+                  </Grid>
                 </Grid>
-                <Grid md={6} xs={12} sx={{ display: { xs: 'none', md: 'block' } }}/>
-
-                <Grid md={6} xs={12}>
-                  <Typography variant="overline" color="text.secondary">Course Code</Typography>
-                  <Typography variant="body2">{selectedCourse?.code || courses[0].code}</Typography>
-                </Grid>
-                <Grid md={6} xs={12}>
-                  <Typography variant="overline" color="text.secondary">Course Name</Typography>
-                  <Typography variant="body2">{selectedCourse?.name || courses[0].name }</Typography>
-                </Grid>
-                <Grid md={6} xs={12}>
-                  <Typography variant="overline" color="text.secondary">Course Group</Typography>
-                  <Typography variant="body2">{selectedCourse?.group || courses[0].group}</Typography>
-                </Grid>
-                <Grid md={6} xs={12}>
-                  <Typography variant="overline" color="text.secondary">Course Year / Term</Typography>
-                  <Typography variant="body2">
-                    AY {selectedCourse?.term.academic_year.start_year || courses[0].term.academic_year.start_year}-{selectedCourse?.term.academic_year.end_year || courses[0].term.academic_year.end_year} / {selectedCourse?.term.name || courses[0].term.name}
-                  </Typography>
-                </Grid>
-                <Grid md={6} xs={12}>
-                  <Typography variant="overline" color="text.secondary">Course Duration</Typography>
-                  <Typography variant="body2">
-                    From {selectedCourse?.term.start_date || courses[0].term.start_date} to {selectedCourse?.term.end_date || courses[0].term.end_date}
-                  </Typography>
-                </Grid>
-                <Grid xs={12}>
-                  <Typography variant="overline" color="text.secondary">Course Description</Typography>
-                  <Typography variant="body2">{selectedCourse?.description || courses[0].description}</Typography>
-                </Grid>
-              </Grid>
-
-              <Grid md={6} xs={12}>
-                <Typography variant="overline" color="text.secondary">Course Thumbnail</Typography>
-                <CardMedia
-                  component="img"
-                  alt={selectedCourse?.image.name || courses[0].image.name}
-                  image={`/assets/${selectedCourse?.image.filename || courses[0].image.filename}`}
-                  sx={{ backgroundColor: theme.palette.background.level1, border: `1px solid ${theme.palette.neutral[200]}`, borderRadius: '8px' }}
-                />
-              </Grid>
-            </Grid> : null}
-
+              </Grid> : null}
 
       </CardContent>
     </Card>

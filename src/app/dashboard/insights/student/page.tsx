@@ -1,82 +1,62 @@
 "use client"
 import * as React from 'react';
-// import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import type { EduquestUser } from '@/types/eduquest-user';
-import apiService from "@/api/api-service";
-import {AxiosError, type AxiosResponse} from "axios";
 import { logger } from '@/lib/default-logger'
-import {authClient} from "@/lib/auth/client";
-// import type {Course} from "@/types/course";
-import {UserTable} from "@/components/dashboard/insights/student/user-table";
+import {StudentTable} from "@/components/dashboard/insights/student/student-table";
 import Grid from "@mui/material/Unstable_Grid2";
 import {MyCourseProgress} from "@/components/dashboard/overview/my-course-progress";
 import {MyQuestScores} from "@/components/dashboard/overview/my-quest-scores";
-import type {Course} from "@/types/course";
-import {AnalyticsPartTwo} from "@/app/dashboard/page";
-import {useUser} from "@/hooks/use-user";
+import {type AnalyticsPartTwo, type UserCourseProgression} from "@/types/analytics/analytics-two";
 import {SkeletonMyCourseProgress} from "@/components/dashboard/skeleton/analytics/skeleton-my-course-progress";
-import type {UserCourseProgression} from "@/types/analytics/user-course-progression";
-import {SkeletonMyQuestScores} from "@/components/dashboard/skeleton/analytics/skeleton-my-quest-scores";
+import {getAllEduquestUsers} from "@/api/services/eduquest-user";
+import {getAnalyticsPartTwo} from "@/api/services/analytics";
 
 export default function Page(): React.JSX.Element {
-  const { eduquestUser } = useUser();
   const [analyticsPartTwoLoading, setAnalyticsPartTwoLoading] = React.useState(false);
-  const [analyticsPartTwo, setAnalyticsPartTwo] = React.useState<AnalyticsPartTwo>({
-    user_course_progression: [],
-    user_badge_progression: [],
-  });
+  const [analyticsPartTwo, setAnalyticsPartTwo] = React.useState<AnalyticsPartTwo>(
+    {
+      user_course_progression: [],
+      user_badge_progression: []
+    }
+  );
   const [nullPrompt, setNullPrompt] = React.useState<string>('Select a user to view their course progress');
   const [userCourseProgression, setUserCourseProgression] = React.useState<UserCourseProgression | null>(null);
   const [eduquestUsers, setEduquestUsers] = React.useState<EduquestUser[]>([]);
   const [selectedUser, setSelectedUser] = React.useState<EduquestUser | null>(null);
-  // const [showForm, setShowForm] = React.useState(false);
-  //
-  // const toggleForm = (): void => {
-  //   setShowForm(!showForm);
-  // };
 
-  const handleCourseSelection = (aUserCourseProgression: UserCourseProgression ) => {
+
+  const handleCourseSelection = (aUserCourseProgression: UserCourseProgression) => {
     setUserCourseProgression(aUserCourseProgression);
   }
 
+  const handleUserSelection = async (userId: number): Promise<void> => {
+    setAnalyticsPartTwoLoading(true);
+    setUserCourseProgression(null);
+    await fetchAnalyticsPartTwo(userId);
+  }
 
-  const getEduquestUser = async (): Promise<void> => {
+  const fetchEduquestUsers = async (): Promise<void> => {
     try {
-      const response: AxiosResponse<EduquestUser[]> = await apiService.get<EduquestUser[]>('/api/EduquestUser/');
-      const data: EduquestUser[] = response.data;
-      setEduquestUsers(data);
+      const response = await getAllEduquestUsers()
+      setEduquestUsers(response);
     } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-      }
-      logger.error('Error: ', error);
+      logger.error('Failed to fetch Eduquest users', error);
     }
-  };
+  }
 
-  const getAnalyticsPartTwo = async (userId: number): Promise<void> => {
+  const fetchAnalyticsPartTwo = async (userId: number): Promise<void> => {
     const user = eduquestUsers?.find((user) => user.id === userId) ?? null;
     setSelectedUser(user);
     try {
-      setUserCourseProgression(null);
-      setAnalyticsPartTwoLoading(true);
-      const response: AxiosResponse<AnalyticsPartTwo> = await apiService.get<AnalyticsPartTwo>(`/api/Analytics/part-two/${userId.toString()}`);
-      const data: AnalyticsPartTwo = response.data;
-      logger.debug('Analytics Part Two', data);
-      setAnalyticsPartTwo(data);
-      if (data.user_course_progression.length === 0) {
+      const response = await getAnalyticsPartTwo(userId, 'course_progression');
+      setAnalyticsPartTwo(response);
+      if (response.user_course_progression.length === 0) {
         setNullPrompt('This user is not enrolled in any courses');
       }
     } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-      }
-      logger.error('Error: ', error);
+      logger.error('Error fetching analytics part two', error);
     } finally {
       setAnalyticsPartTwoLoading(false);
     }
@@ -84,7 +64,7 @@ export default function Page(): React.JSX.Element {
 
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
-      await getEduquestUser();
+      await fetchEduquestUsers();
     };
 
     fetchData().catch((error: unknown) => {
@@ -99,7 +79,7 @@ export default function Page(): React.JSX.Element {
         <Typography variant="body2" color="text.secondary">The following table shows the list of students and their course progress.</Typography>
       </Stack>
 
-      <UserTable rows={eduquestUsers} handleUserSelection={getAnalyticsPartTwo}/>
+      <StudentTable rows={eduquestUsers} handleUserSelection={handleUserSelection}/>
 
       {selectedUser ? <Typography variant="h5" pt={2}>{`${selectedUser.username}'s Progress`}</Typography> : null}
 

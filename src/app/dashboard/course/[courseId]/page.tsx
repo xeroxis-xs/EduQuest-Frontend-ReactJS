@@ -6,11 +6,7 @@ import { CaretLeft as CaretLeftIcon } from "@phosphor-icons/react/dist/ssr/Caret
 import { Pen as PenIcon } from "@phosphor-icons/react/dist/ssr/Pen";
 import type {Course} from '@/types/course';
 import type { Quest } from '@/types/quest';
-import apiService from "@/api/api-service";
-import type { AxiosResponse } from "axios";
-import { AxiosError } from "axios";
 import { logger } from '@/lib/default-logger'
-import { authClient } from "@/lib/auth/client";
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
 import CardContent from "@mui/material/CardContent";
@@ -70,7 +66,6 @@ const ExpandMore = styled((props: ExpandMoreProps) => {
 }));
 
 
-
 export default function Page({ params }: { params: { courseId: string } }) : React.JSX.Element {
   const { eduquestUser } = useUser();
   const [course, setCourse] = React.useState<Course>();
@@ -87,14 +82,14 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
   const [loadingUserCourseGroupEnrollments, setLoadingUserCourseGroupEnrollments] = React.useState(true);
   const [submitStatus, setSubmitStatus] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [openDialog, setOpenDialog] = useState(false);
-  const [selectedCourseGroup, setSelectedCourseGroup] = React.useState<string | null>(null);
+  const [selectedCourseGroupId, setSelectedCourseGroupId] = React.useState<string | null>(null);
 
   const handleExpandClick = (): void => {
     setExpanded(!expanded);
   };
 
   const handleCourseGroupSelect = async(courseGroupId: string): Promise<void> => {
-    setSelectedCourseGroup(courseGroupId);
+    setSelectedCourseGroupId(courseGroupId);
     await fetchQuestsByCourseGroup(courseGroupId);
   };
 
@@ -151,7 +146,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
       try {
         const response = await getUserCourseGroupEnrollmentsByCourseAndUser(params.courseId, eduquestUser?.id.toString());
         setUserCourseGroupEnrollments(response);
-        logger.debug('My course groups', response);
+        // logger.debug('My course groups', response);
       } catch (error: unknown) {
         logger.error('Failed to fetch course group enrollments', error);
       } finally {
@@ -164,7 +159,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
     try {
       const response = await getCourseGroupsByCourse(params.courseId);
       setCourseGroups(response);
-      logger.debug('All course groups', response);
+      // logger.debug('All course groups', response);
     } catch (error: unknown) {
       logger.error('Failed to fetch course groups', error);
     } finally {
@@ -177,7 +172,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
       setLoadingQuests(true)
       const response = await getQuestsByCourseGroup(courseGroupId);
       setQuests(response);
-      logger.debug('My quests', response);
+      // logger.debug('My quests', response);
     } catch (error: unknown) {
       logger.error('Failed to fetch quests', error);
     } finally {
@@ -197,30 +192,6 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
       setLoadingQuests(false);
     }
   };
-
-
-  // const handleEnroll = async (): Promise<void> => {
-  //   try {
-  //     const data = {
-  //       user: { id: eduquestUser?.id },
-  //       course: { id: params.courseId }
-  //     }
-  //     const response = await apiService.post(`/api/UserCourse/`, data);
-  //     if (response.status === 201) {
-  //       logger.debug('Enrolled successfully');
-  //       await getCourse();
-  //     }
-  //   } catch (error: unknown) {
-  //     if (error instanceof AxiosError) {
-  //       if (error.response?.status === 401) {
-  //         await authClient.signInWithMsal();
-  //       }
-  //     }
-  //     logger.error('Error enrolling: ', error);
-  //   }
-  // }
-
-
 
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
@@ -462,9 +433,9 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
           <Typography variant="h5">Quests</Typography>
           <Typography variant="body2" color="text.secondary">Quests available for this group</Typography>
         </Box>
-        {eduquestUser?.is_staff ? (
+        {eduquestUser?.is_staff && selectedCourseGroupId? (
           <Stack direction="row" spacing={1}>
-            <Button startIcon={<UploadIcon />} variant="contained" color="primary" component={RouterLink} href={`${paths.dashboard.import}/${params.courseId.toString()}`}>
+            <Button startIcon={<UploadIcon />} variant="contained" color="primary" component={RouterLink} href={`${paths.dashboard.import}/${selectedCourseGroupId.toString()}`}>
               Import
             </Button>
             <Button
@@ -482,18 +453,18 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
 
 
       {showCreateQuestForm && course ?
-        <QuestNewForm onFormSubmitSuccess={fetchQuests} courseId={course.id}/> : null}
+        <QuestNewForm onFormSubmitSuccess={fetchQuests} courseGroupId={selectedCourseGroupId} /> : null}
 
       {loadingQuests ? (
         <SkeletonQuestCard />
-      ) : selectedCourseGroup ? (
+      ) : selectedCourseGroupId ? (
         quests && quests.length > 0 ? (
           <QuestCard rows={quests} onQuestDeleteSuccess={fetchQuests} />
         ) : (
           <Typography variant="body1">No quests available for this group</Typography>
         )
       ) : (
-        <Typography variant="body1">Select a course group to view the quests</Typography>
+        <Typography variant="body1">Select a group to view the quests</Typography>
       )}
 
     </Stack>

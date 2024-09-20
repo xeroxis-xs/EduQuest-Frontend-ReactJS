@@ -10,7 +10,6 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
-import RouterLink from "next/link";
 import type { UserQuestAttempt } from '@/types/user-quest-attempt';
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
@@ -20,12 +19,13 @@ import {LinearProgressSlim} from "@/components/dashboard/misc/linear-progress-wi
 
 interface UserQuestAttemptTableProps {
   questId?: string;
-  rows?: UserQuestAttempt[];
+  rows: UserQuestAttempt[];
   totalMaxScore?: number;
   questStatus?: string;
+  handleViewAnswerAttempts: (params: { attemptId: string; submitted: boolean }) => void;
 }
 
-export function UserQuestAttemptTable({ questId = '0', rows = [], totalMaxScore = 0, questStatus }: UserQuestAttemptTableProps): React.JSX.Element {
+export function UserQuestAttemptTable({rows = [], totalMaxScore = 0, questStatus, handleViewAnswerAttempts }: UserQuestAttemptTableProps): React.JSX.Element {
 
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -109,30 +109,28 @@ export function UserQuestAttemptTable({ questId = '0', rows = [], totalMaxScore 
                   </TableCell>
                   <TableCell>
                     <Chip
-                      label={row.all_questions_submitted ? "Submitted" : "In Progress"}
-                      color={row.all_questions_submitted ? "success" : "primary"}
+                      label={row.submitted ? "Submitted" : "In Progress"}
+                      color={row.submitted ? "success" : "primary"}
                       variant="outlined"
                       size="small"/>
                   </TableCell>
                   <TableCell sx={{ width: '15%'}}>
-                    {row.all_questions_submitted ?
+                    {row.submitted ?
                       <LinearProgressSlim
                         value={(row.total_score_achieved / totalMaxScore) * 100}
                         text={`${(Math.round(row.total_score_achieved * 100) / 100).toString()} / ${totalMaxScore?.toString()}`} />
                        : "Not Available"}
                   </TableCell>
                   <TableCell>
-                    {row.all_questions_submitted ? (
+                    {row.submitted ? (
                       <Button
-                        component={RouterLink}
-                        href={`/dashboard/quest/${questId}/quest-attempt/${row.id.toString()}`}
+                        onClick={() => { handleViewAnswerAttempts({attemptId: row.id.toString(), submitted: row.submitted}); }}
                       >
                         View
                       </Button>
                     ) :
                       <Button
-                        component={RouterLink}
-                        href={`/dashboard/quest/${questId}/quest-attempt/${row.id.toString()}`}
+                        onClick={() => { handleViewAnswerAttempts({attemptId: row.id.toString(), submitted: row.submitted}); }}
                         disabled={questStatus === 'Expired'}>
                         Continue
                       </Button>

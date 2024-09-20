@@ -2,14 +2,12 @@
 import * as React from 'react';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import apiService from "@/api/api-service";
-import {AxiosError, type AxiosResponse} from "axios";
 import { logger } from '@/lib/default-logger'
-import { authClient } from "@/lib/auth/client";
 import {useUser} from "@/hooks/use-user";
 import type { Document } from "@/types/document";
 import { SkeletonBadgeCard } from '@/components/dashboard/skeleton/skeleton-badge-card';
 import { DocumentCard } from "@/components/dashboard/generator/document-card";
+import {getMyDocuments} from "@/api/services/document";
 
 
 
@@ -20,20 +18,14 @@ export default function Page(): React.JSX.Element {
 
 
 
-  const getMyDocuments = async (): Promise<void> => {
+  const fetchMyDocuments = async (): Promise<void> => {
     if (eduquestUser) {
       try {
-        const response: AxiosResponse<Document[]> = await apiService.get<Document[]>(`/api/Document/by-user/${eduquestUser?.id.toString()}/`);
-        const data: Document[] = response.data;
-        setDocuments(data);
-        logger.debug('Documents', data);
+        const response = await getMyDocuments(eduquestUser.id.toString());
+        setDocuments(response);
+        logger.debug('Documents', response);
       } catch (error: unknown) {
-        if (error instanceof AxiosError) {
-          if (error.response?.status === 401) {
-            await authClient.signInWithMsal();
-          }
-        }
-        logger.error('Failed to fetch data', error);
+        logger.error('Failed to fetch documents', error);
       } finally {
         setLoadingDocuments(false);
       }
@@ -41,17 +33,17 @@ export default function Page(): React.JSX.Element {
   }
 
   const handleDeleteSuccess = async (): Promise<void> => {
-    await getMyDocuments();
+    await fetchMyDocuments();
   }
 
   const handleSubmitSuccess = async (): Promise<void> => {
-    await getMyDocuments();
+    await fetchMyDocuments();
   }
 
 
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
-      await getMyDocuments();
+      await fetchMyDocuments();
     };
 
     fetchData().catch((error: unknown) => {

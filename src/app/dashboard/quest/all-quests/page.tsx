@@ -7,10 +7,7 @@ import { Plus as PlusIcon } from '@phosphor-icons/react/dist/ssr/Plus';
 import { XCircle as XCircleIcon } from '@phosphor-icons/react/dist/ssr/XCircle';
 import { Funnel as FunnelIcon } from '@phosphor-icons/react/dist/ssr/Funnel';
 import { Upload as UploadIcon } from '@phosphor-icons/react/dist/ssr/Upload';
-import apiService from "@/api/api-service";
-import {AxiosError, type AxiosResponse} from "axios";
 import { logger } from '@/lib/default-logger'
-import { authClient } from "@/lib/auth/client";
 import { QuestNewForm } from "@/components/dashboard/quest/quest-new-form";
 import { QuestCard } from "@/components/dashboard/quest/quest-card";
 import type { Quest } from '@/types/quest';
@@ -22,10 +19,12 @@ import {useUser} from "@/hooks/use-user";
 import RouterLink from "next/link";
 import {paths} from "@/paths";
 import Grid from '@mui/material/Unstable_Grid2';
+import {getNonPrivateQuests} from "@/api/services/quest";
 
 
 export default function Page(): React.JSX.Element {
   const [quests, setQuests] = React.useState<Quest[]>([]);
+
   const [showForm, setShowForm] = React.useState(false);
   const [loading, setLoading] = React.useState(true);
   const [selectedCourseId, setSelectedCourseId] = React.useState<string | null>(null);
@@ -37,30 +36,23 @@ export default function Page(): React.JSX.Element {
     setShowForm(!showForm);
   };
 
-  const getQuests = async (): Promise<void> => {
+  const fetchQuests = async (): Promise<void> => {
     try {
-      const response: AxiosResponse<Quest[]> = await apiService.get<Quest[]>('/api/Quest/');
-      const data: Quest[] = response.data;
-      const filteredData = data.filter((quest) => quest.type !== 'Private');
-      setQuests(filteredData);
-      const uniqueCourseIds = Array.from(new Set(filteredData.map(quest => `${quest.from_course.id.toString()} - [${quest.from_course.group}] ${quest.from_course.code} ${quest.from_course.name}`)));
-      setCourseIds(uniqueCourseIds)
-      logger.debug('Filtered Quests', filteredData);
+      const response = await getNonPrivateQuests()
+      setQuests(response);
+      const uniqueCourseIds = Array.from(new Set(response.map(quest => `${quest.course_group.course.id.toString()} - [${quest.course_group.name}] ${quest.course_group.course.code} ${quest.course_group.course.name}`)));
+      setCourseIds(uniqueCourseIds);
     } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-      }
-      logger.error('Error: ', error);
+      logger.error('Failed to fetch my courses', error);
     } finally {
       setLoading(false);
     }
-  };
+  }
+
 
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
-      await getQuests();
+      await fetchQuests();
     };
 
     fetchData().catch((error: unknown) => {
@@ -74,7 +66,7 @@ export default function Page(): React.JSX.Element {
 
 
   const filteredQuests = selectedCourseId
-    ? quests.filter(quest => `${quest.from_course.id.toString()} - [${quest.from_course.group}] ${quest.from_course.code} ${quest.from_course.name}` === selectedCourseId)
+    ? quests.filter(quest => `${quest.course_group.course.id.toString()} - [${quest.course_group.name}] ${quest.course_group.course.code} ${quest.course_group.course.name}` === selectedCourseId)
     : quests;
 
 
@@ -109,7 +101,7 @@ export default function Page(): React.JSX.Element {
         </Grid>
       </Grid>
 
-      {showForm ? <QuestNewForm onFormSubmitSuccess={getQuests} courseId={null}/> : null} {/* Conditional rendering */}
+      {showForm ? <QuestNewForm onFormSubmitSuccess={fetchQuests} courseGroupId={null}/> : null} {/* Conditional rendering */}
 
       <Stack direction="row" spacing={2} alignItems="center" justifyContent="flex-end">
         <FunnelIcon height={20} width={20} />
@@ -139,7 +131,7 @@ export default function Page(): React.JSX.Element {
         quests.length === 0 ? (
             <Typography variant="h6" align="center" mt={4}>No data available.</Typography>
           ) :
-        <QuestCard rows={filteredQuests} onQuestDeleteSuccess={getQuests}/>
+        <QuestCard rows={filteredQuests} onQuestDeleteSuccess={fetchQuests}/>
       )}
     </Stack>
   );

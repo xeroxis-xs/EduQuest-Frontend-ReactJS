@@ -1,5 +1,5 @@
 import type { EduquestUser } from './eduquest-user';
-import type { Quest } from './quest';
+import type {Quest, QuestSummary} from './quest';
 
 export interface UserQuestAttempt {
   student_id: EduquestUser['id']
@@ -7,7 +7,15 @@ export interface UserQuestAttempt {
   id: number
   first_attempted_date: string | null // ISO 8601 datetime string
   last_attempted_date: string | null// ISO 8601 datetime string
-  all_questions_submitted: boolean
+  time_taken: number
+  total_score_achieved: number
+  submitted: boolean
+}
+
+export interface UserQuestAttemptSummary {
+  student_id: EduquestUser['id']
+  quest: QuestSummary
+  id: number
   time_taken: number
   total_score_achieved: number
   submitted: boolean

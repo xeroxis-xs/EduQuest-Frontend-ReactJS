@@ -2,12 +2,10 @@ import * as React from 'react';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Skeleton from '@mui/material/Skeleton';
-import Grid from "@mui/material/Unstable_Grid2";
 import CardHeader from "@mui/material/CardHeader";
 import Stack from "@mui/material/Stack";
 import Tooltip from "@mui/material/Tooltip";
 import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
-import {Typography} from "@mui/material";
 import {TrendUp as TrendUpIcon} from "@phosphor-icons/react/dist/ssr/TrendUp";
 
 export function SkeletonRecentAchievements(): React.JSX.Element {

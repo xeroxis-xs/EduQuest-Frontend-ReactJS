@@ -15,9 +15,8 @@ import SpeedsterBadge from "../../../../public/assets/speedster_badge.svg";
 import CompletionistBadge from "../../../../public/assets/completionist_badge.svg";
 import { User as UserIcon } from "@phosphor-icons/react/dist/ssr/User";
 import CardContent from "@mui/material/CardContent";
-import { type RecentBadge } from "@/types/analytics/recent-badge";
-import { useRouter } from 'next/navigation';
 import RouterLink from "next/link";
+import type {RecentBadge} from "@/types/analytics/analytics-three";
 
 
 export interface RecentAchievementsProps {
@@ -43,7 +42,6 @@ export function RecentAchievements({ recentBadges = [], sx }: RecentAchievements
     }
   };
 
-  const router = useRouter();
 
   // const handleRoute = (id: string, type: 'course' | 'quest'): void => {
   //   router.push(`/dashboard/${type}/${id}`);
