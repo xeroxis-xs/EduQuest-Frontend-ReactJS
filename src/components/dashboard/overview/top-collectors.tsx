@@ -10,7 +10,7 @@ import Tooltip from "@mui/material/Tooltip";
 import Stack from "@mui/material/Stack";
 import {TopCollectorBarChart} from "@/components/dashboard/overview/chart/top-collector-bar-chart";
 import CardContent from "@mui/material/CardContent";
-import type { TopCollector } from "@/types/analytics/top-collector";
+import type { TopCollector } from "@/types/analytics/analytics-three";
 import Typography from "@mui/material/Typography";
 
 
