@@ -2,7 +2,7 @@ import * as React from 'react';
 import {useTheme} from '@mui/material/styles';
 import type { ApexOptions } from 'apexcharts';
 import { Chart } from '@/components/core/chart';
-import type { UserBadgeProgression } from "@/types/analytics/user-badge-progression";
+import type { UserBadgeProgression } from "@/types/analytics/analytics-two";
 
 
 export interface CourseChartProps {

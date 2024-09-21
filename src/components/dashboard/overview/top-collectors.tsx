@@ -34,7 +34,7 @@ export function TopCollectors({ topCollectors = [], sx }: TopCollectorsProps): R
           <InfoIcon fontSize="var(--icon-fontSize-sm)" style={{ marginLeft: '0px', cursor: 'pointer', color: 'var(--mui-palette-neutral-500)', marginTop: '16px'}} />
         </Tooltip>
       </Stack>
-      <CardContent sx={{  justifyContent: 'center', paddingTop: 0, '&:last-child': { paddingBottom: 0 }  }}>
+      <CardContent sx={{  justifyContent: 'center', paddingTop: 0  }}>
         { topCollectors?.length > 0 ? (
           <TopCollectorBarChart topCollectors={topCollectors}/>
         ) : (

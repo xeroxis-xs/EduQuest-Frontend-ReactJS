@@ -138,7 +138,7 @@ export function ShortestUser ({ sx, shortestTimeUser }: BudgetProps): React.JSX.
             </Grid>
           </Stack>
         ) : (
-          <Typography variant="body2">No User</Typography>
+          <Typography variant="body2" align="center">No User</Typography>
         )}
       </CardContent>
     </Card>
