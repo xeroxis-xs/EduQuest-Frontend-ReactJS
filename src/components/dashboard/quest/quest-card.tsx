@@ -64,11 +64,12 @@ export function QuestCard({ rows = [], onQuestDeleteSuccess }: QuestCardProps): 
         <Grid key={quest.id} lg={4} md={6} xs={12} >
           <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <CardActionArea sx={{ height: '100%', borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }} href={`/dashboard/quest/${quest.id.toString()}`} component={RouterLink}>
-            <CardHeader title={quest.name} subheader={`[${quest.from_course.group}] ${quest.from_course.code} ${quest.from_course.name}`}/>
+            <CardHeader title={quest.name} subheader={`${quest.course_group.name} - ${quest.course_group.course.code} ${quest.course_group.course.name}`}/>
               <CardMedia
                 component="img"
                 alt="Multiple Choice"
                 image={`/assets/${quest.image.filename}`}
+                sx={{ margin: 0 }}
               />
               <CardContent>
 
@@ -83,11 +84,17 @@ export function QuestCard({ rows = [], onQuestDeleteSuccess }: QuestCardProps): 
                     quest.status === 'Active' ? 'success' : 'secondary'
                 } size="small"/>
 
-                {quest.type !=='Private' && (
-                  <Typography variant="subtitle2" sx={{ mb: 1 }}>
-                    AY{quest.from_course.term.academic_year.start_year}-{quest.from_course.term.academic_year.end_year} {quest.from_course.term.name}
-                  </Typography>
-                )}
+                {quest.tutorial_date ?
+                  <Typography variant="body2" color="textSecondary" sx={{ mb: 1.5 }}>
+                    Tutorial Date: {new Date(quest.tutorial_date).toLocaleDateString("en-SG", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                  </Typography> : null
+                }
 
                 <Typography variant="body2">
                   {quest.description}

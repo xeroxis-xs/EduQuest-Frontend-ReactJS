@@ -11,10 +11,7 @@ import Button from "@mui/material/Button";
 import {CardMedia, Alert} from "@mui/material";
 import { Trash as TrashIcon } from "@phosphor-icons/react/dist/ssr/Trash";
 import { MagicWand as MagicWandIcon } from "@phosphor-icons/react/dist/ssr/MagicWand";
-import apiService from "@/api/api-service";
 import {logger} from "@/lib/default-logger";
-import {AxiosError} from "axios";
-import {authClient} from "@/lib/auth/client";
 import {useUser} from "@/hooks/use-user";
 import type { Document } from "@/types/document";
 import Stack from "@mui/material/Stack";
@@ -24,6 +21,7 @@ import FormControl from "@mui/material/FormControl";
 import {styled} from "@mui/material/styles";
 import RouterLink from "next/link";
 import { paths } from '@/paths';
+import {deleteDocument, uploadDocument} from "@/api/services/document";
 
 
 const VisuallyHiddenInput = styled('input')({
@@ -55,20 +53,13 @@ export function DocumentCard({ documents = [], handleDeleteSuccess, handleSubmit
     logger.debug('Selected File:', file);
   };
 
+
   const handleDelete = (documentId: number) => async (): Promise<void> => {
     try {
       logger.debug("test")
-      const response = await apiService.delete(`/api/Document/${documentId.toString()}/`);
-      if (response.status === 204) {
-        logger.debug('Document deleted successfully');
-        handleDeleteSuccess(true);
-      }
+      await deleteDocument(documentId.toString());
+      handleDeleteSuccess(true);
     } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-      }
       logger.error('Failed to delete document', error);
     }
   }
@@ -76,27 +67,27 @@ export function DocumentCard({ documents = [], handleDeleteSuccess, handleSubmit
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     if (!selectedFile) {
-      setUploadStatus({ type: 'error', message: 'No file selected' });
+      setUploadStatus({type: 'error', message: 'No file selected'});
       return;
     }
 
     // Check for maximum uploads
     if (documents.length >= 5) {
-      setUploadStatus({ type: 'error', message: 'Maximum uploads per user: 5' });
+      setUploadStatus({type: 'error', message: 'Maximum uploads per user: 5'});
       return;
     }
 
     // Check for supported file type
     const supportedFileTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/vnd.openxmlformats-officedocument.presentationml.presentation'];
     if (!supportedFileTypes.includes(selectedFile.type)) {
-      setUploadStatus({ type: 'error', message: 'Supported file type: PDF, DOCX, PPTX' });
+      setUploadStatus({type: 'error', message: 'Supported file type: PDF, DOCX, PPTX'});
       return;
     }
 
     // Check for maximum file size
     const maxSizeInBytes = 5 * 1024 * 1024; // 5MB
     if (selectedFile.size > maxSizeInBytes) {
-      setUploadStatus({ type: 'error', message: 'Maximum file size: 5MB' });
+      setUploadStatus({type: 'error', message: 'Maximum file size: 5MB'});
       return;
     }
 
@@ -108,21 +99,14 @@ export function DocumentCard({ documents = [], handleDeleteSuccess, handleSubmit
       formData.append('size', (selectedFile.size / (1024 * 1024)).toFixed(2));
 
       try {
-        const response = await apiService.post('/api/DocumentUpload/', formData);
-        if (response.status === 201) {
-          logger.debug('Document uploaded successfully');
-          setSelectedFile(null);
-          handleSubmitSuccess(true);
-          setUploadStatus({ type: 'success', message: 'Document uploaded successfully' });
-        }
+       await uploadDocument(formData);
+        // logger.debug('Document uploaded successfully');
+        setSelectedFile(null);
+        handleSubmitSuccess(true);
+        setUploadStatus({type: 'success', message: 'Document uploaded successfully'});
       } catch (error: unknown) {
-        if (error instanceof AxiosError) {
-          if (error.response?.status === 401) {
-            await authClient.signInWithMsal();
-          }
-        }
         logger.error('Failed to upload document');
-        setUploadStatus({ type: 'error', message: 'Failed to upload document' });
+        setUploadStatus({type: 'error', message: 'Failed to upload document'});
       }
     }
   }

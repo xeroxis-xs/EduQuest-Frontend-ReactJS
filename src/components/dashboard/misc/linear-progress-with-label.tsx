@@ -52,38 +52,48 @@ export function LinearProgressWithLabel(props: LinearProgressProps & { value: nu
 }
 
 
-export function LinearProgressForLevel(props: LinearProgressProps & { value: number, level: string, absValue: number }): React.JSX.Element {
-  let absValue = props.absValue;
-  return (
+export function LinearProgressForLevel(
+  props: LinearProgressProps & { value: number; level: string; absValue: number }
+): React.JSX.Element {
+  const { absValue, level, value, ...rest } = props; // Destructure to exclude `absValue`
 
+  return (
     <Box sx={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }}>
       <Box sx={{ width: '100%', mr: 1 }}>
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
-          <Typography variant="body2" color="text.secondary" >
-            {props.level}
+          <Typography variant="body2" color="text.secondary">
+            {level}
           </Typography>
           <Tooltip
-            title={<Typography fontSize="inherit">Points: {Math.round( absValue * 100) / 100}</Typography>}
-            placement="bottom" arrow>
-          <Stack direction="row" spacing={0.5} alignItems="center">
-            <Typography variant="body2" color="text.secondary" >
-              {Math.round( absValue ) }
-            </Typography>
-            <Points height={18}/>
-          </Stack>
+            title={
+              <Typography fontSize="inherit">
+                Points: {Math.round(absValue * 100) / 100}
+              </Typography>
+            }
+            placement="bottom"
+            arrow
+          >
+            <Stack direction="row" spacing={0.5} alignItems="center">
+              <Typography variant="body2" color="text.secondary">
+                {Math.round(absValue)}
+              </Typography>
+              <Points height={18} />
+            </Stack>
           </Tooltip>
         </Box>
         <Tooltip
           title={
             <Stack>
               <Typography fontSize="inherit">
-                Points are calculated based on the highest number of points achieved in a every quest.
+                Points are calculated based on the highest number of points achieved in every quest.
               </Typography>
             </Stack>
           }
-          placement="bottom" arrow>
-        <BorderLinearProgress variant="determinate" {...props} />
-
+          placement="bottom"
+          arrow
+        >
+          {/* Pass only necessary props to BorderLinearProgress */}
+          <BorderLinearProgress variant="determinate" value={value} {...rest} />
         </Tooltip>
       </Box>
     </Box>

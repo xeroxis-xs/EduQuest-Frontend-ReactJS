@@ -6,10 +6,7 @@ import Typography from '@mui/material/Typography';
 import RouterLink from 'next/link';
 import { paths } from "@/paths";
 import { CaretRight as CaretRightIcon } from '@phosphor-icons/react/dist/ssr/CaretRight';
-import apiService from "@/api/api-service";
-import {AxiosError, type AxiosResponse} from "axios";
 import { logger } from '@/lib/default-logger'
-import { authClient } from "@/lib/auth/client";
 import type {UserCourseBadge} from "@/types/user-course-badge";
 import {useUser} from "@/hooks/use-user";
 import type {UserQuestBadge} from "@/types/user-quest-badge";
@@ -21,6 +18,7 @@ import Box from '@mui/material/Box';
 import {CourseBadgeCard} from "@/components/dashboard/badge/course-badge-card";
 import {QuestBadgeCard} from "@/components/dashboard/badge/quest-badge-card";
 import { SkeletonBadgeCard } from '@/components/dashboard/skeleton/skeleton-badge-card';
+import {getUserCourseBadgesByUser, getUserQuestBadgesByUser} from "@/api/services/badge";
 
 
 
@@ -37,41 +35,26 @@ export default function Page(): React.JSX.Element {
     setValue(newValue);
   };
 
-
-  const getMyCourseBadges = async (): Promise<void> => {
+  const fetchMyCourseBadges = async (): Promise<void> => {
     if (eduquestUser) {
       try {
-        const response: AxiosResponse<UserCourseBadge[]> = await apiService.get<UserCourseBadge[]>(`/api/UserCourseBadge/by-user/${eduquestUser?.id.toString()}/`);
-        const data: UserCourseBadge[] = response.data;
-        setCourseBadges(data);
-        logger.debug('Course Badges', data);
+        const response = await getUserCourseBadgesByUser(eduquestUser.id.toString());
+        setCourseBadges(response);
       } catch (error: unknown) {
-        if (error instanceof AxiosError) {
-          if (error.response?.status === 401) {
-            await authClient.signInWithMsal();
-          }
-        }
-        logger.error('Failed to fetch data', error);
+        logger.error('Failed to fetch course badges', error);
       } finally {
         setLoadingCourseBadges(false);
       }
     }
   }
 
-  const getMyQuestBadges = async (): Promise<void> => {
+  const fetchMyQuestBadges = async (): Promise<void> => {
     if (eduquestUser) {
       try {
-        const response: AxiosResponse<UserQuestBadge[]> = await apiService.get<UserQuestBadge[]>(`/api/UserQuestBadge/by-user/${eduquestUser?.id.toString()}/`);
-        const data: UserQuestBadge[] = response.data;
-        setQuestBadges(data);
-        logger.debug('Quest Badges', data);
+        const response = await getUserQuestBadgesByUser(eduquestUser.id.toString());
+        setQuestBadges(response);
       } catch (error: unknown) {
-        if (error instanceof AxiosError) {
-          if (error.response?.status === 401) {
-            await authClient.signInWithMsal();
-          }
-        }
-        logger.error('Failed to fetch data', error);
+        logger.error('Failed to fetch quest badges', error);
       } finally {
         setLoadingQuestBadges(false);
       }
@@ -80,8 +63,8 @@ export default function Page(): React.JSX.Element {
 
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
-      await getMyCourseBadges();
-      await getMyQuestBadges();
+      await fetchMyCourseBadges();
+      await fetchMyQuestBadges();
     };
 
     fetchData().catch((error: unknown) => {

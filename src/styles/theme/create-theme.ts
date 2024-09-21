@@ -52,7 +52,7 @@ declare module '@mui/material/Chip' {
 
 export function createTheme(): Theme {
   const theme = extendTheme({
-    breakpoints: { values: { xs: 0, sm: 600, md: 900, lg: 1200, xl: 1440 } },
+    breakpoints: { values: { xs: 0, sm: 600, md: 900, lg: 1350, xl: 1440 } },
     components,
     colorSchemes,
     shadows,

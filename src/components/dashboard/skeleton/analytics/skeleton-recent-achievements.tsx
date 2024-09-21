@@ -2,17 +2,15 @@ import * as React from 'react';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Skeleton from '@mui/material/Skeleton';
-import Grid from "@mui/material/Unstable_Grid2";
 import CardHeader from "@mui/material/CardHeader";
 import Stack from "@mui/material/Stack";
 import Tooltip from "@mui/material/Tooltip";
 import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
-import {Typography} from "@mui/material";
 import {TrendUp as TrendUpIcon} from "@phosphor-icons/react/dist/ssr/TrendUp";
 
 export function SkeletonRecentAchievements(): React.JSX.Element {
   return (
-    <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Card sx={{ display: 'flex', flexDirection: 'column' }}>
       <Stack direction="row" sx={{ alignItems: 'center' }} spacing={0}>
         <CardHeader
           title="Recent Achievements"
@@ -25,23 +23,14 @@ export function SkeletonRecentAchievements(): React.JSX.Element {
         </Tooltip>
       </Stack>
       <CardContent sx={{ height: '100%'}}>
-        {Array.from({ length: 5 }).map((_, index) => (
-          <Grid container spacing={2} key={index}>
-            <Grid xs={4}>
-              <Typography sx={{ mb: 2 }} variant="body2" >
-                <Skeleton />
-              </Typography>
-            </Grid>
-            <Grid xs={8}>
-              <Typography sx={{ mb: 2 }} variant="body2">
-                <Skeleton />
-              </Typography>
-              <Typography sx={{ mb: 2 }} variant="body2">
-                <Skeleton />
-              </Typography>
-            </Grid>
-          </Grid>
-        ))}
+        <Stack spacing={3} justifyContent="space-evenly" alignItems="center" height="100%">
+          <Skeleton variant="rounded" width="100%" height={20}/>
+          <Skeleton variant="rounded" width="100%" height={20}/>
+          <Skeleton variant="rounded" width="100%" height={20}/>
+          <Skeleton variant="rounded" width="100%" height={20}/>
+          <Skeleton variant="rounded" width="100%" height={20}/>
+
+        </Stack>
       </CardContent>
     </Card>
   );

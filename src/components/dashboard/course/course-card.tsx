@@ -10,27 +10,16 @@ import CardActionArea from "@mui/material/CardActionArea";
 import CardHeader from "@mui/material/CardHeader";
 import Chip from "@mui/material/Chip";
 import CardActions from "@mui/material/CardActions";
-import Button from "@mui/material/Button";
 import {CardMedia} from "@mui/material";
-import { SignIn as SignInIcon } from "@phosphor-icons/react/dist/ssr/SignIn";
 import { Users as UsersIcon } from "@phosphor-icons/react/dist/ssr/Users";
-import { Check as CheckIcon } from "@phosphor-icons/react/dist/ssr/Check";
-import { CalendarX as CalendarXIcon } from "@phosphor-icons/react/dist/ssr/CalendarX";
-import apiService from "@/api/api-service";
-import {logger} from "@/lib/default-logger";
-import {AxiosError} from "axios";
-import {authClient} from "@/lib/auth/client";
-import {useUser} from "@/hooks/use-user";
 import RouterLink from "next/link";
 
 interface CourseCardProps {
   rows?: Course[];
-  onEnrolledSuccess: () => void;
 }
 
-export function CourseCard({ rows = [], onEnrolledSuccess }: CourseCardProps): React.JSX.Element {
+export function CourseCard({ rows = [] }: CourseCardProps): React.JSX.Element {
   const [page, setPage] = React.useState(1);
-  const { eduquestUser } = useUser();
   const rowsPerPage = 6;
 
   // Calculate the number of pages
@@ -44,31 +33,6 @@ export function CourseCard({ rows = [], onEnrolledSuccess }: CourseCardProps): R
     setPage(newPage);
   };
 
-  const handleEnroll = async (courseId:number): Promise<void> => {
-    try {
-      const data = {
-        user: {
-          id: eduquestUser?.id
-        },
-        course: {
-          id: courseId
-        }
-      }
-      const response = await apiService.post(`/api/UserCourse/`, data);
-      if (response.status === 201) {
-        logger.debug('Enrolled successfully');
-        onEnrolledSuccess();
-      }
-    } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-      }
-      logger.error('Error enrolling: ', error);
-    }
-  }
-
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
@@ -78,15 +42,20 @@ export function CourseCard({ rows = [], onEnrolledSuccess }: CourseCardProps): R
 
       {currentCourses.map((course) => (
         <Grid key={course.id} lg={4} md={6} xs={12} >
-          <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-            <CardActionArea href={`/dashboard/course/${course.id.toString()}` } sx={{ height: '100%', borderBottomLeftRadius: 0, borderBottomRightRadius: 0 }} component={RouterLink}>
-              <CardHeader title={`${course.code} ${course.name}`} subheader={`Group: ${course.group}`}/>
+          <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', hover: 'pointer' }}>
+            <CardActionArea
+              href={`/dashboard/course/${course.id.toString()}` }
+              sx={{ height: '100%', borderBottomLeftRadius: 0, borderBottomRightRadius: 0, display: 'flex', flexDirection: 'column' }}
+              component={RouterLink}
+            >
+              <CardHeader title={`${course.code} ${course.name}`} sx={{ width: '100%'}}/>
               <CardMedia
                 component="img"
                 alt={course.image.name}
                 image={`/assets/${course.image.filename}`}
+                sx={{ width: '100%'}}
               />
-              <CardContent sx={{ flex: 1 }}>
+              <CardContent sx={{ flex: 1, width: '100%' }}>
                 <Chip label={course.type} sx={{ mb: 1.5, mr: 1 }} color={
                   course.type === 'System-enroll' ? 'primary' :
                     course.type === 'Self-enroll' ? 'success' :
@@ -108,28 +77,15 @@ export function CourseCard({ rows = [], onEnrolledSuccess }: CourseCardProps): R
                   {course.description}
                 </Typography>
               </CardContent>
-            </CardActionArea>
-            <Box>
-              <CardActions sx={{ justifyContent: 'space-between'}}>
-                <Box sx={{ mx: '16px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <CardActions sx={{ justifyContent: 'space-between', mt: 'auto', width: '100%' }}>
+                <Box sx={{ mx: 2, display: 'flex', justifyContent: 'center', alignItems: 'center', my: 1 }}>
                   <UsersIcon size={20}/>
                   <Typography sx={{ marginLeft: '10px' }} variant="body1">
-                    {course.enrolled_users.length.toString()}
+                    {course.total_students_enrolled}
                   </Typography>
                 </Box>
-                {eduquestUser && course.enrolled_users.includes(eduquestUser?.id.toString()) ? (
-                  <Button endIcon={<CheckIcon/>} disabled>Enrolled</Button>
-                ) : course.type === 'System-enroll' ?
-                  <Button startIcon={<SignInIcon/>} disabled>Enroll</Button>
-                  : course.status === 'Expired' ?
-                  <Button startIcon={<CalendarXIcon/>} disabled>Expired</Button>
-                  : (
-                  <Button endIcon={<SignInIcon/>} onClick={() => handleEnroll(course.id)}>Enroll</Button>
-
-                )}
-
               </CardActions>
-            </Box>
+            </CardActionArea>
 
           </Card>
         </Grid>

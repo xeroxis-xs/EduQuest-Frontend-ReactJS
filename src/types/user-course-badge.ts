@@ -1,9 +1,9 @@
 import type { Badge } from "@/types/badge";
-import type { UserCourse } from "@/types/user-course";
+import { type UserCourseGroupEnrollmentSummary} from "@/types/user-course-group-enrollment";
 
 export interface UserCourseBadge {
   id: number;
   badge: Badge;
-  course_completed: UserCourse;
+  user_course_group_enrollment: UserCourseGroupEnrollmentSummary
   awarded_date: string; // ISO 8601 datetime string
 }

@@ -3,13 +3,11 @@ import * as React from 'react';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import type { Course } from '@/types/course';
-import apiService from "@/api/api-service";
-import {AxiosError, type AxiosResponse} from "axios";
 import { logger } from '@/lib/default-logger'
-import { authClient } from "@/lib/auth/client";
 import { CourseCard } from "@/components/dashboard/course/course-card";
 import { SkeletonCourseCard } from "@/components/dashboard/skeleton/skeleton-course-card";
 import { useUser } from '@/hooks/use-user';
+import {getMyCourses} from "@/api/services/course";
 
 
 export default function Page(): React.JSX.Element {
@@ -17,31 +15,22 @@ export default function Page(): React.JSX.Element {
   const [courses, setCourses] = React.useState<Course[]>([]);
   const [loading, setLoading] = React.useState(true);
 
-  const getMyCourses = async (): Promise<void> => {
+  const fetchMyCourses = async (): Promise<void> => {
     if (eduquestUser) {
       try {
-        const response: AxiosResponse<Course[]> = await apiService.get<Course[]>(`/api/Course/by-user/${eduquestUser?.id.toString()}/`);
-        const data: Course[] = response.data;
-        const filteredData = data.filter((course) => course.type !== 'Private');
-        setCourses(filteredData);
-        logger.debug('Filtered Courses', filteredData);
+        const response = await getMyCourses(eduquestUser.id.toString());
+        setCourses(response);
       } catch (error: unknown) {
-        if (error instanceof AxiosError) {
-          if (error.response?.status === 401) {
-            await authClient.signInWithMsal();
-          }
-        }
-        logger.error('Error: ', error);
+        logger.error('Failed to fetch courses', error);
       } finally {
         setLoading(false);
       }
     }
-  };
-
+  }
 
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
-      await getMyCourses();
+      await fetchMyCourses();
     };
 
     fetchData().catch((error: unknown) => {
@@ -65,7 +54,7 @@ export default function Page(): React.JSX.Element {
         courses.length === 0 ? (
             <Typography variant="h6" align="center" mt={4}>No data available.</Typography>
           ) :
-        <CourseCard rows={courses} onEnrolledSuccess={getMyCourses} />
+        <CourseCard rows={courses} />
       )}
     </Stack>
   );

@@ -15,9 +15,7 @@ import {logger} from "@/lib/default-logger";
 import Avatar from "@mui/material/Avatar";
 import {FloppyDisk as FloppyDiskIcon} from "@phosphor-icons/react/dist/ssr/FloppyDisk";
 import Typography from "@mui/material/Typography";
-import {AxiosError, type AxiosResponse} from "axios";
-import type {Course} from "@/types/course";
-import apiService from "@/api/api-service";
+import {AxiosError} from "axios";
 import {authClient} from "@/lib/auth/client";
 import Alert from "@mui/material/Alert";
 import Points from "../../../../public/assets/point.svg";
@@ -25,6 +23,7 @@ import Stack from "@mui/material/Stack";
 import FormLabel from "@mui/material/FormLabel";
 import {TextField} from "@mui/material";
 import {User as UserIcon} from "@phosphor-icons/react/dist/ssr/User";
+import {updateEduquestUser} from "@/api/services/eduquest-user";
 
 export function AccountDetailsForm(): React.JSX.Element {
   const { eduquestUser, checkSession } = useUser();
@@ -51,24 +50,18 @@ export function AccountDetailsForm(): React.JSX.Element {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
-    const updatedNickname = {
-      nickname: nicknameRef.current?.value
-    };
-    if (eduquestUser) {
-      try {
-        const response: AxiosResponse<Course> = await apiService.patch(`/api/EduquestUser/${eduquestUser.email.toString()}/`, updatedNickname);
-        logger.debug('Update Success:', response.data);
-        setSubmitStatus({ type: 'success', message: 'Update Successful' });
-        await refreshUser();
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          if (error.response?.status === 401) {
-            await authClient.signInWithMsal();
-          }
-          else {
-            logger.error('Code: ', error.response?.status);
-            logger.error('Message: ', error.response?.data);
-          }
+    if (nicknameRef.current?.value) {
+      const updatedNickname = {
+        nickname: nicknameRef.current?.value,
+      };
+      if (eduquestUser) {
+        try {
+          const response = await updateEduquestUser(eduquestUser.id.toString(), updatedNickname);
+          logger.debug('Update Success:', response);
+          setSubmitStatus({ type: 'success', message: 'Update Successful' });
+          await refreshUser();
+        } catch (error) {
+          logger.error('Update Failed:', error);
         }
       }
     }
@@ -116,15 +109,6 @@ export function AccountDetailsForm(): React.JSX.Element {
       logger.error('Failed to fetch data', error);
     });
   }, [eduquestUser]);
-
-  React.useEffect(() => {
-    const fetchData = async (): Promise<void> => {
-      await setUserPhotoAvatar();
-    }
-    fetchData().catch((error: unknown) => {
-      logger.error('Failed to fetch data', error);
-    });
-  }, [])
 
   return (
     <form onSubmit={handleSubmit}>

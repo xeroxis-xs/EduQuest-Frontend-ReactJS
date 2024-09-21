@@ -21,7 +21,7 @@ export function SkeletonTotalUser(): React.JSX.Element {
             <Stack spacing={1}>
               <Stack direction="row" sx={{ alignItems: 'center' }} spacing={0}>
                 <Typography color="text.secondary" variant="overline">
-                  Total Users
+                  Total Students
                 </Typography>
                 <Tooltip title="This represents the total number of users in the platform." placement="top">
                   <InfoIcon fontSize="var(--icon-fontSize-sm)" style={{ marginLeft: '8px', cursor: 'pointer', color: 'var(--mui-palette-neutral-500)' }} />

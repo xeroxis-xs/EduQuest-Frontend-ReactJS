@@ -6,22 +6,11 @@ import { TotalCourse } from '@/components/dashboard/overview/total-course';
 import { TotalQuest } from "@/components/dashboard/overview/total-quest";
 import { ShortestUser } from "@/components/dashboard/overview/shortest-user";
 import { TotalUser } from "@/components/dashboard/overview/total-user";
-import { MyCourseProgress } from "@/components/dashboard/overview/my-course-progress";
-import { MyBadgeProgress } from "@/components/dashboard/overview/my-badge-progress";
+import { CourseProgressCard } from "@/components/dashboard/overview/course-progress-card";
+import { BadgeProgressCard } from "@/components/dashboard/overview/badge-progress-card";
 import { RecentAchievements } from "@/components/dashboard/overview/recent-achievements";
 import { TopCollectors } from "@/components/dashboard/overview/top-collectors";
-import { type ExtendedUserCourseBadge, type ExtendedUserQuestBadge } from "@/types/analytics/recent-badge";
-import { type TopCollector } from "@/types/analytics/top-collector";
-import { type UserCourseProgression } from "@/types/analytics/user-course-progression";
-import { type UserBadgeProgression } from "@/types/analytics/user-badge-progression";
-import { type UserStats } from "@/types/analytics/user-stats";
-import { type CourseEnrollmentStats } from "@/types/analytics/course-enrollment-stats";
-import { type QuestAttemptStats } from "@/types/analytics/quest-attempt-stats";
-import { type ShortestTimeUser } from "@/types/analytics/shortest-time-user";
-import { AxiosError, type AxiosResponse } from "axios";
-import apiService from "@/api/api-service";
 import { logger } from "@/lib/default-logger";
-import { authClient } from "@/lib/auth/client";
 import { SkeletonTopCollector } from "@/components/dashboard/skeleton/analytics/skeleton-top-collector";
 import { SkeletonRecentAchievements } from "@/components/dashboard/skeleton/analytics/skeleton-recent-achievements";
 import {useUser} from "@/hooks/use-user";
@@ -32,29 +21,20 @@ import {SkeletonTotalQuest} from "@/components/dashboard/skeleton/analytics/skel
 import {SkeletonShortestUser} from "@/components/dashboard/skeleton/analytics/skeleton-shortest-user";
 import {SkeletonMyBadgeProgress} from "@/components/dashboard/skeleton/analytics/skeleton-my-badge-progress";
 import Stack from "@mui/material/Stack";
-import {LiveIndicator} from "@/components/dashboard/overview/chart/LiveIndicator";
+import {LiveIndicator} from "@/components/dashboard/overview/chart/live-indicator";
 import Typography from "@mui/material/Typography";
+import {QuestScoresCard} from "@/components/dashboard/overview/quest-scores-card";
+import {SkeletonMyQuestScores} from "@/components/dashboard/skeleton/analytics/skeleton-my-quest-scores";
+import {AnalyticsPartThree} from "@/types/analytics/analytics-three";
+import {AnalyticsPartTwo, UserCourseProgression} from "@/types/analytics/analytics-two";
+import {AnalyticsPartOne} from "@/types/analytics/analytics-one";
+import {getAnalyticsPartOne, getAnalyticsPartThree, getAnalyticsPartTwo} from "@/api/services/analytics";
 
 
-export interface AnalyticsPartOne {
-  user_stats: UserStats;
-  course_enrollment_stats: CourseEnrollmentStats;
-  quest_attempt_stats: QuestAttemptStats;
-  shortest_time_user: ShortestTimeUser | null;
-}
-
-export interface AnalyticsPartTwo {
-  user_course_progression: UserCourseProgression[];
-  user_badge_progression: UserBadgeProgression[];
-}
-
-export interface AnalyticsPartThree {
-  top_users_with_most_badges: TopCollector[];
-  recent_badge_awards: (ExtendedUserCourseBadge | ExtendedUserQuestBadge)[];
-}
 
 export default function Page(): React.JSX.Element {
   const { eduquestUser } = useUser();
+  const [userCourseProgression, setUserCourseProgression] = React.useState<UserCourseProgression | null>(null);
   const [analyticsPartOneLoading, setAnalyticsPartOneLoading] = React.useState(true);
   const [analyticsPartTwoLoading, setAnalyticsPartTwoLoading] = React.useState(true);
   const [analyticsPartThreeLoading, setAnalyticsPartThreeLoading] = React.useState(true);
@@ -83,67 +63,54 @@ export default function Page(): React.JSX.Element {
     recent_badge_awards: [],
   });
 
-  const getAnalyticsPartOne = async (): Promise<void> => {
+
+  const fetchAnalyticsPartOne = async (): Promise<void> => {
     try {
-      const response: AxiosResponse<AnalyticsPartOne> = await apiService.get<AnalyticsPartOne>('/api/Analytics/part-one');
-      const data: AnalyticsPartOne = response.data;
-      logger.debug('Analytics Part One', data);
-      setAnalyticsPartOne(data);
+      const response = await getAnalyticsPartOne()
+      // logger.debug('Analytics Part One', response);
+      setAnalyticsPartOne(response);
     } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-      }
-      logger.error('Error: ', error);
+      logger.error('Error fetching analytics part one', error);
     } finally {
       setAnalyticsPartOneLoading(false);
     }
   }
 
-  const getAnalyticsPartTwo = async (): Promise<void> => {
+  const fetchAnalyticsPartTwo = async (): Promise<void> => {
     if (eduquestUser) {
       try {
-        const response: AxiosResponse<AnalyticsPartTwo> = await apiService.get<AnalyticsPartTwo>(`/api/Analytics/part-two/${eduquestUser.id.toString()}`);
-        const data: AnalyticsPartTwo = response.data;
-        logger.debug('Analytics Part Two', data);
-        setAnalyticsPartTwo(data);
+        const response = await getAnalyticsPartTwo(eduquestUser.id, 'both');
+        // logger.debug('Analytics Part Two', response);
+        setAnalyticsPartTwo(response);
       } catch (error: unknown) {
-        if (error instanceof AxiosError) {
-          if (error.response?.status === 401) {
-            await authClient.signInWithMsal();
-          }
-        }
-        logger.error('Error: ', error);
+        logger.error('Error fetching analytics part two', error);
       } finally {
         setAnalyticsPartTwoLoading(false);
       }
     }
   }
 
-  const getAnalyticsPartThree = async (): Promise<void> => {
+  const fetchAnalyticsPartThree = async (): Promise<void> => {
     try {
-      const response: AxiosResponse<AnalyticsPartThree> = await apiService.get<AnalyticsPartThree>('/api/Analytics/part-three/');
-      const data: AnalyticsPartThree = response.data;
-      logger.debug('Analytics Part Three', data);
-      setAnalyticsPartThree(data);
+      const response = await getAnalyticsPartThree()
+      // logger.debug('Analytics Part Three', response);
+      setAnalyticsPartThree(response);
     } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-      }
-      logger.error('Error: ', error);
+      logger.error('Error fetching analytics part three', error);
     } finally {
       setAnalyticsPartThreeLoading(false);
     }
-  };
+  }
+
+  const handleOnClick = (aUserCourseProgression: UserCourseProgression ) => {
+    setUserCourseProgression(aUserCourseProgression);
+  }
 
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
-      await getAnalyticsPartOne();
-      await getAnalyticsPartTwo();
-      await getAnalyticsPartThree();
+      await fetchAnalyticsPartOne();
+      await fetchAnalyticsPartTwo();
+      await fetchAnalyticsPartThree();
     };
 
     fetchData().catch((error: unknown) => {
@@ -167,40 +134,43 @@ export default function Page(): React.JSX.Element {
       </Stack>
 
       <Grid container spacing={5}>
-        <Grid lg={3} sm={6} xs={12}>
-          { analyticsPartOneLoading? <SkeletonTotalUser /> :
-            (analyticsPartOne.user_stats ?
-                <TotalUser
+        <Grid lg={4} md={4} xs={12}>
+          { eduquestUser?.is_staff ?
+            analyticsPartOneLoading ? <SkeletonTotalUser /> :
+              (analyticsPartOne.user_stats ?
+                  <TotalUser
+                    sx={{ height: '100%' }}
+                    value={analyticsPartOne.user_stats.total_users}
+                    trend="up"
+                    diff={analyticsPartOne.user_stats.new_users_percentage} /> :
+                  <TotalUser
+                    sx={{ height: '100%' }}
+                    value={null}
+                    trend="up"
+                    diff={null} />
+              )
+          : null }
+        </Grid>
+        <Grid lg={4} md={4} xs={12}>
+          { eduquestUser?.is_staff ?
+            analyticsPartOneLoading ? <SkeletonTotalCourse /> :
+              (analyticsPartOne.course_enrollment_stats ?
+                <TotalCourse
                   sx={{ height: '100%' }}
-                  value={analyticsPartOne.user_stats.total_users}
+                  value={analyticsPartOne.course_enrollment_stats.total_enrollments}
                   trend="up"
-                  diff={analyticsPartOne.user_stats.new_users_percentage} /> :
-                <TotalUser
+                  diff={analyticsPartOne.course_enrollment_stats.new_enrollments_percentage} /> :
+                <TotalCourse
                   sx={{ height: '100%' }}
                   value={ null }
                   trend="up"
                   diff={ null } />
-            )
-          }
+              )
+          : null }
         </Grid>
-        <Grid lg={3} sm={6} xs={12}>
-          { analyticsPartOneLoading? <SkeletonTotalCourse /> :
-            (analyticsPartOne.course_enrollment_stats ?
-              <TotalCourse
-                sx={{ height: '100%' }}
-                value={analyticsPartOne.course_enrollment_stats.total_enrollments}
-                trend="up"
-                diff={analyticsPartOne.course_enrollment_stats.new_enrollments_percentage} /> :
-              <TotalCourse
-                sx={{ height: '100%' }}
-                value={ null }
-                trend="up"
-                diff={ null } />
-            )
-          }
-        </Grid>
-        <Grid lg={3} sm={6} xs={12}>
-          { analyticsPartOneLoading? <SkeletonTotalQuest /> :
+        <Grid lg={4} md={4} xs={12}>
+          { eduquestUser?.is_staff ?
+            analyticsPartOneLoading? <SkeletonTotalQuest /> :
             (analyticsPartOne.quest_attempt_stats ?
               <TotalQuest
                 sx={{ height: '100%' }}
@@ -213,42 +183,78 @@ export default function Page(): React.JSX.Element {
                 trend="up"
                 diff={ null } />
             )
-          }
+           : null }
         </Grid>
-        <Grid lg={3} sm={6} xs={12}>
-          { analyticsPartOneLoading? <SkeletonShortestUser /> :
-              <ShortestUser shortestTimeUser={analyticsPartOne.shortest_time_user} sx={{ height: '100%' }} />
 
-          }
-        </Grid>
-        <Grid lg={8} md={12} xs={12}>
-          { analyticsPartTwoLoading? <SkeletonMyCourseProgress /> :
+        <Grid lg={5} md={6} xs={12}>
+          { analyticsPartTwoLoading ?
+            <SkeletonMyCourseProgress
+              title="My Courses"
+              tooltip="The progress of the courses that you are enrolled in"
+            /> :
             (analyticsPartTwo.user_course_progression ?
-              <MyCourseProgress userCourseProgression={analyticsPartTwo.user_course_progression} sx={{ height: '100%' }} /> : null
+              <CourseProgressCard
+                userCourseProgression={analyticsPartTwo.user_course_progression}
+                handleOnClick={handleOnClick}
+                title="My Courses"
+                tooltip="The progress of the courses that you are enrolled in"
+                nullPrompt="No data available."
+                sx={{ height: '100%' }} /> : null
             )
           }
-
         </Grid>
-        <Grid lg={4} md={12} xs={12}>
+        <Grid lg={4} md={6} xs={12}>
+          { analyticsPartTwoLoading ?
+            <SkeletonMyQuestScores
+              title="My Quest"
+              tooltip="The highest score you have achieved for each quests"
+            /> :
+            (analyticsPartTwo.user_course_progression ?
+                <QuestScoresCard
+                  userCourseProgression={userCourseProgression}
+                  title="My Quest"
+                  prompt="Select a course to view your quest scores"
+                  tooltip="The highest score you have achieved for each quests"
+                  chartAutoHeight
+                  sx={{ height: '100%' }}
+                /> : null
+            )
+          }
+        </Grid>
+        <Grid lg={3} md={6} xs={12}>
           { analyticsPartTwoLoading? <SkeletonMyBadgeProgress /> :
             (analyticsPartTwo.user_badge_progression ?
-              <MyBadgeProgress userBadgeProgression={analyticsPartTwo.user_badge_progression} sx={{ height: "100%" }}/> : null
-        )}
-          </Grid>
-        <Grid lg={6} md={12} xs={12}>
-          {analyticsPartThreeLoading ? <SkeletonTopCollector /> :
-            (analyticsPartThree.top_users_with_most_badges ?
-                <TopCollectors topCollectors={analyticsPartThree.top_users_with_most_badges} sx={{ height: '100%' }} /> : null
-            )
-          }
+                <BadgeProgressCard userBadgeProgression={analyticsPartTwo.user_badge_progression} sx={{ height: "100%" }}/> : null
+            )}
         </Grid>
-        <Grid lg={6} md={12} xs={12}>
+
+        <Grid container lg={5} md={6} xs={12}>
+          <Grid xs={12}>
+            { analyticsPartOneLoading? <SkeletonShortestUser /> :
+              <ShortestUser shortestTimeUser={analyticsPartOne.shortest_time_user} />
+
+            }
+          </Grid>
+          <Grid xs={12}>
+            {analyticsPartThreeLoading ? <SkeletonTopCollector /> :
+              (analyticsPartThree.top_users_with_most_badges ?
+                  <TopCollectors topCollectors={analyticsPartThree.top_users_with_most_badges} /> : null
+              )
+            }
+          </Grid>
+
+        </Grid>
+
+
+        <Grid lg={7} md={6} sm={12} xs={12}>
           {analyticsPartThreeLoading ? <SkeletonRecentAchievements /> :
             (analyticsPartThree.recent_badge_awards ?
-                <RecentAchievements recentBadges={analyticsPartThree.recent_badge_awards} sx={{ height: '100%' }} /> : null
+                <RecentAchievements recentBadges={analyticsPartThree.recent_badge_awards} /> : null
             )
           }
         </Grid>
+
+
       </Grid>
     </Stack>
   );

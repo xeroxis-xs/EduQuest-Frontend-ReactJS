@@ -4,10 +4,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import MenuItem from '@mui/material/MenuItem';
 import Select from '@mui/material/Select';
-import apiService from "@/api/api-service";
-import {AxiosError, type AxiosResponse} from "axios";
 import { logger } from '@/lib/default-logger'
-import { authClient } from "@/lib/auth/client";
 import { QuestCard } from "@/components/dashboard/quest/quest-card";
 import type { Quest } from '@/types/quest';
 import { SkeletonQuestCard } from "@/components/dashboard/skeleton/skeleton-quest-card";
@@ -15,6 +12,7 @@ import {useUser} from "@/hooks/use-user";
 import type { SelectChangeEvent } from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
 import {Funnel as FunnelIcon} from "@phosphor-icons/react/dist/ssr/Funnel";
+import {getMyQuests} from "@/api/services/quest";
 
 
 export default function Page(): React.JSX.Element {
@@ -24,31 +22,25 @@ export default function Page(): React.JSX.Element {
   const [selectedCourseId, setSelectedCourseId] = React.useState<string | null>(null);
   const [courseIds, setCourseIds] = React.useState<string[]>([]);
 
-  const getMyQuests = async (): Promise<void> => {
+  const fetchMyQuests = async (): Promise<void> => {
     if (eduquestUser) {
       try {
-        const response: AxiosResponse<Quest[]> = await apiService.get<Quest[]>(`/api/Quest/by-enrolled-user/${eduquestUser?.id.toString()}`);
-        const data: Quest[] = response.data;
-        setQuests(data);
-        const uniqueCourseIds = Array.from(new Set(data.map(quest => `${quest.from_course.id.toString()} - [${quest.from_course.group}] ${quest.from_course.code} ${quest.from_course.name}`)));
-        setCourseIds(uniqueCourseIds)
-        logger.debug('My Quests', data);
+        const response = await getMyQuests(eduquestUser.id.toString());
+        setQuests(response);
+        const uniqueCourseIds = Array.from(new Set(response.map(quest => `${quest.course_group.course.id.toString()} - [${quest.course_group.name}] ${quest.course_group.course.code} ${quest.course_group.course.name}`)));
+        setCourseIds(uniqueCourseIds);
       } catch (error: unknown) {
-        if (error instanceof AxiosError) {
-          if (error.response?.status === 401) {
-            await authClient.signInWithMsal();
-          }
-        }
-        logger.error('Error: ', error);
+        logger.error('Failed to fetch my courses', error);
       } finally {
         setLoading(false);
       }
     }
-  };
+  }
+
 
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
-      await getMyQuests();
+      await fetchMyQuests();
     };
 
     fetchData().catch((error: unknown) => {
@@ -62,7 +54,7 @@ export default function Page(): React.JSX.Element {
 
 
   const filteredQuests = selectedCourseId
-    ? quests.filter(quest => `${quest.from_course.id.toString()} - [${quest.from_course.group}] ${quest.from_course.code} ${quest.from_course.name}` === selectedCourseId)
+    ? quests.filter(quest => `${quest.course_group.course.id.toString()} - [${quest.course_group.name}] ${quest.course_group.course.code} ${quest.course_group.course.name}` === selectedCourseId)
     : quests;
 
   return (
@@ -101,7 +93,7 @@ export default function Page(): React.JSX.Element {
         filteredQuests.length === 0 ? (
           <Typography variant="h6" align="center" mt={4}>No data available.</Typography>
           ) :
-          <QuestCard rows={filteredQuests} onQuestDeleteSuccess={getMyQuests}/>
+          <QuestCard rows={filteredQuests} onQuestDeleteSuccess={fetchMyQuests}/>
         )}
     </Stack>
   );
