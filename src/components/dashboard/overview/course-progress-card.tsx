@@ -4,7 +4,7 @@ import * as React from 'react';
 import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 import type { SxProps } from '@mui/material/styles';
-import { CourseChart } from "@/components/dashboard/overview/chart/course-chart";
+import { CourseRadialBarChart } from "@/components/dashboard/overview/chart/course-radial-bar-chart";
 import {Book as BookIcon} from "@phosphor-icons/react/dist/ssr/Book";
 import {CaretRight as CaretRightIcon} from "@phosphor-icons/react/dist/ssr/CaretRight";
 import {CaretLeft as CaretLeftIcon} from "@phosphor-icons/react/dist/ssr/CaretLeft";
@@ -29,7 +29,7 @@ export interface MyEnrolledCoursesProps {
   nullPrompt: string;
 }
 
-export function MyCourseProgress({ userCourseProgression = [], sx, handleOnClick, title, tooltip, nullPrompt }: MyEnrolledCoursesProps): React.JSX.Element {
+export function CourseProgressCard({ userCourseProgression = [], sx, handleOnClick, title, tooltip, nullPrompt }: MyEnrolledCoursesProps): React.JSX.Element {
   const [page, setPage] = React.useState(0);
   const theme = useTheme();
   const isXs = useMediaQuery(theme.breakpoints.down('sm'));
@@ -50,7 +50,7 @@ export function MyCourseProgress({ userCourseProgression = [], sx, handleOnClick
   const paginatedData = userCourseProgression.slice(page * itemsPerPage, (page + 1) * itemsPerPage);
 
   return (
-    <Card sx={{ ...sx, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+    <Card sx={{ ...sx, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <Stack direction="row" sx={{ alignItems: 'center' }} spacing={0}>
         <CardHeader
           title={title}
@@ -87,7 +87,7 @@ export function MyCourseProgress({ userCourseProgression = [], sx, handleOnClick
                            borderRadius: '16px',
                          } }}
                 >
-                  <CourseChart aUserCourseProgression={aUserCourseProgression} />
+                  <CourseRadialBarChart aUserCourseProgression={aUserCourseProgression}/>
                   <Typography variant="body2" align="center" >{aUserCourseProgression.course_code}</Typography>
                   <Typography variant="body2" align="center" color="text.secondary">{aUserCourseProgression.course_name}</Typography>
                 </Grid>

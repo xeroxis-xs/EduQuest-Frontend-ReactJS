@@ -8,7 +8,7 @@ export interface AnalyticsPartThree {
   recent_badge_awards: RecentBadge[];
 }
 
-interface TopCollector {
+export interface TopCollector {
   user_id: EduquestUser['id'],
   nickname: EduquestUser['nickname'],
   badge_count: number,
@@ -16,7 +16,7 @@ interface TopCollector {
   course_badges: BadgeCount[];
 }
 
-interface BadgeCount {
+export interface BadgeCount {
   badge_id: Badge['id'];
   badge_name: Badge['name'];
   badge_filename: Badge['image']['filename'];

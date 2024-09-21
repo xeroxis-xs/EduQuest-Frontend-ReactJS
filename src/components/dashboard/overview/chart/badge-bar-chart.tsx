@@ -10,7 +10,7 @@ export interface CourseChartProps {
   maxCount: number[];
 }
 
-export function BadgeChart({ aUserBadgeProgression, maxCount }: CourseChartProps): React.JSX.Element {
+export function BadgeBarChart({ aUserBadgeProgression, maxCount }: CourseChartProps): React.JSX.Element {
 
   const chartOptions = useChartOptions(aUserBadgeProgression.badge_name, maxCount);
 

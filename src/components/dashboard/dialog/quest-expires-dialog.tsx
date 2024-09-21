@@ -55,16 +55,16 @@ export function QuestExpiresDialog({ quest, openDialog, handleDialogClose, handl
                 <List sx={{ width: '100%' }}>
                   <ListItem>
                     <ListItemAvatar>
-                      <Avatar sx={{ backgroundColor: 'transparent' }}>
-                        <ExpertBadge size={28}/>
+                      <Avatar sx={{ backgroundColor: 'transparent', height: '100%' }} variant="square">
+                        <ExpertBadge height={46}/>
                       </Avatar>
                     </ListItemAvatar>
                     <ListItemText primary="Expert Badge" secondary="Awarded to the user with the highest score for this quest." />
                   </ListItem>
                   <ListItem>
                     <ListItemAvatar>
-                      <Avatar sx={{ backgroundColor: 'transparent' }}>
-                        <SpeedsterBadge size={28}/>
+                      <Avatar sx={{ backgroundColor: 'transparent', height: '100%' }} variant="square">
+                        <SpeedsterBadge height={46}/>
                       </Avatar>
                     </ListItemAvatar>
                     <ListItemText primary="Speedster Badge" secondary="Awarded to the user with the fastest attempt for this quest. " />

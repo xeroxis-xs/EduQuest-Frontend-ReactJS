@@ -8,7 +8,7 @@ import { Medal as MedalIcon } from '@phosphor-icons/react/dist/ssr/Medal';
 import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
 import Tooltip from "@mui/material/Tooltip";
 import Stack from "@mui/material/Stack";
-import {BadgeChart} from "@/components/dashboard/overview/chart/badge-chart";
+import {BadgeBarChart} from "@/components/dashboard/overview/chart/badge-bar-chart";
 import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
 import {paths} from "@/paths";
@@ -24,7 +24,7 @@ export interface MyEarnedBadgesProps {
   sx?: SxProps;
 }
 
-export function MyBadgeProgress({ userBadgeProgression = [], sx }: MyEarnedBadgesProps): React.JSX.Element {
+export function BadgeProgressCard({ userBadgeProgression = [], sx }: MyEarnedBadgesProps): React.JSX.Element {
   const badgeCounts = userBadgeProgression.map(i => i.count);
 
   return (
@@ -62,7 +62,7 @@ export function MyBadgeProgress({ userBadgeProgression = [], sx }: MyEarnedBadge
               <Box component="img" src={`assets/${aUserBadgeProgression.badge_filename}`} sx={{ cursor: 'pointer', width: 34 }} />
             </Tooltip>
             <Box sx={{ flexGrow: 1 }}>
-              <BadgeChart aUserBadgeProgression={aUserBadgeProgression} maxCount={badgeCounts} />
+              <BadgeBarChart aUserBadgeProgression={aUserBadgeProgression} maxCount={badgeCounts} />
             </Box>
           </Stack>
         ))}

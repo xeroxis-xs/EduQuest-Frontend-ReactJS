@@ -56,24 +56,24 @@ export function CourseExpiresDialog({ course, openDialog, handleDialogClose, han
                 <List sx={{ width: '100%' }}>
                   <ListItem>
                     <ListItemAvatar>
-                      <Avatar sx={{ backgroundColor: 'transparent' }}>
-                        <CompletionistBadge size={28}/>
+                      <Avatar sx={{ backgroundColor: 'transparent', height: '100%' }} variant="square">
+                        <CompletionistBadge height={46}/>
                       </Avatar>
                     </ListItemAvatar>
                     <ListItemText primary="Completionist Badge" secondary="Awarded to the user who have completed all Quests under this course." />
                   </ListItem>
                   <ListItem>
                     <ListItemAvatar>
-                      <Avatar sx={{ backgroundColor: 'transparent' }}>
-                        <ExpertBadge size={28}/>
+                      <Avatar sx={{ backgroundColor: 'transparent', height: '100%' }} variant="square">
+                        <ExpertBadge height={46}/>
                       </Avatar>
                     </ListItemAvatar>
                     <ListItemText primary="Expert Badge" secondary="Awarded to the user with the highest score for any quest under this course." />
                   </ListItem>
                   <ListItem>
                     <ListItemAvatar>
-                      <Avatar sx={{ backgroundColor: 'transparent' }}>
-                        <SpeedsterBadge size={28}/>
+                      <Avatar sx={{ backgroundColor: 'transparent', height: '100%' }} variant="square">
+                        <SpeedsterBadge height={46}/>
                       </Avatar>
                     </ListItemAvatar>
                     <ListItemText primary="Speedster Badge" secondary="Awarded to the user with the fastest attempt for any quest under this course." />

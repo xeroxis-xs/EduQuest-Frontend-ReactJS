@@ -29,7 +29,7 @@ import Tooltip from "@mui/material/Tooltip";
 import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
 import {getImages} from "@/api/services/image";
 import {type CourseGroup} from "@/types/course-group";
-import {getCourseGroups} from "@/api/services/course-group";
+import {getNonPrivateCourseGroups} from "@/api/services/course-group";
 import {deleteQuest, updateQuest} from "@/api/services/quest";
 import {User as UserIcon} from "@phosphor-icons/react/dist/ssr/User";
 
@@ -72,7 +72,7 @@ export default function QuestEditForm( {quest, toggleForm, setSubmitStatus, onUp
 
   const fetchCourseGroups = async (): Promise<void> => {
     try {
-      const response = await getCourseGroups()
+      const response = await getNonPrivateCourseGroups()
       setCourseGroups(response);
     } catch (error: unknown) {
       logger.error('Failed to fetch course groups', error);

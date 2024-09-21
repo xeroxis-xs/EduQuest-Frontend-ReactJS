@@ -14,8 +14,15 @@ export interface CourseGroup {
   quests: Quest[]
 }
 
-interface Quest {
+export interface Quest {
   quest_id: number;
   quest_name: string;
   quest_completion: number;
+  quest_max_score: number;
+  students_progress: StudentsProgress[];
+}
+
+interface StudentsProgress {
+  username: string;
+  highest_score: number | null;
 }

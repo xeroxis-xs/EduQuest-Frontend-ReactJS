@@ -139,7 +139,7 @@ export function ImportCardQuestion({ questions, onAggregationComplete, newQuestI
     reason: string | null,
     isCorrect: boolean
   ): void => {
-    logger.debug('handleAnswerChange', questionId, answerId, isCorrect);
+    // logger.debug('handleAnswerChange', questionId, answerId, isCorrect);
 
     // Update the questions state for UI
     const newQuestions = updatedQuestions.map((question) => {
@@ -272,7 +272,7 @@ export function ImportCardQuestion({ questions, onAggregationComplete, newQuestI
 
       {/* Loading Indicators */}
       {loadingState === LoadingState.UpdatingQuestions && <Loading text="Updating Questions..." />}
-      {loadingState === LoadingState.ConsolidatingUserAttempts && <Loading text="Consolidating All User Attempts..." />}
+      {loadingState === LoadingState.ConsolidatingUserAttempts && <Loading text="Consolidating all User Attempts..." />}
 
       {/* Submit Button */}
       <Box sx={{ display: "flex", justifyContent: "center", mt: 6 }}>

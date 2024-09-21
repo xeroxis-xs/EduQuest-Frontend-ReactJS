@@ -43,7 +43,7 @@ export async function getToken(): Promise<string | null> {
 export async function handleLoginResponse(loginResponse: AuthenticationResult): Promise<void> {
     const account = loginResponse.account;
     msalInstance.setActiveAccount(account);
-    logger.debug("MSAL: Active account set:", account);
+    // logger.debug("MSAL: Active account set:", account);
     const token = await getToken();
     if (token !== null) {
         localStorage.setItem('access-token', token);

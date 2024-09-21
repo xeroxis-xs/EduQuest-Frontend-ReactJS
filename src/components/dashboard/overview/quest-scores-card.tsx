@@ -10,7 +10,7 @@ import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
 import Stack from "@mui/material/Stack";
 import type { UserCourseProgression } from "@/types/analytics/analytics-two";
 import Typography from "@mui/material/Typography";
-import {QuestScoreChart} from "@/components/dashboard/overview/chart/quest-score-chart";
+import {QuestScoreBarChart} from "@/components/dashboard/overview/chart/quest-score-bar-chart";
 import CardContent from "@mui/material/CardContent";
 
 export interface MyEnrolledCoursesProps {
@@ -19,13 +19,14 @@ export interface MyEnrolledCoursesProps {
   title: string;
   prompt: string;
   tooltip: string;
+  chartAutoHeight: boolean;
 }
 
-export function MyQuestScores({ userCourseProgression, sx, title, prompt, tooltip }: MyEnrolledCoursesProps): React.JSX.Element {
+export function QuestScoresCard({ userCourseProgression, sx, title, prompt, tooltip, chartAutoHeight }: MyEnrolledCoursesProps): React.JSX.Element {
 
 
   return (
-    <Card sx={{ ...sx, display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+    <Card sx={{ ...sx, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
       <Stack direction="row" sx={{ alignItems: 'center' }} spacing={0}>
         <CardHeader
           title={title}
@@ -46,7 +47,7 @@ export function MyQuestScores({ userCourseProgression, sx, title, prompt, toolti
             <Typography variant="body2" align="center">
               {userCourseProgression.course_code} {userCourseProgression.course_name}
             </Typography>
-            <QuestScoreChart aUserCourseProgression={userCourseProgression} />
+            <QuestScoreBarChart aUserCourseProgression={userCourseProgression} chartAutoHeight={chartAutoHeight}/>
           </Stack>
         ) :  userCourseProgression ?
             <Typography variant="body2" align="center" pb={3}>This course does not have any quest setup yet</Typography>

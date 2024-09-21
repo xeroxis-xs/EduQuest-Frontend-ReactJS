@@ -2,14 +2,14 @@ import * as React from 'react';
 import { useTheme } from '@mui/material/styles';
 import type { ApexOptions } from 'apexcharts';
 import { Chart } from '@/components/core/chart';
-import type { TopCollector } from "@/types/analytics/top-collector";
+import type {TopCollector} from "@/types/analytics/analytics-three";
 
 
-export interface TopCollectorsProps {
+interface TopCollectorsProps {
   topCollectors?: TopCollector[];
 }
 
-export function TopCollectorChart({ topCollectors = [] }: TopCollectorsProps): React.JSX.Element {
+export function TopCollectorBarChart({ topCollectors = [] }: TopCollectorsProps): React.JSX.Element {
   // Sort topUsersWithMostBadges by the number of badges in descending order
   const sortedTopUsers = [...topCollectors].sort((a, b) => b.badge_count - a.badge_count);
 

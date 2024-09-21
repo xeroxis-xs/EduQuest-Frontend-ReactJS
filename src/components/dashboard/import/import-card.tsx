@@ -26,7 +26,7 @@ import Stack from "@mui/material/Stack";
 import Tooltip from "@mui/material/Tooltip";
 import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
 import {getImages} from "@/api/services/image";
-import {getCourseGroup, getCourseGroups} from "@/api/services/course-group";
+import {getCourseGroup, getNonPrivateCourseGroups} from "@/api/services/course-group";
 import {type CourseGroup} from "@/types/course-group";
 import {importQuest} from "@/api/services/quest";
 import {User as UserIcon} from "@phosphor-icons/react/dist/ssr/User";
@@ -94,7 +94,7 @@ export function ImportCard({ onImportSuccess, courseGroupId }: ImportCardProps):
         const response = await getCourseGroup(courseGroupId);
         setCourseGroups([response]);
       } else {
-        const response = await getCourseGroups();
+        const response = await getNonPrivateCourseGroups();
         setCourseGroups(response);
       }
     } catch (error: unknown) {
@@ -144,9 +144,6 @@ export function ImportCard({ onImportSuccess, courseGroupId }: ImportCardProps):
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
     event.preventDefault();
     setIsProcessing(true);
-    const tutorialDate = questTutorialDateRef.current?.value
-        ? new Date(questTutorialDateRef.current.value).toISOString()
-        : null;
     // Create FormData
     const formData = new FormData();
 
@@ -163,13 +160,12 @@ export function ImportCard({ onImportSuccess, courseGroupId }: ImportCardProps):
       formData.append('type', questTypeRef.current?.value || '');
       formData.append('name', questNameRef.current?.value || '');
       formData.append('description', questDescriptionRef.current?.value || '');
-      formData.append('tutorial_date', tutorialDate || '');
+      formData.append('tutorial_date', new Date(questTutorialDateRef.current.value).toISOString());
       formData.append('status', 'Active');
       formData.append('max_attempts', '1');
       formData.append('course_group_id', selectedCourseGroup.id.toString() );
       formData.append('organiser_id', eduquestUser.id.toString() );
       formData.append('image_id', selectedImage.id.toString() );
-      // logger.debug('Form Data:', Array.from(formData.entries()));
     } else {
       logger.error('Missing required fields');
       setSubmitStatus({ type: 'error', message: 'Missing required fields' });
@@ -180,6 +176,8 @@ export function ImportCard({ onImportSuccess, courseGroupId }: ImportCardProps):
     if (selectedFile) {
       try {
         formData.append('file', selectedFile);
+
+        // logger.debug('Form Data:', Array.from(formData.entries()));
         const response = await importQuest(formData);
         logger.debug('Upload Success, Question data: ', response);
         setSubmitStatus({type: 'success', message: 'Quest Import Successful'});
@@ -423,7 +421,7 @@ export function ImportCard({ onImportSuccess, courseGroupId }: ImportCardProps):
           {String(submitStatus.message)}
         </Alert> : null}
 
-      {isProcessing ? <Loading text="Creating Quest and Questions..." /> : null}
+      {isProcessing ? <Loading text="Processing File..." /> : null}
 
     <Box sx={{display: "flex", justifyContent: "center", mt: 6}}>
       <Button endIcon={<CaretRightIcon/>} type="submit" variant="contained">Next: Edit Question</Button>

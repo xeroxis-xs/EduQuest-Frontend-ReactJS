@@ -57,7 +57,7 @@ export function CourseTable({ rows = [], onCourseGroupSelect }: CourseTableProps
           <TableHead>
             <TableRow>
               {/*<TableCell />*/}
-              <TableCell>Name</TableCell>
+              <TableCell>Course</TableCell>
               <TableCell>Term</TableCell>
               <TableCell>Groups</TableCell>
               <TableCell>Total Students</TableCell>
@@ -127,10 +127,10 @@ function CollapsibleRow({ row, onCourseGroupSelect }: CollapsibleRowProps) {
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box>
                 <Table size="small" aria-label="course groups" >
-                  <TableHead >
-                    <TableRow>
+                  <TableHead sx={{ '& .MuiTableCell-root': { backgroundColor: 'var(--mui-palette-common-white)' } }}>
+                    <TableRow >
                       <TableCell sx={{ paddingLeft: 7, py: 2 }}>Group Name</TableCell>
-                      <TableCell>Quests</TableCell>
+                      <TableCell sx={{ backgroundColor: 'var(--mui-palette-common-white)' }}>Quests</TableCell>
                       <TableCell>Students</TableCell>
                     </TableRow>
                   </TableHead>

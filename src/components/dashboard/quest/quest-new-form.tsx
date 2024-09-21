@@ -26,7 +26,7 @@ import {Info as InfoIcon} from "@phosphor-icons/react/dist/ssr/Info";
 import Stack from "@mui/material/Stack";
 import {getImages} from "@/api/services/image";
 import {createQuest} from "@/api/services/quest";
-import {getCourseGroup, getCourseGroups} from "@/api/services/course-group";
+import {getCourseGroup, getNonPrivateCourseGroups} from "@/api/services/course-group";
 import {type CourseGroup} from "@/types/course-group";
 import {User as UserIcon} from "@phosphor-icons/react/dist/ssr/User";
 import Skeleton from "@mui/material/Skeleton";
@@ -78,7 +78,7 @@ export function QuestNewForm({onFormSubmitSuccess, courseGroupId}: CourseFormPro
         const response = await getCourseGroup(courseGroupId);
         setCourseGroups([response]);
       } else {
-        const response = await getCourseGroups();
+        const response = await getNonPrivateCourseGroups();
         setCourseGroups(response);
       }
     } catch (error: unknown) {
@@ -121,8 +121,12 @@ export function QuestNewForm({onFormSubmitSuccess, courseGroupId}: CourseFormPro
         type: questTypeRef.current.value.trim(),
         status: questStatusRef.current.value.trim(),
         max_attempts: Number(questMaxAttemptsRef.current.value),
-        expiration_date: questExpirationDateRef.current?.value || null,
-        tutorial_date: questTutorialDateRef.current?.value || null,
+        expiration_date: questExpirationDateRef.current?.value
+          ? new Date(questExpirationDateRef.current.value).toISOString()
+          : null,
+        tutorial_date: questTutorialDateRef.current?.value
+          ? new Date(questTutorialDateRef.current.value).toISOString()
+          : null,
         course_group_id: selectedCourseGroup.id,
         image_id: selectedImage.id,
         organiser_id: eduquestUser.id

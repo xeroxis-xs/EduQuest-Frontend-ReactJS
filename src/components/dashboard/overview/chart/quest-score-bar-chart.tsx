@@ -7,9 +7,10 @@ import {logger} from "@/lib/default-logger";
 
 export interface QuestScoreChartProps {
   aUserCourseProgression: UserCourseProgression;
+  chartAutoHeight: boolean;
 }
 
-export function QuestScoreChart({ aUserCourseProgression }: QuestScoreChartProps): React.JSX.Element {
+export function QuestScoreBarChart({ aUserCourseProgression, chartAutoHeight }: QuestScoreChartProps): React.JSX.Element {
   const questNames = aUserCourseProgression.quest_scores.map((quest: QuestScore) => quest.quest_name);
   const chartOptions = useChartOptions(questNames);
 
@@ -32,7 +33,7 @@ export function QuestScoreChart({ aUserCourseProgression }: QuestScoreChartProps
       ]}
       type="bar"
       width="100%"
-      height="auto"
+      height={chartAutoHeight ? 'auto' : questScores.length * 60}
       align="center"
     />
   );

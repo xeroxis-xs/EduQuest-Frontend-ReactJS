@@ -84,6 +84,18 @@ export function QuestCard({ rows = [], onQuestDeleteSuccess }: QuestCardProps): 
                     quest.status === 'Active' ? 'success' : 'secondary'
                 } size="small"/>
 
+                {quest.tutorial_date ?
+                  <Typography variant="body2" color="textSecondary" sx={{ mb: 1.5 }}>
+                    Tutorial Date: {new Date(quest.tutorial_date).toLocaleDateString("en-SG", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })}
+                  </Typography> : null
+                }
+
                 <Typography variant="body2">
                   {quest.description}
                 </Typography>

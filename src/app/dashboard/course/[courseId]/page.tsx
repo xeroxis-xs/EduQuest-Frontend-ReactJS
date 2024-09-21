@@ -47,6 +47,7 @@ import {CourseNewGroupForm} from "@/components/dashboard/course-group/course-gro
 import type {CourseGroup} from "@/types/course-group";
 import {getUserCourseGroupEnrollmentsByCourseAndUser} from "@/api/services/user-course-group-enrollment";
 import type {UserCourseGroupEnrollment} from "@/types/user-course-group-enrollment";
+import {SkeletonCourseGroupCard} from "@/components/dashboard/skeleton/skeleton-course-group-card";
 
 
 interface ExpandMoreProps extends IconButtonProps {
@@ -416,7 +417,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
 
 
       {loadingCourseGroups || loadingUserCourseGroupEnrollments ? (
-        <SkeletonQuestCard />
+        <SkeletonCourseGroupCard />
       ) : courseGroups && userCourseGroupEnrollments && courseGroups.length > 0 ? (
         <CourseGroupCard
           rows={courseGroups}

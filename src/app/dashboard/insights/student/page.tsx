@@ -6,8 +6,8 @@ import type { EduquestUser } from '@/types/eduquest-user';
 import { logger } from '@/lib/default-logger'
 import {StudentTable} from "@/components/dashboard/insights/student/student-table";
 import Grid from "@mui/material/Unstable_Grid2";
-import {MyCourseProgress} from "@/components/dashboard/overview/my-course-progress";
-import {MyQuestScores} from "@/components/dashboard/overview/my-quest-scores";
+import {CourseProgressCard} from "@/components/dashboard/overview/course-progress-card";
+import {QuestScoresCard} from "@/components/dashboard/overview/quest-scores-card";
 import {type AnalyticsPartTwo, type UserCourseProgression} from "@/types/analytics/analytics-two";
 import {SkeletonMyCourseProgress} from "@/components/dashboard/skeleton/analytics/skeleton-my-course-progress";
 import {getAllEduquestUsers} from "@/api/services/eduquest-user";
@@ -91,7 +91,7 @@ export default function Page(): React.JSX.Element {
               tooltip="The progress of the courses that the selected student is enrolled in"
             /> :
             (analyticsPartTwo.user_course_progression ?
-                <MyCourseProgress
+                <CourseProgressCard
                   userCourseProgression={analyticsPartTwo.user_course_progression}
                   handleOnClick={handleCourseSelection}
                   title="Student's Courses"
@@ -103,11 +103,12 @@ export default function Page(): React.JSX.Element {
         </Grid>
         <Grid md={6} xs={12}>
           { analyticsPartTwo.user_course_progression ?
-            <MyQuestScores
+            <QuestScoresCard
               userCourseProgression={userCourseProgression}
               title="Student's Quest"
               prompt="Select a course to view the student's quest scores"
               tooltip="The highest score the student has achieved for each quest"
+              chartAutoHeight={false}
             /> : null}
         </Grid>
       </Grid>

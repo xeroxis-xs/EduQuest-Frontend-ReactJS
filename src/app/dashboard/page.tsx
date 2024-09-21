@@ -6,8 +6,8 @@ import { TotalCourse } from '@/components/dashboard/overview/total-course';
 import { TotalQuest } from "@/components/dashboard/overview/total-quest";
 import { ShortestUser } from "@/components/dashboard/overview/shortest-user";
 import { TotalUser } from "@/components/dashboard/overview/total-user";
-import { MyCourseProgress } from "@/components/dashboard/overview/my-course-progress";
-import { MyBadgeProgress } from "@/components/dashboard/overview/my-badge-progress";
+import { CourseProgressCard } from "@/components/dashboard/overview/course-progress-card";
+import { BadgeProgressCard } from "@/components/dashboard/overview/badge-progress-card";
 import { RecentAchievements } from "@/components/dashboard/overview/recent-achievements";
 import { TopCollectors } from "@/components/dashboard/overview/top-collectors";
 import { logger } from "@/lib/default-logger";
@@ -23,7 +23,7 @@ import {SkeletonMyBadgeProgress} from "@/components/dashboard/skeleton/analytics
 import Stack from "@mui/material/Stack";
 import {LiveIndicator} from "@/components/dashboard/overview/chart/live-indicator";
 import Typography from "@mui/material/Typography";
-import {MyQuestScores} from "@/components/dashboard/overview/my-quest-scores";
+import {QuestScoresCard} from "@/components/dashboard/overview/quest-scores-card";
 import {SkeletonMyQuestScores} from "@/components/dashboard/skeleton/analytics/skeleton-my-quest-scores";
 import {AnalyticsPartThree} from "@/types/analytics/analytics-three";
 import {AnalyticsPartTwo, UserCourseProgression} from "@/types/analytics/analytics-two";
@@ -80,7 +80,7 @@ export default function Page(): React.JSX.Element {
     if (eduquestUser) {
       try {
         const response = await getAnalyticsPartTwo(eduquestUser.id, 'both');
-        logger.debug('Analytics Part Two', response);
+        // logger.debug('Analytics Part Two', response);
         setAnalyticsPartTwo(response);
       } catch (error: unknown) {
         logger.error('Error fetching analytics part two', error);
@@ -193,7 +193,7 @@ export default function Page(): React.JSX.Element {
               tooltip="The progress of the courses that you are enrolled in"
             /> :
             (analyticsPartTwo.user_course_progression ?
-              <MyCourseProgress
+              <CourseProgressCard
                 userCourseProgression={analyticsPartTwo.user_course_progression}
                 handleOnClick={handleOnClick}
                 title="My Courses"
@@ -210,11 +210,13 @@ export default function Page(): React.JSX.Element {
               tooltip="The highest score you have achieved for each quests"
             /> :
             (analyticsPartTwo.user_course_progression ?
-                <MyQuestScores
+                <QuestScoresCard
                   userCourseProgression={userCourseProgression}
                   title="My Quest"
                   prompt="Select a course to view your quest scores"
                   tooltip="The highest score you have achieved for each quests"
+                  chartAutoHeight
+                  sx={{ height: '100%' }}
                 /> : null
             )
           }
@@ -222,7 +224,7 @@ export default function Page(): React.JSX.Element {
         <Grid lg={3} md={6} xs={12}>
           { analyticsPartTwoLoading? <SkeletonMyBadgeProgress /> :
             (analyticsPartTwo.user_badge_progression ?
-                <MyBadgeProgress userBadgeProgression={analyticsPartTwo.user_badge_progression} sx={{ height: "100%" }}/> : null
+                <BadgeProgressCard userBadgeProgression={analyticsPartTwo.user_badge_progression} sx={{ height: "100%" }}/> : null
             )}
         </Grid>
 

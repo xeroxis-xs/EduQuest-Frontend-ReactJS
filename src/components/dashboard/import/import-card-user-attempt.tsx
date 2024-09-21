@@ -39,6 +39,8 @@ export function ImportCardUserAttempt( { aggregatedResults, newQuestId }:ImportC
     CalculatingScores = "CalculatingScores",
     IssuingBadges = 'IssuingBadges',
     SettingQuestAsExpired = 'SettingQuestAsExpired',
+    IssuingPoints = 'IssuingPoints',
+    Redirecting = 'Redirecting',
   }
   const { checkSession } = useUser();
 
@@ -46,15 +48,24 @@ export function ImportCardUserAttempt( { aggregatedResults, newQuestId }:ImportC
   const rowsPerPage = 1; // Each page will show one card
   const router = useRouter();
   const [loadingState, setLoadingState] = React.useState<LoadingState>(LoadingState.Idle);
+  const delay = (ms: number): Promise<void> => new Promise(resolve => {setTimeout(resolve, ms)});
 
   const handleChangePage = (_event: React.ChangeEvent<unknown>, newPage: number): void => {
     setPage(newPage);
   };
 
   const refreshUser = async () : Promise<void> => {
-    if (checkSession) {
-      await checkSession();
+    try {
+      setLoadingState(LoadingState.IssuingPoints);
+      if (checkSession) {
+        await checkSession();
+      }
+    } catch (error: unknown) {
+      logger.error('Failed to refresh user:', error);
+    } finally {
+      setLoadingState(LoadingState.Redirecting);
     }
+
   };
   const setAttemptsAsSubmitted = async (questId: Quest['id']): Promise<void> => {
     try {
@@ -74,8 +85,6 @@ export function ImportCardUserAttempt( { aggregatedResults, newQuestId }:ImportC
       // logger.debug('Quest set as expired:');
     } catch (error: unknown) {
       logger.error('Failed to expire quest:', error);
-    } finally {
-      setLoadingState(LoadingState.Idle);
     }
   }
 
@@ -85,6 +94,9 @@ export function ImportCardUserAttempt( { aggregatedResults, newQuestId }:ImportC
 
       // 2. Set all attempts for the quest as submitted
       await setAttemptsAsSubmitted(newQuestId);
+
+      // Insert a 5-second blocking timer
+      await delay(5000);
 
       // 3. Set the quest as expired
       await setQuestToExpire(newQuestId);
@@ -147,9 +159,11 @@ export function ImportCardUserAttempt( { aggregatedResults, newQuestId }:ImportC
         </Card>
       ))}
 
-      {loadingState === LoadingState.CalculatingScores ? <Loading text="Calculating Scores All Attempts..." /> : null}
+      {loadingState === LoadingState.CalculatingScores ? <Loading text="Calculating Scores all Attempts..." /> : null}
       {loadingState === LoadingState.IssuingBadges ? <Loading text="Checking Conditions and Issuing Badges..." /> : null}
       {loadingState === LoadingState.SettingQuestAsExpired ? <Loading text='Setting Quest as Expired...' /> : null}
+      {loadingState === LoadingState.IssuingPoints ? <Loading text='Issuing Points...' /> : null}
+      {loadingState === LoadingState.Redirecting ? <Loading text='Completed! Redirecting...' /> : null}
 
       <Box sx={{display: "flex", justifyContent: "center", mt: 6}}>
         <Button startIcon={<CheckFatIcon/>} type="submit" variant="contained">Grade Attempts</Button>
