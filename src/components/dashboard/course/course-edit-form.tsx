@@ -11,7 +11,6 @@ import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Unstable_Grid2';
 import type { Course } from "@/types/course";
 import type {Term} from "@/types/term";
-import apiService from "@/api/api-service";
 import {logger} from "@/lib/default-logger";
 import Typography from "@mui/material/Typography";
 import Select, { type SelectChangeEvent} from "@mui/material/Select";
