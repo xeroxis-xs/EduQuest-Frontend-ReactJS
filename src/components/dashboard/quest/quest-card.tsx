@@ -14,10 +14,8 @@ import RouterLink from "next/link";
 import Button from "@mui/material/Button";
 import {Trash as TrashIcon} from "@phosphor-icons/react/dist/ssr/Trash";
 import CardActions from "@mui/material/CardActions";
-import apiService from "@/api/api-service";
-import {AxiosError} from "axios";
 import {logger} from "@/lib/default-logger";
-import {authClient} from "@/lib/auth/client";
+import {deleteQuest} from "@/api/services/quest";
 
 interface QuestCardProps {
   rows?: Quest[];
@@ -38,18 +36,10 @@ export function QuestCard({ rows = [], onQuestDeleteSuccess }: QuestCardProps): 
 
   const handleDelete = (questId:number) => async () => {
     try {
-      const response = await apiService.delete(`/api/Quest/${questId.toString()}`);
-      if (response.status === 204) {
-        logger.debug('Deleted successfully');
-        onQuestDeleteSuccess();
-      }
+      await deleteQuest(questId.toString());
+      onQuestDeleteSuccess();
     } catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        }
-      }
-      logger.error('Error: ', error);
+      logger.error('Error deleting quest ', error);
     }
   }
 

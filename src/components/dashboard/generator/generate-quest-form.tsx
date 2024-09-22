@@ -10,10 +10,8 @@ import Divider from '@mui/material/Divider';
 import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Unstable_Grid2';
 import microService from "@/api/micro-service";
-import {authClient} from "@/lib/auth/client";
 import {logger} from "@/lib/default-logger";
 import Typography from "@mui/material/Typography";
-import {AxiosError} from "axios";
 import type {AxiosResponse} from "axios";
 import Select, { type SelectChangeEvent} from "@mui/material/Select";
 import MenuItem from "@mui/material/MenuItem";
@@ -38,7 +36,8 @@ import {getPrivateCourseGroups} from "@/api/services/course-group";
 import {getMyDocuments} from "@/api/services/document";
 import {createQuest} from "@/api/services/quest";
 import {createQuestionsAndAnswers} from "@/api/services/question";
-import type { GeneratedQuestion } from "@/types/question"
+import type {GeneratedQuestion, GeneratedQuestions} from "@/types/question"
+import type {AnswerNewForm} from "@/types/answer";
 
 
 interface CourseFormProps {
@@ -159,15 +158,18 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
         difficultyRef.current?.value || ''
       );
 
+      logger.debug('Generated questions:', generatedQuestions);
+      // logger.debug('is array:', Array.isArray(generatedQuestions.questions));
+
       if (generatedQuestions === null) {
         logger.debug('Generated questions is null');
         setSubmitStatus({ type: 'error', message: 'Generate Failed. Please try again.' });
         setProgressStatus('Generation failed'); // Progress status on failure
-      } else if (Array.isArray(generatedQuestions)) {
+      } else if (Array.isArray(generatedQuestions.questions)) {
         setProgress(70); // Progress after questions generation
         setProgressStatus('Importing Questions generated'); // Progress status after questions generation
         logger.debug('Generated questions is an array');
-        await bulkCreateQuestions(generatedQuestions, newQuestId);
+        await bulkCreateQuestions(generatedQuestions.questions, newQuestId);
         setProgress(100); // Final progress
         setProgressStatus('Completed'); // Final progress status
       } else {
@@ -175,6 +177,7 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
         setSubmitStatus({ type: 'error', message: 'Generate Failed. Please try again.' });
         setProgressStatus('Generation failed'); // Progress status on failure
       }
+
       } else {
         setSubmitStatus({ type: 'error', message: 'Quest creation failed. Please try again.' });
         setProgressStatus('Quest creation failed'); // Progress status on failure
@@ -201,9 +204,9 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
     }
   }
 
-  const generateQuestions = async (filename: string, numQuestions: number, difficulty: string): Promise<GeneratedQuestion[] | null> => {
+  const generateQuestions = async (filename: string, numQuestions: number, difficulty: string): Promise<GeneratedQuestions | null> => {
     try {
-      const response: AxiosResponse<GeneratedQuestion[]> = await microService.post(`/generate_questions_from_document`, {
+      const response: AxiosResponse<GeneratedQuestions> = await microService.post(`/generate_questions_from_document`, {
         document_id: filename,
         num_questions: numQuestions,
         difficulty
@@ -222,23 +225,24 @@ export function GenerateQuestForm({onFormSubmitSuccess}: CourseFormProps): React
 
   const bulkCreateQuestions = async (generatedQuestions: GeneratedQuestion[], createdQuestId: number): Promise<void> => {
     try {
-      const updatedQuestions = generatedQuestions.map(question => ({
+      const updatedQuestions: {
+        number: number;
+        max_score: number;
+        answers: AnswerNewForm[];
+        quest_id: number;
+        text: string
+      }[] = generatedQuestions.map(question => ({
         ...question,
         max_score: 10,
         quest_id: createdQuestId
       }));
+      logger.debug('Questions to be created:', updatedQuestions);
       await createQuestionsAndAnswers(updatedQuestions);
       setSubmitStatus({ type: 'success', message: 'Questions Created Successfully' });
       onFormSubmitSuccess();
     }
     catch (error: unknown) {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          await authClient.signInWithMsal();
-        } else {
-          logger.error("Error creating questions: ", error.response?.data);
-        }
-      }
+
       setSubmitStatus({type: 'error', message: 'Questions Create Failed. Please try again.'});
     }
   }

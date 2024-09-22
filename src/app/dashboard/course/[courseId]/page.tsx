@@ -389,6 +389,13 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
         </Alert>
       ) : null}
 
+      {course && course.type === 'System-enroll' ? (
+        <Box>
+
+
+
+
+
 
       <Stack direction="row" sx={{justifyContent: 'space-between', alignItems: 'center', verticalAlign: 'center', pt:3}}>
         <Box>
@@ -467,6 +474,8 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
       ) : (
         <Typography variant="body1">Select a group to view the quests</Typography>
       )}
+
+        </Box> ): null }
 
     </Stack>
 

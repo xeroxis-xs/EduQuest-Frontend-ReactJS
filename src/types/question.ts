@@ -18,6 +18,10 @@ export interface QuestionMultipleNewForm {
   answers: AnswerNewForm[];
 }
 
+export interface GeneratedQuestions {
+  questions: GeneratedQuestion[];
+}
+
 export interface GeneratedQuestion {
   number: number;
   text: string;
