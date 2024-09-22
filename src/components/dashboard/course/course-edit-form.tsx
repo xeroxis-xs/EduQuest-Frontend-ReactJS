@@ -35,7 +35,7 @@ import {getNonPrivateTerms} from "@/api/services/term";
 import {getAdminEduquestUsers} from "@/api/services/eduquest-user";
 import {getImages} from "@/api/services/image";
 import type {EduquestUser} from "@/types/eduquest-user";
-import {updateCourse} from "@/api/services/course";
+import {deleteCourse, updateCourse} from "@/api/services/course";
 import OutlinedInput from "@mui/material/OutlinedInput";
 import Box from "@mui/material/Box";
 import {User as UserIcon} from "@phosphor-icons/react/dist/ssr/User";
@@ -167,7 +167,7 @@ export function CourseEditForm({ setSubmitStatus, course, toggleForm, onUpdateSu
 
   const handleDeleteCourse = async (): Promise<void> => {
     try {
-      await apiService.delete(`/api/Course/${course.id.toString()}`);
+      await deleteCourse(course.id);
 
       router.push(paths.dashboard.course.all);
     } catch (error) {
