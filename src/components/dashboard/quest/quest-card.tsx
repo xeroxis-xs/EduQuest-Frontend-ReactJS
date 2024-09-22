@@ -45,9 +45,7 @@ export function QuestCard({ rows = [], onQuestDeleteSuccess }: QuestCardProps): 
 
   return (
     <Box>
-      <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
-        <Pagination count={pageCount} page={page} onChange={handleChangePage} color="primary" />
-      </Box>
+
       <Grid container spacing={4}>
 
       {currentQuests.map((quest) => (
@@ -105,8 +103,10 @@ export function QuestCard({ rows = [], onQuestDeleteSuccess }: QuestCardProps): 
         </Grid>
       ))}
 
-
     </Grid>
+      <Box sx={{ display: 'flex', justifyContent: 'center', my: 3 }}>
+        <Pagination count={pageCount} page={page} onChange={handleChangePage} color="primary" />
+      </Box>
 
     </Box>
   );

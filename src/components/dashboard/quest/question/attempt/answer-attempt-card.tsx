@@ -238,7 +238,7 @@ export function AnswerAttemptCard({ data, userQuestAttemptId, onAnswerChange, su
                   <Grid container spacing={3}>
                     <Grid xs={12}>
                       <Typography variant="subtitle1">
-                        {question.text}
+                        {parseKaTeX(question.text)}
                       </Typography>
                     </Grid>
                     {answers.map((attempt) => {
@@ -251,7 +251,7 @@ export function AnswerAttemptCard({ data, userQuestAttemptId, onAnswerChange, su
                                 onChange={(e) => { handleCheckboxChange(attempt.id, attempt.answer.id, e.target.checked); }}
                               />
                             }
-                            label={attempt.answer.text}
+                            label={parseKaTeX(attempt.answer.text)}
                           />
                           {showExplanation[attempt.question.id] && attempt.answer.reason ? <Typography variant="body2" mt={1}>
                               {parseKaTeX(attempt.answer.reason)}

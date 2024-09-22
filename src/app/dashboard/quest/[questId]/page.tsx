@@ -40,6 +40,7 @@ import {getUserAnswerAttemptByUserQuestAttempt} from "@/api/services/user-answer
 import {type UserAnswerAttempt} from "@/types/user-answer-attempt";
 import {AnswerAttemptCard} from "@/components/dashboard/quest/question/attempt/answer-attempt-card";
 import Box from "@mui/material/Box";
+import {SkeletonAnswerAttemptCard} from "@/components/dashboard/skeleton/skeleton-answer-attempt-card";
 
 
 export default function Page({ params }: { params: { questId: string } }) : React.JSX.Element {
@@ -232,7 +233,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
 
       {showAnswerAttemptsMode ? (
         loadingUserAnswerAttempts ? (
-          <SkeletonQuestAttemptTable />
+          <SkeletonAnswerAttemptCard />
         ) : (
           userAnswerAttempts && userAnswerAttemptIdAndStatus ? (
             <AnswerAttemptCard

@@ -78,19 +78,7 @@ export function CourseGroupCard({ rows = [], userCourseGroupEnrollments, handleC
 
   return (
     <Box>
-      {/* Pagination Controls - only show if pageCount > 1 */}
-      {pageCount > 1 && (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
-          <Pagination
-            count={pageCount}
-            page={page}
-            onChange={handleChangePage}
-            color="primary"
-            siblingCount={0} // Optional: Adjust pagination appearance
-            boundaryCount={1} // Optional: Adjust pagination appearance
-          />
-        </Box>
-      )}
+
 
       {/* Grid Container */}
       <Grid container spacing={2}>
@@ -170,6 +158,21 @@ export function CourseGroupCard({ rows = [], userCourseGroupEnrollments, handleC
           </Grid>
         ))}
       </Grid>
+
+      {/* Pagination Controls - only show if pageCount > 1 */}
+      {pageCount > 1 && (
+        <Box sx={{ display: 'flex', justifyContent: 'center', my: 3 }}>
+          <Pagination
+            count={pageCount}
+            page={page}
+            onChange={handleChangePage}
+            color="primary"
+            siblingCount={0} // Optional: Adjust pagination appearance
+            boundaryCount={1} // Optional: Adjust pagination appearance
+          />
+        </Box>
+      )}
+
     </Box>
   );
 }

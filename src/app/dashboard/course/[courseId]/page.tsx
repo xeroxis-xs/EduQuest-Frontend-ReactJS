@@ -209,7 +209,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
 
   return (
     <Stack spacing={3}>
-      <Stack direction="row" spacing={1} sx={{justifyContent: 'space-between'}}>
+      <Stack direction="row"sx={{justifyContent: 'space-between'}}>
         <Button startIcon={<CaretLeftIcon fontSize="var(--icon-fontSize-md)"/>} component={RouterLink} href={paths.dashboard.course.all}>View all Courses</Button>
 
       </Stack>
@@ -400,7 +400,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
       <Stack direction="row" sx={{justifyContent: 'space-between', alignItems: 'center', verticalAlign: 'center', pt:3}}>
         <Box>
           <Typography variant="h5">Groups</Typography>
-          <Typography variant="body2" color="text.secondary">Groups available for this course</Typography>
+          <Typography variant="body2" color="text.secondary" pb={2}>Groups available for this course</Typography>
         </Box>
         { eduquestUser?.is_staff ?
           <Stack direction='row' spacing={1}>
@@ -432,14 +432,14 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
           handleCourseGroupSelect={handleCourseGroupSelect}
         />
       ) : (
-        <Typography variant="body1">No groups available for this course</Typography>
+        <Typography variant="body1" pb={2}>No groups available for this course</Typography>
       )}
 
 
       <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center', verticalAlign: 'center', pt: 3 }}>
         <Box>
-          <Typography variant="h5">Quests</Typography>
-          <Typography variant="body2" color="text.secondary">Quests available for this group</Typography>
+          <Typography variant="h5" pt={4}>Quests</Typography>
+          <Typography variant="body2" color="text.secondary" pb={2}>Quests available for this group</Typography>
         </Box>
         {eduquestUser?.is_staff && selectedCourseGroupId? (
           <Stack direction="row" spacing={1}>
@@ -458,8 +458,6 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
         ) : null}
       </Stack>
 
-
-
       {showCreateQuestForm && course ?
         <QuestNewForm onFormSubmitSuccess={fetchQuestsByCourseGroup} courseGroupId={selectedCourseGroupId} /> : null}
 
@@ -469,7 +467,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
         quests && quests.length > 0 ? (
           <QuestCard rows={quests} onQuestDeleteSuccess={fetchQuests} />
         ) : (
-          <Typography variant="body1">No quests available for this group</Typography>
+          <Typography variant="body1" pb={2}>No quests available for this group</Typography>
         )
       ) : (
         <Typography variant="body1">Select a group to view the quests</Typography>
