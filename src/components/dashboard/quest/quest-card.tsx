@@ -46,7 +46,7 @@ export function QuestCard({ rows = [], onQuestDeleteSuccess }: QuestCardProps): 
   return (
     <Box>
 
-      <Grid container spacing={4}>
+      <Grid container spacing={4} pt={2}>
 
       {currentQuests.map((quest) => (
         <Grid key={quest.id} lg={4} md={6} xs={12} >

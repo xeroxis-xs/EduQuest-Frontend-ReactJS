@@ -52,7 +52,10 @@ interface GroupedQuestion {
  * @returns An array of React elements.
  */
 const parseKaTeX = (text: string): React.ReactNode[] => {
-  const parts = text.split(/(?<temp1>\$[^$]*\$)/g); // Split by KaTeX expressions
+  // Replace double backslashes with a single backslash
+  const sanitizedText = text.replace(/\\\\/g, '\\');
+
+  const parts = sanitizedText.split(/(?<temp1>\$[^$]*\$)/g); // Split by KaTeX expressions
   return parts.map((part, index) => {
     if (part.startsWith('$') && part.endsWith('$')) {
       const math = part.slice(1, -1); // Remove the $ delimiters
