@@ -461,7 +461,7 @@ export default function Page({ params }: { params: { courseId: string } }) : Rea
 
 
       {showCreateQuestForm && course ?
-        <QuestNewForm onFormSubmitSuccess={fetchQuests} courseGroupId={selectedCourseGroupId} /> : null}
+        <QuestNewForm onFormSubmitSuccess={fetchQuestsByCourseGroup} courseGroupId={selectedCourseGroupId} /> : null}
 
       {loadingQuests ? (
         <SkeletonQuestCard />

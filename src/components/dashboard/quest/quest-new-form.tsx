@@ -32,7 +32,7 @@ import {User as UserIcon} from "@phosphor-icons/react/dist/ssr/User";
 import Skeleton from "@mui/material/Skeleton";
 
 interface CourseFormProps {
-  onFormSubmitSuccess: () => void;
+  onFormSubmitSuccess: (courseGroupId: string) => void;
   courseGroupId: string | null;
 }
 
@@ -133,7 +133,7 @@ export function QuestNewForm({onFormSubmitSuccess, courseGroupId}: CourseFormPro
       };
       try {
         const response = await createQuest(newQuest);
-        onFormSubmitSuccess();
+        onFormSubmitSuccess(courseGroupId || selectedCourseGroup.id.toString());
         logger.debug('New Quest has been created successfully:', response);
         setSubmitStatus({type: 'success', message: 'Create Successful'});
       } catch (error: unknown) {

@@ -27,6 +27,9 @@ import { updateMultipleUserAnswerAttempts } from "@/api/services/user-answer-att
 import { updateUserQuestAttempt } from "@/api/services/user-quest-attempt";
 import Points from "../../../../../../public/assets/point.svg";
 import { useUser } from '@/hooks/use-user';
+import { InlineMath } from 'react-katex';
+import 'katex/dist/katex.min.css';
+
 
 interface AnswerAttemptCardProps {
   data: UserAnswerAttempt[];
@@ -43,42 +46,21 @@ interface GroupedQuestion {
 }
 
 /**
- * Calculates the score achieved for each UserAnswerAttempt based on selection and correctness.
+ * Parses the text and replaces KaTeX expressions with InlineMath components.
  *
- * @param attempts - Array of UserAnswerAttempt objects.
- * @returns A new array of UserAnswerAttempt objects with updated score_achieved.
+ * @param text - The text containing KaTeX expressions.
+ * @returns An array of React elements.
  */
-export function calculateScores(attempts: UserAnswerAttempt[]): UserAnswerAttempt[] {
-  // Group attempts by question ID
-  const groupedByQuestion = attempts.reduce<Record<number, { question: UserAnswerAttempt['question']; answers: UserAnswerAttempt[] }>>((acc, attempt) => {
-    const questionId = attempt.question.id;
-    if (!acc[questionId]) {
-      acc[questionId] = {
-        question: attempt.question,
-        answers: [] as UserAnswerAttempt[],
-      };
+const parseKaTeX = (text: string): React.ReactNode[] => {
+  const parts = text.split(/(?<temp1>\$[^$]*\$)/g); // Split by KaTeX expressions
+  return parts.map((part, index) => {
+    if (part.startsWith('$') && part.endsWith('$')) {
+      const math = part.slice(1, -1); // Remove the $ delimiters
+      return <InlineMath key={index} math={math} />;
     }
-    acc[questionId].answers.push(attempt);
-    return acc;
-  }, {});
-
-  // Iterate through each question group to calculate scores
-  Object.values(groupedByQuestion).forEach(({ question, answers }) => {
-    const weight = question.max_score / answers.length;
-
-    answers.forEach((attempt) => {
-      if (attempt.answer.is_correct && attempt.is_selected) {
-        attempt.score_achieved = weight;
-      } else if (!attempt.answer.is_correct && !attempt.is_selected) {
-        attempt.score_achieved = weight;
-      } else {
-        attempt.score_achieved = 0;
-      }
-    });
+    return part;
   });
-
-  return attempts;
-}
+};
 
 export function AnswerAttemptCard({ data, userQuestAttemptId, onAnswerChange, submitted, onAnswerSubmit, onAnswerSave }: AnswerAttemptCardProps): React.JSX.Element {
   const { checkSession } = useUser();
@@ -272,7 +254,7 @@ export function AnswerAttemptCard({ data, userQuestAttemptId, onAnswerChange, su
                             label={attempt.answer.text}
                           />
                           {showExplanation[attempt.question.id] && attempt.answer.reason ? <Typography variant="body2" mt={1}>
-                              {attempt.answer.reason}
+                              {parseKaTeX(attempt.answer.reason)}
                             </Typography> : null}
                         </Grid>
                       );

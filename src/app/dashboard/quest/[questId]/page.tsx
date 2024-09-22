@@ -69,6 +69,7 @@ export default function Page({ params }: { params: { questId: string } }) : Reac
       toggleAnswerAttemptMode();
       // Fetch the selected user answer attempts
       const response = await getUserAnswerAttemptByUserQuestAttempt(attemptId);
+      logger.debug('User answer attempts fetched:', response);
       setUserAnswerAttempts(response);
     } catch (error: unknown) {
       logger.error('Failed to fetch user answer attempts', error);
