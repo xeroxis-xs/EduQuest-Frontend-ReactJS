@@ -55,3 +55,4 @@ jobs:
         slot-name: 'production'
         publish-profile: ${{ secrets.AzureAppService_PublishProfile_c8b70da7da2d4de0877a073727a89bdc }}
         images: 'index.docker.io/${{ secrets.AzureAppService_ContainerUsername_a98bdbabc2e2428b9155d8b4ba9c5b3e }}/eduquest-frontend-reactjs:${{ github.sha }}'
+
