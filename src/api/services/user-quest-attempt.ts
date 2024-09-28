@@ -1,7 +1,7 @@
 import apiService from "@/api/api-service";
 import type {
   UserQuestAttempt,
-  UserQuestAttemptMultipleUpdateForm,
+  // UserQuestAttemptMultipleUpdateForm,
   UserQuestAttemptNewForm, UserQuestAttemptUpdateForm
 } from "@/types/user-quest-attempt";
 
@@ -37,11 +37,6 @@ export const updateUserQuestAttempt = async (id: string, userQuestAttempt: UserQ
 
 export const updateUserQuestAttemptByQuestAsSubmitted = async (questId: string): Promise<void> => {
   await apiService.post(`/api/user-quest-attempts/set_all_attempts_submitted_by_quest/?quest_id=${questId}`);
-}
-
-export const updateMultipleUserQuestAttempts = async (userQuestAttempts: UserQuestAttemptMultipleUpdateForm[]): Promise<UserQuestAttempt[]> => {
-  const response = await apiService.patch<UserQuestAttempt[]>('/api/user-quest-attempts/bulk-update/', userQuestAttempts);
-  return response.data;
 }
 
 export const deleteUserQuestAttempt = async (id: string): Promise<void> => {

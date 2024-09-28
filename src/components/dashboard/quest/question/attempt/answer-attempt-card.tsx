@@ -66,7 +66,7 @@ const parseKaTeX = (text: string): React.ReactNode[] => {
 };
 
 export function AnswerAttemptCard({ data, userQuestAttemptId, onAnswerChange, submitted, onAnswerSubmit, onAnswerSave }: AnswerAttemptCardProps): React.JSX.Element {
-  const { checkSession } = useUser();
+  const { checkSession, eduquestUser } = useUser();
   const [page, setPage] = React.useState(1);
   const [showExplanation, setShowExplanation] = React.useState<Record<number, boolean>>({});
   const rowsPerPage = 1; // Adjust as needed
@@ -129,27 +129,33 @@ export function AnswerAttemptCard({ data, userQuestAttemptId, onAnswerChange, su
       is_selected: attempt.is_selected,
     }));
 
-    try {
-      // 2. Update UserAnswerAttempts
-      await bulkUpdateUserAnswerAttempts(updatedUserAnswerAttempts);
+    if (eduquestUser) {
+      try {
+        // 2. Update UserAnswerAttempts
+        await bulkUpdateUserAnswerAttempts(updatedUserAnswerAttempts);
 
-      // 3. Update UserQuestAttempt with last_attempted_date
-      const updatedUserQuestAttempt: UserQuestAttemptUpdateForm = {
-        submitted: false,
-        last_attempted_date: currentDate,
-      };
-      await updateUserQuestAttempt(userQuestAttemptId, updatedUserQuestAttempt);
+        // 3. Update UserQuestAttempt with last_attempted_date
+        const updatedUserQuestAttempt: UserQuestAttemptUpdateForm = {
+          submitted: false,
+          last_attempted_date: currentDate,
+          student_id: eduquestUser.id,
+          quest_id: data[0].question.quest_id,
+        };
+        await updateUserQuestAttempt(userQuestAttemptId, updatedUserQuestAttempt);
 
-      // 4. Refresh the user attempt table
-      onAnswerSave();
+        // 4. Refresh the user attempt table
+        onAnswerSave();
 
-      // 5. Update local state with calculated scores
-      setStatus({ type: 'success', message: 'Save Successful.' });
-      logger.debug('Save action completed successfully.');
-    } catch (error) {
-      setStatus({ type: 'error', message: 'Save Failed. Please try again.' });
-      logger.error('Save action failed:', error);
+        // 5. Update local state with calculated scores
+        setStatus({ type: 'success', message: 'Save Successful.' });
+        logger.debug('Save action completed successfully.');
+      } catch (error) {
+        setStatus({ type: 'error', message: 'Save Failed. Please try again.' });
+        logger.error('Save action failed:', error);
+      }
     }
+
+
   };
 
   /**
@@ -171,30 +177,35 @@ export function AnswerAttemptCard({ data, userQuestAttemptId, onAnswerChange, su
 
     logger.debug('Updated UserAnswerAttempts:', updatedUserAnswerAttempts);
 
-    try {
-      // 3. Update UserAnswerAttempts
-      await bulkUpdateUserAnswerAttempts(updatedUserAnswerAttempts);
+    if (eduquestUser) {
+      try {
+        // 3. Update UserAnswerAttempts
+        await bulkUpdateUserAnswerAttempts(updatedUserAnswerAttempts);
 
-      // 4. Update UserQuestAttempt with submitted=true and last_attempted_date
-      const updatedUserQuestAttempt: UserQuestAttemptUpdateForm = {
-        submitted: true,
-        last_attempted_date: currentDate,
-      };
-      await updateUserQuestAttempt(userQuestAttemptId, updatedUserQuestAttempt);
+        // 4. Update UserQuestAttempt with submitted=true and last_attempted_date
+        const updatedUserQuestAttempt: UserQuestAttemptUpdateForm = {
+          submitted: true,
+          last_attempted_date: currentDate,
+          student_id: eduquestUser.id,
+          quest_id: data[0].question.quest_id,
+        };
+        await updateUserQuestAttempt(userQuestAttemptId, updatedUserQuestAttempt);
 
-      // 5. Update local state with calculated scores
-      setStatus({ type: 'success', message: 'Submit Successful! Redirecting to Quest page...' });
-      logger.debug('Submit action completed successfully.');
+        // 5. Update local state with calculated scores
+        setStatus({ type: 'success', message: 'Submit Successful! Redirecting to Quest page...' });
+        logger.debug('Submit action completed successfully.');
 
-      // 6. Optionally, refresh user session or data here
-      await refreshUser();
+        // 6. Optionally, refresh user session or data here
+        await refreshUser();
 
-      // 7. Redirect to Quest page after submission
-      onAnswerSubmit();
-    } catch (error) {
-      setStatus({ type: 'error', message: 'Submit Failed. Please try again.' });
-      logger.error('Submit action failed:', error);
+        // 7. Redirect to Quest page after submission
+        onAnswerSubmit();
+      } catch (error) {
+        setStatus({ type: 'error', message: 'Submit Failed. Please try again.' });
+        logger.error('Submit action failed:', error);
+      }
     }
+
   };
 
   const toggleExplanation = (questionId: number): void => {

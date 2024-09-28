@@ -29,7 +29,9 @@ export interface UserQuestAttemptNewForm {
 
 export interface UserQuestAttemptUpdateForm {
   submitted?: boolean
-  last_attempted_date: string
+  last_attempted_date: string,
+  student_id: EduquestUser['id'],
+  quest_id: Quest['id'],
 }
 
 export interface UserQuestAttemptMultipleUpdateForm {
