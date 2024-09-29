@@ -32,13 +32,13 @@ jobs:
         push: true
         tags: index.docker.io/${{ secrets.AzureAppService_ContainerUsername_a98bdbabc2e2428b9155d8b4ba9c5b3e }}/eduquest-frontend-reactjs:${{ github.sha }}
         file: ./Dockerfile
-        build-args: |
-          NEXT_PUBLIC_BACKEND_URL=${{ secrets.NEXT_PUBLIC_BACKEND_URL }}
-          NEXT_PUBLIC_AZURE_CLIENT_ID=${{ secrets.NEXT_PUBLIC_AZURE_CLIENT_ID }}
-          NEXT_PUBLIC_AZURE_REDIRECT_URI=${{ secrets.NEXT_PUBLIC_AZURE_REDIRECT_URI }}
-          NEXT_PUBLIC_MICROSERVICE_URL=${{ secrets.NEXT_PUBLIC_MICROSERVICE_URL }}
-          NEXT_PUBLIC_SITE_URL=${{ secrets.NEXT_PUBLIC_SITE_URL }}
-          NEXT_PUBLIC_LOGIN_REQUEST_SCOPE=${{ secrets.NEXT_PUBLIC_LOGIN_REQUEST_SCOPE }}
+#        build-args: |
+#          NEXT_PUBLIC_BACKEND_URL=${{ secrets.NEXT_PUBLIC_BACKEND_URL }}
+#          NEXT_PUBLIC_AZURE_CLIENT_ID=${{ secrets.NEXT_PUBLIC_AZURE_CLIENT_ID }}
+#          NEXT_PUBLIC_AZURE_REDIRECT_URI=${{ secrets.NEXT_PUBLIC_AZURE_REDIRECT_URI }}
+#          NEXT_PUBLIC_MICROSERVICE_URL=${{ secrets.NEXT_PUBLIC_MICROSERVICE_URL }}
+#          NEXT_PUBLIC_SITE_URL=${{ secrets.NEXT_PUBLIC_SITE_URL }}
+#          NEXT_PUBLIC_LOGIN_REQUEST_SCOPE=${{ secrets.NEXT_PUBLIC_LOGIN_REQUEST_SCOPE }}
 
   deploy:
     runs-on: ubuntu-latest
