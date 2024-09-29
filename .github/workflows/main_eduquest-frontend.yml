@@ -38,6 +38,7 @@ jobs:
           NEXT_PUBLIC_AZURE_REDIRECT_URI=${{ secrets.NEXT_PUBLIC_AZURE_REDIRECT_URI }}
           NEXT_PUBLIC_MICROSERVICE_URL=${{ secrets.NEXT_PUBLIC_MICROSERVICE_URL }}
           NEXT_PUBLIC_SITE_URL=${{ secrets.NEXT_PUBLIC_SITE_URL }}
+          NEXT_PUBLIC_LOGIN_REQUEST_SCOPE=${{ secrets.NEXT_PUBLIC_LOGIN_REQUEST_SCOPE }}
 
   deploy:
     runs-on: ubuntu-latest

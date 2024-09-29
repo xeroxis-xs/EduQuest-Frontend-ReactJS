@@ -1,8 +1,9 @@
 const clientId = process.env.NEXT_PUBLIC_AZURE_CLIENT_ID;
 const redirectUri = process.env.NEXT_PUBLIC_AZURE_REDIRECT_URI;
+const scope = process.env.NEXT_PUBLIC_LOGIN_REQUEST_SCOPE;
 
-if (!clientId || !redirectUri) {
-  throw new Error('Environment variables NEXT_PUBLIC_AZURE_CLIENT_ID and NEXT_PUBLIC_AZURE_REDIRECT_URI must be set');
+if (!clientId || !redirectUri || !scope) {
+  throw new Error('Environment variables NEXT_PUBLIC_AZURE_CLIENT_ID and NEXT_PUBLIC_AZURE_REDIRECT_URI and NEXT_PUBLIC_LOGIN_REQUEST_SCOPE must be set.');
 }
 
 export const msalConfig = {
@@ -30,7 +31,7 @@ export const loginRequest = {
 };
 
 export const userDataLoginRequest = {
-  scopes: ["User.Read"]
+  scopes: [scope]
 };
 /**
  * Add here the scopes to request when obtaining an access token for MS Graph API. For more information, see:
