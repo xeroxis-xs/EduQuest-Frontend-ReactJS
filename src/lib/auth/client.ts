@@ -1,6 +1,6 @@
 'use client';
 
-import axios, { AxiosError, type AxiosResponse } from 'axios';
+import axios, { type AxiosResponse } from 'axios';
 import { handleLoginRedirect, handleLogout, getToken, msalInstance } from "@/app/msal/msal";
 import { logger } from '@/lib/default-logger';
 import type { EduquestUser } from "@/types/eduquest-user";
@@ -113,11 +113,6 @@ class AuthClient {
       );
       return response.data;
     } catch (error: unknown) {
-      // if (error instanceof AxiosError) {
-      //   if (error.response?.status === 401) {
-      //     await this.signInWithMsal();
-      //   }
-      // }
       logger.error('Failed to fetch Eduquest User, redirecting to Login page:', error);
       return null;
     }
