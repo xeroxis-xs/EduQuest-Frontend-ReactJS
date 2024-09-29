@@ -1,7 +1,7 @@
 // src/api/api-service.ts
 
 import axios, { type AxiosError, type AxiosResponse } from 'axios';
-import { handleAuthError } from '@/lib/auth/auth-handler';
+import { getToken } from "@/app/msal/msal";
 import { logger } from '@/lib/default-logger';
 
 // Create an Axios instance for general API calls
@@ -12,9 +12,12 @@ const api = axios.create({
 // Request interceptor to add Authorization header
 api.interceptors.request.use(
   async (config) => {
-    const token = localStorage.getItem('access-token');
+    const token = await getToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    } else {
+      logger.warn('No access token available for API request.');
+      // Optionally, you might redirect to login or handle the missing token
     }
     return config;
   },
@@ -29,35 +32,18 @@ api.interceptors.request.use(
  */
 const handleError = async (error: AxiosError): Promise<never> => {
   if (error.response) {
-    const { status, data } = error.response;
+    const { status } = error.response;
 
-    // Handle specific status codes
-    switch (status) {
-      case 401:
-        // Unauthorized: Trigger authentication flow
-        await handleAuthError();
-        break;
-      case 403:
-        // Forbidden: Inform the user they don't have access
-        logger.warn('Access forbidden: You do not have permission to perform this action.');
-        break;
-      case 404:
-        // Not Found: Inform the user the resource doesn't exist
-        logger.warn('Resource not found.');
-        break;
-      default:
-        // Other errors
-        logger.error(`API Error: ${status.toString()}`, data);
+    if (status === 401) {
+      // Optionally, you can refresh the token here if not already handled
+      logger.warn('Unauthorized access - possibly due to an expired token.');
+    } else {
+      logger.error(`API Error: ${status.toString()}`, error.response.data);
     }
-  } else if (error.request) {
-    // No response received
-    logger.error('No response received from the API.', error.request);
   } else {
-    // Error setting up the request
-    logger.error('Error in setting up the API request.', error.message);
+    logger.error('API request error:', error.message);
   }
 
-  // Optionally, you can throw a custom error or rethrow the original error
   throw error;
 };
 

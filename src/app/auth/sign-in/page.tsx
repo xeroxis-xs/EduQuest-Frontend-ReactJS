@@ -1,18 +1,18 @@
-import * as React from 'react';
-import type { Metadata } from 'next';
+'use client';
 
-import { config } from '@/config';
+import * as React from 'react';
 import { GuestGuard } from '@/components/auth/guest-guard';
 import { Layout } from '@/components/auth/layout';
 import { SignInForm } from '@/components/auth/sign-in-form';
 
-export const metadata = { title: `Sign in | Auth | ${config.site.name}` } satisfies Metadata;
 
 export default function Page(): React.JSX.Element {
+  const [error, setError] = React.useState<string | null>(null);
+
   return (
     <Layout>
-      <GuestGuard>
-        <SignInForm />
+      <GuestGuard onError={setError}>
+        <SignInForm error={error}/>
       </GuestGuard>
     </Layout>
   );

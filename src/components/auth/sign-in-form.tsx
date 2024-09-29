@@ -11,7 +11,11 @@ import { Medal as MedalIcon } from "@phosphor-icons/react/dist/ssr/Medal";
 
 import Box from "@mui/material/Box";
 
-export function SignInForm(): React.JSX.Element {
+interface SignInFormProps {
+  error: string | null;
+}
+
+export function SignInForm({ error }: SignInFormProps): React.JSX.Element {
   const theme = useTheme();
 
   return (
@@ -23,13 +27,17 @@ export function SignInForm(): React.JSX.Element {
         A platform for you to learn and earn.
       </Typography>
       <SignInButton />
-      <Alert severity="info">
-        Only users with {' '}
-        <Typography component="span" sx={{ fontWeight: 700 }} variant="inherit">
-          NTU 365 Account
-        </Typography>{' '}
-        have access to this site.
-      </Alert>
+      { error ? <Alert severity="error">{error}</Alert>
+        :
+        <Alert severity="info">
+          Only users with {' '}
+          <Typography component="span" sx={{ fontWeight: 700 }} variant="inherit">
+            NTU 365 Account
+          </Typography>{' '}
+          have access to this site.
+        </Alert>
+      }
+
 
       {/*<Box sx={{ display: 'flex', alignItems: 'center', height: '100%' }}>*/}
       <Stack spacing={3} px={3}>

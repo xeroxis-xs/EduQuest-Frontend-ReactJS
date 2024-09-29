@@ -27,6 +27,7 @@ export function SignInButton(): React.JSX.Element {
 
   return (
     <Button
+      id="signIn"
       startIcon={<MicrosoftOutlookLogo size="34px" weight="fill"/>}
       disabled={isPending}
       variant="contained"

@@ -1,6 +1,6 @@
 import * as React from 'react';
 import RouterLink from 'next/link';
-import Box from '@mui/material/Box'
+import Box from '@mui/material/Box';
 
 import { paths } from '@/paths';
 import { DynamicLogo } from '@/components/core/logo';
@@ -21,6 +21,7 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
+        height: '100vh'
       }}
     >
       <Box sx={{ display: 'flex', flex: '1 1 auto', flexDirection: 'column' }}>
@@ -30,53 +31,10 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
           </Box>
         </Box>
         <Box sx={{ alignItems: 'center', display: 'flex', flex: '1 1 auto', justifyContent: 'center', p: 3 }}>
-          <Box sx={{ maxWidth: '450px', width: '100%' }}>
+          <Box sx={{ maxWidth: '450px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {children}
           </Box>
         </Box>
-      </Box>
-      <Box>
-        {/*<Stack spacing={3}>*/}
-        {/*  <Stack spacing={1}>*/}
-        {/*    <Typography color="inherit" sx={{ fontSize: '24px', lineHeight: '32px', textAlign: 'center' }} variant="h1">*/}
-        {/*      Welcome to{' '}*/}
-        {/*      <Box component="span" sx={{ color: '#15b79e' }}>*/}
-        {/*        EduQuest*/}
-        {/*      </Box>*/}
-        {/*    </Typography>*/}
-        {/*    <Typography align="center" variant="subtitle1">*/}
-        {/*      A platform to for students to learn and earn!*/}
-        {/*    </Typography>*/}
-        {/*  </Stack>*/}
-        {/*  <Stack spacing={2}>*/}
-        {/*    <Box display="flex" justifyContent="center" alignItems="center">*/}
-        {/*      <ListChecks size={28}  />*/}
-        {/*      <Typography align="center" variant="subtitle1" sx={{ marginLeft: '8px' }}>*/}
-        {/*        Complete*/}
-        {/*      </Typography>*/}
-        {/*    </Box>*/}
-        {/*    <Box display="flex" justifyContent="center" alignItems="center">*/}
-        {/*      <Crown size={28} />*/}
-        {/*    <Typography align="center" variant="subtitle1" sx={{ marginLeft: '8px' }}>*/}
-        {/*       Conquer*/}
-        {/*    </Typography>*/}
-        {/*    </Box>*/}
-        {/*    <Box display="flex" justifyContent="center" alignItems="center">*/}
-        {/*      <Trophy size={28} />*/}
-        {/*    <Typography align="center" variant="subtitle1" sx={{ marginLeft: '8px' }}>*/}
-        {/*       Collect*/}
-        {/*    </Typography>*/}
-        {/*    </Box>*/}
-        {/*  </Stack>*/}
-        {/*  <Box sx={{ display: 'flex', justifyContent: 'center' }}>*/}
-        {/*    <Box*/}
-        {/*      component="img"*/}
-        {/*      alt="Widgets"*/}
-        {/*      src="/assets/auth-widgets.png"*/}
-        {/*      sx={{ height: 'auto', width: '100%', maxWidth: '600px' }}*/}
-        {/*    />*/}
-        {/*  </Box>*/}
-        {/*</Stack>*/}
       </Box>
     </Box>
   );

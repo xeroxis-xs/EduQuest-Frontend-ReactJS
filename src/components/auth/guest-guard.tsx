@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import Alert from '@mui/material/Alert';
+// import Alert from '@mui/material/Alert';
 
 import { paths } from '@/paths';
 import { logger } from '@/lib/default-logger';
@@ -11,9 +11,10 @@ import { Verifying } from '@/components/dashboard/loading/veryfying';
 
 export interface GuestGuardProps {
   children: React.ReactNode;
+  onError?: (error: string) => void;
 }
 
-export function GuestGuard({ children }: GuestGuardProps): React.JSX.Element | null {
+export function GuestGuard({ children, onError }: GuestGuardProps): React.JSX.Element | null {
   const router = useRouter();
   const { user, error, isLoading } = useUser();
   const [isChecking, setIsChecking] = React.useState<boolean>(true);
@@ -25,6 +26,9 @@ export function GuestGuard({ children }: GuestGuardProps): React.JSX.Element | n
 
     if (error) {
       setIsChecking(false);
+      if (onError) {
+        onError(error);
+      }
       return;
     }
 
@@ -50,9 +54,9 @@ export function GuestGuard({ children }: GuestGuardProps): React.JSX.Element | n
     );
   }
 
-  if (error) {
-    return <Alert severity="error">{error}</Alert>;
-  }
+  // if (error) {
+  //   return <Alert severity="error">{error}</Alert>;
+  // }
 
   return <React.Fragment>{children}</React.Fragment>;
 }

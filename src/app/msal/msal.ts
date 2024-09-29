@@ -1,68 +1,104 @@
-import { type AuthenticationResult, PublicClientApplication } from "@azure/msal-browser";
-// import { getCurrentToken } from "./token-fetcher";
+// msal.ts
+
+import { AuthenticationResult, InteractionRequiredAuthError, PublicClientApplication } from "@azure/msal-browser";
 import { msalConfig, loginRequest } from "./msal-config";
 import { logger } from '@/lib/default-logger';
 
 export const msalInstance = new PublicClientApplication(msalConfig);
 
-export async function initializeMsal() : Promise<void>{
+/**
+ * Initializes MSAL by handling redirect responses and setting the active account.
+ */
+export async function initializeMsal(): Promise<void> {
   logger.debug("MSAL: Initializing...");
   await msalInstance.initialize();
-  logger.debug("MSAL: Initialized.")
-  const accounts = msalInstance.getAllAccounts();
-  if (accounts.length > 0) {
-    msalInstance.setActiveAccount(accounts[0]);
-  }
-  const loginResponse = await msalInstance.handleRedirectPromise();
-  if (loginResponse !== null) {
-    logger.debug("MSAL: Login response received");
-    await handleLoginResponse(loginResponse);
+  try {
+    // Handle redirect promise to process the response from loginRedirect
+    const loginResponse: AuthenticationResult | null = await msalInstance.handleRedirectPromise();
+
+    if (loginResponse && loginResponse.account !== null) {
+      logger.debug("MSAL: Login response received");
+      msalInstance.setActiveAccount(loginResponse.account);
+      // await handleLoginResponse(loginResponse);
+    } else {
+      const accounts = msalInstance.getAllAccounts();
+      if (accounts.length > 0) {
+        msalInstance.setActiveAccount(accounts[0]);
+        logger.debug("MSAL: Active account set");
+      }
+    }
+
+    logger.debug("MSAL: Initialization complete.");
+  } catch (error) {
+    logger.error("MSAL: Initialization error:", error);
   }
 }
 
+// /**
+//  * Handles the login response.
+//  */
+// export async function handleLoginResponse(loginResponse: AuthenticationResult): Promise<void> {
+//   const account = loginResponse.account;
+//   msalInstance.setActiveAccount(account);
+//   // logger.debug("MSAL: Active account set:", account);
+//   const token = await getToken();
+//   if (token) {
+//     logger.debug("MSAL: Token acquired:", token);
+//   } else {
+//     logger.warn("MSAL: No token acquired.");
+//   }
+// }
+
+/**
+ * Acquires a token silently, or triggers a login if necessary.
+ */
 export async function getToken(): Promise<string | null> {
   try {
-    // Check if a user is already logged in
-    const accounts = msalInstance.getAllAccounts();
-    if (accounts.length > 0) {
-      const response = await msalInstance.acquireTokenSilent({
-        account: accounts[0],
-        scopes: [loginRequest.scopes[0]],
-      });
-      logger.debug("MSAL: Token acquired");
-      return response.accessToken;
+    const activeAccount = msalInstance.getActiveAccount();
+    if (!activeAccount) {
+      // No active account, initiate login
+      logger.warn("MSAL: No active account found, initiating login.");
+      await handleLoginRedirect();
+      return null;
     }
-    logger.debug('MSAL: No accounts found.');
-    return null;
+
+    const response = await msalInstance.acquireTokenSilent({
+      ...loginRequest,
+      account: activeAccount,
+    });
+    logger.debug("MSAL: Token acquired silently.");
+    return response.accessToken;
   } catch (error) {
-    logger.error('MSAL: Token acquisition failed.', error);
+    if (error instanceof InteractionRequiredAuthError) {
+      // Silent acquisition failed, initiate interactive login
+      logger.warn('MSAL: Interaction required, redirecting to login.');
+      await handleLoginRedirect();
+    } else {
+      logger.error('MSAL: Unexpected error acquiring token silently:', error);
+    }
     return null;
   }
 }
 
-export async function handleLoginResponse(loginResponse: AuthenticationResult): Promise<void> {
-    const account = loginResponse.account;
-    msalInstance.setActiveAccount(account);
-    // logger.debug("MSAL: Active account set:", account);
-    const token = await getToken();
-    if (token !== null) {
-        localStorage.setItem('access-token', token);
-      }
-}
-
-
-export async function handleLoginRedirect() : Promise<void>{
+/**
+ * Handles the login redirect process.
+ */
+export async function handleLoginRedirect(): Promise<void> {
   try {
     await msalInstance.loginRedirect(loginRequest);
+    logger.debug("MSAL: Redirecting to login...");
   } catch (error) {
-    logger.error("MSAL: Error handling login redirect: ", error);
+    logger.error("MSAL: Error during login redirect:", error);
   }
 }
 
+/**
+ * Handles the logout process.
+ */
 export const handleLogout = (logoutType = "redirect"): void => {
   if (logoutType === "popup") {
     msalInstance.logoutPopup().catch((e: unknown) => {
-      logger.error("logoutPopup failed: ", e);
+      logger.error("MSAL: logoutPopup failed:", e);
     });
   } else if (logoutType === "redirect") {
     const logoutRequest = {
@@ -70,7 +106,7 @@ export const handleLogout = (logoutType = "redirect"): void => {
       postLogoutRedirectUri: "/",
     };
     msalInstance.logoutRedirect(logoutRequest).catch((e: unknown) => {
-      logger.error("logoutRedirect failed: ", e);
+      logger.error("MSAL: logoutRedirect failed:", e);
     });
   }
 };
