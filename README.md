@@ -1,90 +1,93 @@
-## [Devias Kit - React](https://material-kit-react.devias.io/)
+# EduQuest Frontend
 
-![license](https://img.shields.io/badge/license-MIT-blue.svg)
+EduQuest Frontend is a React-based web application that interacts with Microsoft Graph API and other microservices. This project is containerized using Docker and deployed to Azure Web App.
 
-[![Devias Kit - React](https://github.com/devias-io/material-kit-react/blob/main/public/assets/thumbnail.png)](https://material-kit-react.devias.io/)
+## Table of Contents
 
-> Free React Admin Dashboard made with [MUI's](https://mui.com) components, [React](https://reactjs.org) and of course [Next.js](https://github.com/vercel/next.js) to boost your app development process!
+- [Features](#features)
+- [Technologies](#technologies)
+- [Setup](#setup)
+- [Usage](#usage)
+- [Deployment](#deployment)
+- [Contributing](#contributing)
+- [License](#license)
 
-## Pages 
+## Features
 
-- [Dashboard](https://material-kit-react.devias.io)
-- [Customers](https://material-kit-react.devias.io/dashboard/customers)
-- [Integrations](https://material-kit-react.devias.io/dashboard/integrations)
-- [Settings](https://material-kit-react.devias.io/dashboard/settings)
-- [Account](https://material-kit-react.devias.io/dashboard/account)
-- [Sign In](https://material-kit-react.devias.io/auth/sign-in)
-- [Sign Up](https://material-kit-react.devias.io/auth/sign-up)
-- [Reset Password](https://material-kit-react.devias.io/auth/reset-password)
+- User authentication with Azure AD
+- Fetch user data from Microsoft Graph API
+- Responsive design
+- Integration with backend microservices
 
-## Free Figma Community File
+## Technologies
 
-- [Duplicate File](https://www.figma.com/file/b3L1Np4RYiicZAOMopHNkm/Devias-Dashboard-Design-Library-Kit)
+- **Languages**: TypeScript, JavaScript
+- **Frameworks**: React, Next.js
+- **Tools**: Docker, GitHub Actions, Azure Web App
 
-## Upgrade to PRO Version
+## Setup
 
-We also have a pro version of this product which bundles even more pages and components if you want
-to save more time and design efforts :)
+1. **Clone the repository:**
+    ```sh
+    git clone https://github.com/yourusername/eduquest-frontend.git
+    cd eduquest-frontend
+    ```
 
-| Free Version (this one)  | [Devias Kit Pro](https://mui.com/store/items/devias-kit-pro/)                |
-| ------------------------ | :--------------------------------------------------------------------------- |
-| **8** Pages              | **80+** Pages                                                                |
-| ✔ Custom Authentication  | ✔ Authentication with **Amplify**, **Auth0**, **Firebase** and **Supabase**  |
-| -                        | ✔ Vite Version                                                               |
-| -                        | ✔ Dark Mode Support                                                          |
-| -                        | ✔ Complete Users Flows                                                       |
-| -                        | ✔ Premium Technical Support                                                  |
+2. **Install dependencies:**
+    ```sh
+    npm install
+    ```
 
-## Quick start
+3. **Set up environment variables:**
+   Create a `.env` file in the root directory and add the following:
+    ```env
+    NEXT_PUBLIC_SITE_URL=your_site_url
+    NEXT_PUBLIC_AZURE_CLIENT_ID=your_azure_client_id
+    NEXT_PUBLIC_AZURE_REDIRECT_URI=your_redirect_uri
+    NEXT_PUBLIC_BACKEND_URL=your_backend_url
+    NEXT_PUBLIC_MICROSERVICE_URL=your_microservice_url
+    NEXT_PUBLIC_LOGIN_REQUEST_SCOPE=your_login_request_scope
+    ```
 
-- Clone the repo: `git clone https://github.com/devias-io/material-kit-react.git`
-- Make sure your Node.js and npm versions are up to date
-- Install dependencies: `npm install` or `yarn`
-- Start the server: `npm run dev` or `yarn dev`
-- Open browser: `http://localhost:3000`
+## Usage
 
-## File Structure
+1. **Run the development server:**
+    ```sh
+    npm run dev
+    ```
 
-Within the download you'll find the following directories and files:
+2. **Build the project:**
+    ```sh
+    npm run build
+    ```
 
-```
-┌── .editorconfig
-├── .eslintrc.js
-├── .gitignore
-├── CHANGELOG.md
-├── LICENSE.md
-├── next-env.d.ts
-├── next.config.js
-├── package.json
-├── README.md
-├── tsconfig.json
-├── public
-└── src
-	├── components
-	├── contexts
-	├── hooks
-	├── lib
-	├── styles
-	├── types
-	└── app
-		├── layout.tsx
-		├── page.tsx
-		├── auth
-		└── dashboard
-```
+3. **Start the production server:**
+    ```sh
+    npm start
+    ```
 
-## Resources
+## Deployment
 
-- More freebies like this one: https://devias.io
+This project uses Docker for containerization and GitHub Actions for CI/CD.
 
-## Reporting Issues:
+1. **Build and push Docker image:**
+    ```sh
+    docker build -t your_dockerhub_username/eduquest-frontend .
+    docker push your_dockerhub_username/eduquest-frontend
+    ```
 
-- [Github Issues Page](https://github.com/devias-io/material-kit-react/issues)
+2. **Deploy to Azure Web App:**
+   The deployment is automated using GitHub Actions. On every push to the `main` branch, the workflow defined in `.github/workflows/main_eduquest-frontend.yml` will build and deploy the Docker image to Azure Web App.
+
+## Contributing
+
+1. Fork the repository
+2. Create a new branch (`git checkout -b feature-branch`)
+3. Make your changes
+4. Commit your changes (`git commit -m 'Add some feature'`)
+5. Push to the branch (`git push origin feature-branch`)
+6. Open a pull request
 
 ## License
 
-- Licensed under [MIT](https://github.com/devias-io/material-kit-react/blob/main/LICENSE.md)
-
-## Contact Us
-
-- Email Us: support@deviasio.zendesk.com
+This project is licensed under the MIT License.
