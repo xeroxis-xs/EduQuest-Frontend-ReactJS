@@ -10,12 +10,10 @@ import FormControl from '@mui/material/FormControl';
 import Grid from '@mui/material/Unstable_Grid2';
 import { useUser } from '@/hooks/use-user';
 import {UserAvatar, type UserAvatarProps} from "@/components/auth/user-avatar";
-import {getUserPhotoAvatar} from "@/app/msal/msal-graph";
 import {logger} from "@/lib/default-logger";
 import Avatar from "@mui/material/Avatar";
 import {FloppyDisk as FloppyDiskIcon} from "@phosphor-icons/react/dist/ssr/FloppyDisk";
 import Typography from "@mui/material/Typography";
-import {AxiosError} from "axios";
 import {authClient} from "@/lib/auth/client";
 import Alert from "@mui/material/Alert";
 import Points from "../../../../public/assets/point.svg";
@@ -70,7 +68,8 @@ export function AccountDetailsForm(): React.JSX.Element {
   const setUserPhotoAvatar = async (): Promise<void> => {
     if (eduquestUser) {
       try {
-        const response = await getUserPhotoAvatar();
+        const response = await authClient.getUserPhotoAvatar();
+        // const response = await getUserPhotoAvatar();
         logger.debug("User Avatar: ", response);
         if (response === '') {
           setShowUserInitials(true);
@@ -84,19 +83,13 @@ export function AccountDetailsForm(): React.JSX.Element {
           setShowUserInitials(false);
         }
       } catch (error) {
-        if (error instanceof AxiosError) {
-          if (error.response?.status === 401) {
-            await authClient.signInWithMsal();
-          }
-        } else {
-          setShowUserInitials(true);
-          setUserAvatarProps({
-            name: formatName(eduquestUser.nickname),
-            bgColor: 'var(--mui-palette-neutral-900)',
-            textColor: "white",
-          });
-          logger.error('Error fetching user photo: ', error)
-        }
+        setShowUserInitials(true);
+        setUserAvatarProps({
+          name: formatName(eduquestUser.nickname),
+          bgColor: 'var(--mui-palette-neutral-900)',
+          textColor: "white",
+        });
+        logger.error('Error fetching user photo: ', error)
       }
     }
   };

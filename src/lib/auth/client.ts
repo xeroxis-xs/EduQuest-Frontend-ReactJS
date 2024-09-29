@@ -5,6 +5,8 @@ import { handleLoginRedirect, handleLogout, getToken, msalInstance } from "@/app
 import { logger } from '@/lib/default-logger';
 import type { EduquestUser } from "@/types/eduquest-user";
 import { type AccountInfo } from "@azure/msal-browser";
+import { graphConfig, graphLoginRequest } from "@/app/msal/msal-config";
+import { InteractionRequiredAuthError } from "@azure/msal-browser";
 
 /**
  * Create a separate Axios instance for AuthClient to avoid circular dependencies.
@@ -101,6 +103,66 @@ class AuthClient {
 
     // Return the user and eduquest user
     return { data: { user: msalUser, eduquestUser } };
+  }
+
+  /**
+   * Acquires an access token for Microsoft Graph and fetches the user's photo.
+   */
+  async getUserPhotoAvatar(): Promise<string> {
+    try {
+      const accessToken = await this.getAccessTokenForGraph();
+
+      if (!accessToken) {
+        throw new Error("Unable to acquire access token for fetching user photo.");
+      }
+
+      const photoEndpoint = `${graphConfig.graphMeEndpoint}/photo/$value`;
+
+      const response = await fetch(photoEndpoint, {
+        method: "GET",
+        headers: {
+          "Authorization": `Bearer ${accessToken}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch user photo: ${response.statusText}`);
+      }
+
+      const blob = await response.blob();
+      return URL.createObjectURL(blob);
+    } catch (error) {
+      logger.error("Error fetching user photo:", error);
+      return ''; // Return a fallback avatar URL or an empty string
+    }
+  }
+
+  /**
+   * Acquires an access token specifically for Microsoft Graph API.
+   */
+  async getAccessTokenForGraph(): Promise<string | null> {
+    const activeAccount = msalInstance.getActiveAccount();
+    if (!activeAccount) {
+      logger.warn("MSAL: No active account found, initiating login.");
+      await this.signInWithMsal();
+      return null;
+    }
+
+    try {
+      const response = await msalInstance.acquireTokenSilent({
+        ...graphLoginRequest,
+        account: activeAccount,
+      });
+      return response.accessToken;
+    } catch (error) {
+      if (error instanceof InteractionRequiredAuthError) {
+        logger.warn('MSAL: Interaction required for Graph API token, redirecting to login.');
+        await this.signInWithMsal();
+      } else {
+        logger.error('MSAL: Unexpected error acquiring Graph API token silently:', error);
+      }
+      return null;
+    }
   }
 
   /**

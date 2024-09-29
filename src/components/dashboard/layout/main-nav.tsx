@@ -9,13 +9,11 @@ import {List as ListIcon} from '@phosphor-icons/react/dist/ssr/List';
 import {UserAvatar, type UserAvatarProps} from '@/components/auth/user-avatar';
 import {usePopover} from '@/hooks/use-popover';
 import {useUser} from '@/hooks/use-user';
-import {getUserPhotoAvatar} from "@/app/msal/msal-graph";
 import {logger} from '@/lib/default-logger';
 import {MobileNav} from './mobile-nav';
 import {UserPopover} from './user-popover';
 import { LinearProgressForLevel, } from "@/components/dashboard/misc/linear-progress-with-label";
 import {User as UserIcon} from "@phosphor-icons/react/dist/ssr/User";
-import {AxiosError} from "axios";
 import {authClient} from "@/lib/auth/client";
 
 export function MainNav(): React.JSX.Element {
@@ -39,7 +37,8 @@ export function MainNav(): React.JSX.Element {
   const setUserPhotoAvatar = async (): Promise<void> => {
     if (eduquestUser) {
       try {
-        const response = await getUserPhotoAvatar();
+        const response = await authClient.getUserPhotoAvatar();
+        // const response = await getUserPhotoAvatar();
         logger.debug("User Avatar: ", response);
         if (response === '') {
           setShowUserInitials(true);
@@ -53,19 +52,13 @@ export function MainNav(): React.JSX.Element {
           setShowUserInitials(false);
         }
       } catch (error) {
-        if (error instanceof AxiosError) {
-          if (error.response?.status === 401) {
-            await authClient.signInWithMsal();
-          }
-        } else {
-          setShowUserInitials(true);
-          setUserAvatarProps({
-            name: formatName(eduquestUser.nickname),
-            bgColor: 'var(--mui-palette-neutral-900)',
-            textColor: "white",
-          });
-          logger.error('Error fetching user photo: ', error)
-        }
+        setShowUserInitials(true);
+        setUserAvatarProps({
+          name: formatName(eduquestUser.nickname),
+          bgColor: 'var(--mui-palette-neutral-900)',
+          textColor: "white",
+        });
+        logger.error('Error fetching user photo: ', error)
       }
     }
   };
