@@ -24,6 +24,14 @@ export function SignInForm({ error }: SignInFormProps): React.JSX.Element {
         Welcome to EduQuest!
       </Typography>
       <Typography align="center" variant="body1">
+        {process.env.NEXT_PUBLIC_AZURE_CLIENT_ID}
+        {process.env.NEXT_PUBLIC_AZURE_REDIRECT_URI}
+        {process.env.NEXT_PUBLIC_SITE_URL}
+        {process.env.NEXT_PUBLIC_BACKEND_URL}
+        {process.env.NEXT_PUBLIC_MICROSERVICE_URL}
+        {process.env.NEXT_PUBLIC_LOGIN_REQUEST_SCOPE}
+      </Typography>
+      <Typography align="center" variant="body1">
         A platform for you to learn and earn.
       </Typography>
       <SignInButton />
