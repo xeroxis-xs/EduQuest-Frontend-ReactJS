@@ -1,9 +1,11 @@
 #services:
 #  eduquest-frontend:
-#    image: xeroxisxs/eduquest-frontend-nextjs:latest
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
 #    entrypoint: ["/entrypoint.sh"]
 #    ports:
-#      - "80:80"
+#      - "3000:80"
 #    restart: always
 #    volumes:
 #      - /app/node_modules
@@ -15,11 +17,12 @@
 #      NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL}
 #      NEXT_PUBLIC_MICROSERVICE_URL: ${NEXT_PUBLIC_MICROSERVICE_URL}
 #      NEXT_PUBLIC_LOGIN_REQUEST_SCOPE: ${NEXT_PUBLIC_LOGIN_REQUEST_SCOPE}
-
-
+#
 services:
   frontend:
-    image: xeroxisxs/eduquest-frontend-nextjs:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "3000:80"
     environment:

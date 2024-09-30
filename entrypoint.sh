@@ -1,22 +1,26 @@
-#!/bin/sh
+#!/bin/bash
+envFilename='./.env.production'
+nextFolder='./standalone/.next/'
 
-echo "Starting entrypoint script..."
+while read -r line; do
+    # no comment or not empty
+    if [ "${line:0:1}" == "#" ] || [ "${line}" == "" ]; then
+        continue
+    fi
 
-# Check environment variables
-echo "Checking environment variables..."
-[ -z "$NEXT_PUBLIC_AZURE_CLIENT_ID" ] && echo "NEXT_PUBLIC_AZURE_CLIENT_ID is not set" && exit 1
-[ -z "$NEXT_PUBLIC_AZURE_REDIRECT_URI" ] && echo "NEXT_PUBLIC_AZURE_REDIRECT_URI is not set" && exit 1
-[ -z "$NEXT_PUBLIC_SITE_URL" ] && echo "NEXT_PUBLIC_SITE_URL is not set" && exit 1
-[ -z "$NEXT_PUBLIC_BACKEND_URL" ] && echo "NEXT_PUBLIC_BACKEND_URL is not set" && exit 1
-[ -z "$NEXT_PUBLIC_MICROSERVICE_URL" ] && echo "NEXT_PUBLIC_MICROSERVICE_URL is not set" && exit 1
-[ -z "$NEXT_PUBLIC_LOGIN_REQUEST_SCOPE" ] && echo "NEXT_PUBLIC_LOGIN_REQUEST_SCOPE is not set" && exit 1
+    # split
+    configName="$(cut -d'=' -f1 <<<"$line")"
+    configValue="$(cut -d'=' -f2 <<<"$line")"
+    # get system env
+    envValue=$(env | grep "^$configName=" | grep -oe '[^=]*$')
 
-echo "All required environment variables are set."
+    # if config found && configName starts with NEXT_PUBLIC
+    if [ -n "$configValue" ] && [ -n "$envValue" ]; then
+        # replace all
+        echo "Replace: ${configValue} with ${envValue}"
+        find $nextFolder \( -type d -name .git -prune \) -o -type f -print0 | xargs -0 sed -i "s#$configValue#$envValue#g"
+    fi
+done <$envFilename
 
-# Replace placeholders in .next files
-echo "Replacing placeholders in .next files..."
-# Add your placeholder replacement logic here
-
-# Execute the main command
-echo "Executing command: npm start"
-exec npm start
+echo "Starting Nextjs"
+exec "$@"
