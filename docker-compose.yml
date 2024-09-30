@@ -19,7 +19,7 @@
 
 services:
   frontend:
-    image: xeroxisxs/eduquest-frontend-nextjs:latest
+    image: xeroxisxs/eduquest-frontend-reactjs:latest
     ports:
       - "80:80"
     environment:
