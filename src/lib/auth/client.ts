@@ -18,8 +18,8 @@ const authApi = axios.create({
 // Set up the request interceptor to use MSAL's getToken method
 authApi.interceptors.request.use(
   async (config) => {
-    logger.debug('auth config.baseURL:', config.baseURL);
-    logger.debug('auth env backend url:', process.env.NEXT_PUBLIC_BACKEND_URL);
+    // logger.debug('auth config.baseURL:', config.baseURL);
+    // logger.debug('auth env backend url:', process.env.NEXT_PUBLIC_BACKEND_URL);
     const token = await getToken();
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;

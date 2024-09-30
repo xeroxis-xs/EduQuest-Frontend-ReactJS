@@ -13,8 +13,8 @@ const api = axios.create({
 api.interceptors.request.use(
   async (config) => {
     const token = await getToken();
-    logger.debug('api config.baseURL:', config.baseURL);
-    logger.debug('env backend url:', process.env.NEXT_PUBLIC_BACKEND_URL);
+    // logger.debug('api config.baseURL:', config.baseURL);
+    // logger.debug('env backend url:', process.env.NEXT_PUBLIC_BACKEND_URL);
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     } else {
