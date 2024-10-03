@@ -97,7 +97,7 @@ export function CourseNewGroupForm({ onFormSubmitSuccess, courseId }: CourseGrou
 
   return (
     <form onSubmit={handleSubmit}>
-      <Card>
+      <Card sx={{ marginBottom: 2}}>
         <CardHeader subheader={`Add new group to Course ID: ${courseId}`} title="New Group" />
         <Divider />
         <CardContent>

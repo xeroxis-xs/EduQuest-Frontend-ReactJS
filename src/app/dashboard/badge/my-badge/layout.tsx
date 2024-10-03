@@ -1,8 +1,13 @@
+import * as React from 'react';
 import type { Metadata } from "next";
-import Page from "./page";
 import { config } from "@/config";
 
-// Ensure metadata conforms to Metadata type through regular type checking
-export const metadata: Metadata = { title: `My Badges | ${config.site.name}` };
+export const metadata: Metadata = { title: `My Badges | Badge | ${config.site.name}` };
 
-export default Page;
+export default function Layout({ children }: { children: React.ReactNode }): React.JSX.Element {
+  return (
+    <div>
+      {children}
+    </div>
+  );
+}

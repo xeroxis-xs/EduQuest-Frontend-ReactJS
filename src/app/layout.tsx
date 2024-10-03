@@ -26,7 +26,6 @@ export default function Layout({ children }: LayoutProps): React.JSX.Element {
       <link href="/assets/android-chrome-192x192.png" rel="icon" sizes="192x192" type="image/png"/>
       <link href="/assets/android-chrome-512x512.png" rel="icon" sizes="512x512" type="image/png"/>
       <link href="/assets/apple-touch-icon.png" rel="apple-touch-icon" sizes="180x180"/>
-      <title>EduQuest</title>
     </head>
     <body>
 

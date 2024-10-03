@@ -1,8 +1,17 @@
+import * as React from 'react';
 import type { Metadata } from "next";
-import Page from "./page";   // import your Demo's page
 import { config } from "@/config";
 
-// Ensure metadata conforms to Metadata type through regular type checking
-export const metadata: Metadata = { title: `Course Details | ${config.site.name}` };
+export async function generateMetadata({params} : { params: {courseId: string } }): Promise<Metadata> {
+  return {
+    title: `Course ${params.courseId} Details | Course | ${config.site.name}`
+  }
+}
 
-export default Page;
+export default function Layout({ children }: { children: React.ReactNode }): React.JSX.Element {
+  return (
+    <div>
+      {children}
+    </div>
+  );
+}
