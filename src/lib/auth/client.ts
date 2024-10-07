@@ -6,7 +6,6 @@ import { logger } from '@/lib/default-logger';
 import type { EduquestUser } from "@/types/eduquest-user";
 import { type AccountInfo } from "@azure/msal-browser";
 import { graphConfig, graphLoginRequest } from "@/app/msal/msal-config";
-import { InteractionRequiredAuthError } from "@azure/msal-browser";
 
 /**
  * Create a separate Axios instance for AuthClient to avoid circular dependencies.
@@ -59,6 +58,7 @@ class AuthClient {
     data: {
       user: AccountInfo | null;
       eduquestUser: EduquestUser | null;
+      avatar: string;
     }
     error?: string
   }> {
@@ -68,7 +68,8 @@ class AuthClient {
       return {
         data: {
           user: null,
-          eduquestUser: null
+          eduquestUser: null,
+          avatar: ''
         }
       };
     }
@@ -84,7 +85,8 @@ class AuthClient {
       return {
         data: {
           user: null,
-          eduquestUser: null
+          eduquestUser: null,
+          avatar: ''
         },
         error: 'Please sign in with your NTU email account.'
       };
@@ -93,18 +95,21 @@ class AuthClient {
     // Get the EduquestUser profile
     const eduquestUser = await this.getEduquestUser(msalUser.username);
 
+    const avatar = await this.getUserPhotoAvatar();
+
     if (eduquestUser === null) {
       return {
         data: {
           user: null,
-          eduquestUser: null
+          eduquestUser: null,
+          avatar: ''
         },
         error: 'Failed to fetch user profile.'
       };
     }
 
     // Return the user and eduquest user
-    return { data: { user: msalUser, eduquestUser } };
+    return { data: { user: msalUser, eduquestUser, avatar } };
   }
 
   /**
@@ -114,27 +119,31 @@ class AuthClient {
     try {
       const accessToken = await this.getAccessTokenForGraph();
 
-      if (!accessToken) {
-        throw new Error("Unable to acquire access token for fetching user photo.");
+      if (accessToken) {
+        const photoEndpoint = `${graphConfig.graphMeEndpoint}/photo/$value`;
+
+        const response = await fetch(photoEndpoint, {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${accessToken}`,
+          },
+        });
+        // If successful, this method returns a 200 OK response code and binary data of the requested photo.
+        // If no photo exists, the operation returns 404 Not Found.
+
+        if (response.status === 200) {
+          const blob = await response.blob();
+          return URL.createObjectURL(blob);
+        } else {
+          logger.error(`Failed to fetch blob from graph API: ${response.statusText}`);
+          return ''; // Return a fallback avatar URL or an empty string
+        }
+      } else {
+        logger.error('Failed to fetch access token for user photo.');
+        return ''; // Return a fallback avatar URL or an empty string
       }
-
-      const photoEndpoint = `${graphConfig.graphMeEndpoint}/photo/$value`;
-
-      const response = await fetch(photoEndpoint, {
-        method: "GET",
-        headers: {
-          "Authorization": `Bearer ${accessToken}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch user photo: ${response.statusText}`);
-      }
-
-      const blob = await response.blob();
-      return URL.createObjectURL(blob);
     } catch (error) {
-      logger.error("Error fetching user photo:", error);
+      logger.error('Failed to fetch user photo:', error);
       return ''; // Return a fallback avatar URL or an empty string
     }
   }
@@ -155,19 +164,12 @@ class AuthClient {
         ...graphLoginRequest,
         account: activeAccount,
       });
+      // test if response throw error
+      // throw new Error('test error');
       logger.debug("MSAL: Graph API token acquired silently.");
       return response.accessToken;
     } catch (error) {
-      if (error instanceof InteractionRequiredAuthError) {
-        logger.error('MSAL: Interaction required for Graph API token, redirecting to login.');
-        // You might want to use acquireTokenRedirect here instead of login
-        await msalInstance.acquireTokenRedirect({
-          ...graphLoginRequest,
-          account: activeAccount,
-        });
-      } else {
-        logger.error('MSAL: Unexpected error acquiring Graph API token silently:', error);
-      }
+      logger.error('MSAL: Error acquiring Graph API token silently:', error);
       return null;
     }
   }

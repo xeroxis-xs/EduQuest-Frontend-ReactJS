@@ -14,7 +14,6 @@ import {logger} from "@/lib/default-logger";
 import Avatar from "@mui/material/Avatar";
 import {FloppyDisk as FloppyDiskIcon} from "@phosphor-icons/react/dist/ssr/FloppyDisk";
 import Typography from "@mui/material/Typography";
-import {authClient} from "@/lib/auth/client";
 import Alert from "@mui/material/Alert";
 import Points from "../../../../public/assets/point.svg";
 import Stack from "@mui/material/Stack";
@@ -24,7 +23,7 @@ import {User as UserIcon} from "@phosphor-icons/react/dist/ssr/User";
 import {updateEduquestUser} from "@/api/services/eduquest-user";
 
 export function AccountDetailsForm(): React.JSX.Element {
-  const { eduquestUser, checkSession } = useUser();
+  const { eduquestUser, avatar, checkSession } = useUser();
   const nicknameRef = React.useRef<HTMLInputElement>(null);
   const [userPhoto, setUserPhoto] = React.useState<string | null>(null);
   const [showUserInitials, setShowUserInitials] = React.useState(false);
@@ -68,10 +67,8 @@ export function AccountDetailsForm(): React.JSX.Element {
   const setUserPhotoAvatar = async (): Promise<void> => {
     if (eduquestUser) {
       try {
-        const response = await authClient.getUserPhotoAvatar();
-        // const response = await getUserPhotoAvatar();
-        logger.debug("User Avatar: ", response);
-        if (response === '') {
+        logger.debug("User Avatar: ", avatar);
+        if (avatar === '') {
           setShowUserInitials(true);
           setUserAvatarProps({
             name: formatName(eduquestUser.nickname),
@@ -79,7 +76,7 @@ export function AccountDetailsForm(): React.JSX.Element {
             textColor: "white",
           });
         } else {
-          setUserPhoto(response);
+          setUserPhoto(avatar);
           setShowUserInitials(false);
         }
       } catch (error) {

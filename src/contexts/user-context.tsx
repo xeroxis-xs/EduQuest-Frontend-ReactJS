@@ -13,6 +13,7 @@ import { type EduquestUser} from "@/types/eduquest-user";
 export interface UserContextValue {
   user: AccountInfo | null;
   eduquestUser: EduquestUser | null;
+  avatar: string;
   error: string | null;
   isLoading: boolean;
   checkSession?: () => Promise<void>;
@@ -29,11 +30,13 @@ export function UserProvider({ children }: UserProviderProps): React.JSX.Element
   const [state, setState] = React.useState<{
     user: AccountInfo | null;
     eduquestUser: EduquestUser | null;
+    avatar: string;
     error: string | null;
     isLoading: boolean
   }>({
       user: null,
       eduquestUser: null,
+      avatar: '',
       error: null,
       isLoading: true,
   });
@@ -50,6 +53,7 @@ export function UserProvider({ children }: UserProviderProps): React.JSX.Element
             ...prev,
             user: null,
             eduquestUser: null,
+            avatar: '',
             error,
             isLoading: false
           }));
@@ -60,6 +64,7 @@ export function UserProvider({ children }: UserProviderProps): React.JSX.Element
         ...prev,
         user: data.user ?? null,
         eduquestUser: data.eduquestUser ?? null,
+        avatar: data.avatar,
         error: null,
         isLoading: false
       }));
@@ -71,6 +76,7 @@ export function UserProvider({ children }: UserProviderProps): React.JSX.Element
         ...prev,
         user: null,
         eduquestUser: null,
+        avatar: '',
         error: 'Something went wrong',
         isLoading: false
       }));

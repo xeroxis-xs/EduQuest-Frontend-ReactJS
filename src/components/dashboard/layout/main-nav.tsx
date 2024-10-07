@@ -14,7 +14,6 @@ import {MobileNav} from './mobile-nav';
 import {UserPopover} from './user-popover';
 import { LinearProgressForLevel, } from "@/components/dashboard/misc/linear-progress-with-label";
 import {User as UserIcon} from "@phosphor-icons/react/dist/ssr/User";
-import {authClient} from "@/lib/auth/client";
 
 export function MainNav(): React.JSX.Element {
   const [openNav, setOpenNav] = React.useState<boolean>(false);
@@ -24,7 +23,7 @@ export function MainNav(): React.JSX.Element {
   const [userAvatarProps, setUserAvatarProps] = React.useState<UserAvatarProps>({
     name: '?',
   });
-  const { eduquestUser } = useUser();
+  const { eduquestUser, avatar } = useUser();
 
 
   function formatName(name: string | undefined): string {
@@ -37,9 +36,8 @@ export function MainNav(): React.JSX.Element {
   const setUserPhotoAvatar = async (): Promise<void> => {
     if (eduquestUser) {
       try {
-        const response = await authClient.getUserPhotoAvatar();
-        logger.debug("User Avatar: ", response);
-        if (response === '') {
+        logger.debug("User Avatar: ", avatar);
+        if (avatar === '') {
           setShowUserInitials(true);
           setUserAvatarProps({
             name: formatName(eduquestUser.nickname),
@@ -47,7 +45,7 @@ export function MainNav(): React.JSX.Element {
             textColor: "white",
           });
         } else {
-          setUserPhoto(response);
+          setUserPhoto(avatar);
           setShowUserInitials(false);
         }
       } catch (error) {
@@ -62,14 +60,14 @@ export function MainNav(): React.JSX.Element {
     }
   };
 
-  React.useEffect(() => {
-    const fetchData = async (): Promise<void> => {
-      await setUserPhotoAvatar();
-    }
-    fetchData().catch((error: unknown) => {
-      logger.error('Failed to fetch data', error);
-    });
-  }, [eduquestUser]);
+  // React.useEffect(() => {
+  //   const fetchData = async (): Promise<void> => {
+  //     await setUserPhotoAvatar();
+  //   }
+  //   fetchData().catch((error: unknown) => {
+  //     logger.error('Failed to fetch data', error);
+  //   });
+  // }, [eduquestUser]);
 
   React.useEffect(() => {
     const fetchData = async (): Promise<void> => {
