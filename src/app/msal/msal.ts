@@ -1,7 +1,7 @@
 // msal.ts
 
-import { AuthenticationResult, InteractionRequiredAuthError, PublicClientApplication } from "@azure/msal-browser";
-import { msalConfig, loginRequest } from "./msal-config";
+import { type AuthenticationResult, InteractionRequiredAuthError, PublicClientApplication } from "@azure/msal-browser";
+import { msalConfig, userDataLoginRequest, graphLoginRequest } from "./msal-config";
 import { logger } from '@/lib/default-logger';
 
 export const msalInstance = new PublicClientApplication(msalConfig);
@@ -34,21 +34,6 @@ export async function initializeMsal(): Promise<void> {
   }
 }
 
-// /**
-//  * Handles the login response.
-//  */
-// export async function handleLoginResponse(loginResponse: AuthenticationResult): Promise<void> {
-//   const account = loginResponse.account;
-//   msalInstance.setActiveAccount(account);
-//   // logger.debug("MSAL: Active account set:", account);
-//   const token = await getToken();
-//   if (token) {
-//     logger.debug("MSAL: Token acquired:", token);
-//   } else {
-//     logger.warn("MSAL: No token acquired.");
-//   }
-// }
-
 /**
  * Acquires a token silently, or triggers a login if necessary.
  */
@@ -63,7 +48,7 @@ export async function getToken(): Promise<string | null> {
     }
 
     const response = await msalInstance.acquireTokenSilent({
-      ...loginRequest,
+      ...userDataLoginRequest,
       account: activeAccount,
     });
     logger.debug("MSAL: Token acquired silently.");
@@ -85,10 +70,19 @@ export async function getToken(): Promise<string | null> {
  */
 export async function handleLoginRedirect(): Promise<void> {
   try {
-    await msalInstance.loginRedirect(loginRequest);
+    await msalInstance.loginRedirect(userDataLoginRequest);
     logger.debug("MSAL: Redirecting to login...");
   } catch (error) {
     logger.error("MSAL: Error during login redirect:", error);
+  }
+}
+
+export async function handleAcquireTokenRedirect(): Promise<void> {
+  try {
+    await msalInstance.acquireTokenRedirect(graphLoginRequest);
+    logger.debug("MSAL: Redirecting to acquire token...");
+  } catch (error) {
+    logger.error("MSAL: Error during token acquisition redirect:", error);
   }
 }
 
@@ -103,7 +97,7 @@ export const handleLogout = (logoutType = "redirect"): void => {
   } else if (logoutType === "redirect") {
     const logoutRequest = {
       account: msalInstance.getActiveAccount(),
-      postLogoutRedirectUri: "/",
+      postLogoutRedirectUri: "/auth/sign-in",
     };
     msalInstance.logoutRedirect(logoutRequest).catch((e: unknown) => {
       logger.error("MSAL: logoutRedirect failed:", e);

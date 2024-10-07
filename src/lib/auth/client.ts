@@ -155,11 +155,16 @@ class AuthClient {
         ...graphLoginRequest,
         account: activeAccount,
       });
+      logger.debug("MSAL: Graph API token acquired silently.");
       return response.accessToken;
     } catch (error) {
       if (error instanceof InteractionRequiredAuthError) {
-        logger.warn('MSAL: Interaction required for Graph API token, redirecting to login.');
-        await this.signInWithMsal();
+        logger.error('MSAL: Interaction required for Graph API token, redirecting to login.');
+        // You might want to use acquireTokenRedirect here instead of login
+        await msalInstance.acquireTokenRedirect({
+          ...graphLoginRequest,
+          account: activeAccount,
+        });
       } else {
         logger.error('MSAL: Unexpected error acquiring Graph API token silently:', error);
       }

@@ -38,7 +38,6 @@ export function MainNav(): React.JSX.Element {
     if (eduquestUser) {
       try {
         const response = await authClient.getUserPhotoAvatar();
-        // const response = await getUserPhotoAvatar();
         logger.debug("User Avatar: ", response);
         if (response === '') {
           setShowUserInitials(true);

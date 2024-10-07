@@ -11,11 +11,7 @@ export const msalConfig = {
     clientId,
     authority: `https://login.microsoftonline.com/common`,
     redirectUri
-  },
-  cache: {
-    cacheLocation: "localStorage", // This configures where your cache will be stored
-    storeAuthStateInCookie: false // Set this to true if you are having issues on IE11 or Edge
-  },
+  }
 };
 
 // export const API_SCOPE = "User.ReadBasic.All";
@@ -26,16 +22,13 @@ export const msalConfig = {
  * For more information about OIDC scopes, visit:
  * https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-permissions-and-consent#openid-connect-scopes
  */
-export const loginRequest = {
-  scopes: ["api://778ca789-6293-4ad6-8bae-04fb1a9d9943/.default"]
-};
 
 export const userDataLoginRequest = {
   scopes: [scope]
 };
 
 export const graphLoginRequest = {
-  scopes: ["User.Read"]
+  scopes: ["User.Read", "User.ReadBasic.All"], // Graph API scopes
 };
 /**
  * Add here the scopes to request when obtaining an access token for MS Graph API. For more information, see:
