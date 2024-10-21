@@ -1,36 +1,76 @@
-# EduQuest Frontend
+# EduQuest Frontend (React)
+![CI](https://github.com/xeroxis-xs/EduQuest-Frontend-ReactJs/actions/workflows/main_eduquest-frontend.yml/badge.svg)
 
-EduQuest Frontend is a React-based web application that interacts with Microsoft Graph API and other microservices. This project is containerized using Docker and deployed to Azure Web App.
+
+
+## Introduction
+The **EduQuest Frontend Application** is the user interface component of EduQuest, a web application designed to enhance student engagement and learning outcomes through gamification and digital badges. This application provides a user-friendly platform for students and instructors to interact with courses, quests, and other educational content.
+
+Built using the Next.js framework (React-based), the frontend is highly responsive, ensuring a seamless experience across different devices and screen sizes.
 
 ## Table of Contents
+- [Introduction](#introduction)
+- [Table of Contents](#table-of-contents)
+- [Demo](#demo)
+  - [Login](#login)
+  - [Dashboard](#dashboard)
+  - [Courses](#courses)
+  - [Quest Attempt](#quest-attempt)
+  - [Badge Catalogue](#badge-catalogue)
+  - [Quest Generator](#quest-generator)
+  - [Course Insights](#course-insights)
+- [Key Features:](#key-features)
+- [Technologies Used:](#technologies-used)
+- [Installation](#installation)
+- [Running the Application](#running-the-application)
 
-- [Features](#features)
-- [Technologies](#technologies)
-- [Setup](#setup)
-- [Usage](#usage)
-- [Deployment](#deployment)
-- [Contributing](#contributing)
-- [License](#license)
+## Demo
+### Login
+![img_16.png](img_16.png)
 
-## Features
+### Dashboard
+![img_17.png](img_17.png)
 
-- User authentication with Azure AD
-- Fetch user data from Microsoft Graph API
-- Responsive design
-- Integration with backend microservices
+### Courses
+![img_18.png](img_18.png)
 
-## Technologies
+### Quest Attempt
+![img_15.png](img_15.png)
 
-- **Languages**: TypeScript, JavaScript
-- **Frameworks**: React, Next.js
-- **Tools**: Docker, GitHub Actions, Azure Web App
+### Badge Catalogue
+![img_19.png](img_19.png)
 
-## Setup
+### Quest Generator
+![img_20.png](img_20.png)
+
+### Course Insights
+![img_21.png](img_21.png)
+
+
+## Key Features:
+
+- **Microsoft Authentication**: Secure login and user authentication using Microsoft Authentication Library (MSAL).
+- **Student Dashboard**: A personalized dashboard that allows students to view courses, participate in quests, track progress, and earn digital badges.
+- **Instructor Dashboard**: A comprehensive dashboard for instructors to create, manage, and track courses, quests, and student performance.
+- **Quests and Badges**: Gamification elements such as quests, badges, and leaderboards to motivate students and promote active learning.
+- **Quest Generation**: Integration with a [microservice](https://github.com/xeroxis-xs/EduQuest-Microservice-Flask) that enables students to upload educational materials and generate personalized learning quests.
+- **Integration with Wooclap**: Seamless integration to import quiz data and track student performance.
+
+## Technologies Used:
+
+- **React.js**: A JavaScript library for building user interfaces, used here for managing the app's component-based architecture.
+- **Next.js**: A powerful React-based framework for building dynamic web applications with server-side rendering and static site generation.
+- **Material-UI**: A popular React component library for building responsive and visually appealing user interfaces.
+- **ApexCharts**: A modern charting library that provides interactive and visually stunning charts for data visualization.
+- **MSAL (Microsoft Authentication Library)**: For handling user authentication and secure access to the platform.
+- **Axios**: Used for making API requests to the backend and microservices services.
+
+## Installation
 
 1. **Clone the repository:**
     ```sh
-    git clone https://github.com/yourusername/eduquest-frontend.git
-    cd eduquest-frontend
+    git clone https://github.com/xeroxis-xs/EduQuest-Frontend-ReactJS.git
+    cd EduQuest-Frontend-ReactJS
     ```
 
 2. **Install dependencies:**
@@ -42,52 +82,17 @@ EduQuest Frontend is a React-based web application that interacts with Microsoft
    Create a `.env` file in the root directory and add the following:
     ```env
     NEXT_PUBLIC_SITE_URL=your_site_url
-    NEXT_PUBLIC_AZURE_CLIENT_ID=your_azure_client_id
-    NEXT_PUBLIC_AZURE_REDIRECT_URI=your_redirect_uri
+    NEXT_PUBLIC_AZURE_CLIENT_ID=your_registered_frontend_app_client_id
+    NEXT_PUBLIC_AZURE_REDIRECT_URI=your_registered_frontend_app_redirect_uri
     NEXT_PUBLIC_BACKEND_URL=your_backend_url
-    NEXT_PUBLIC_MICROSERVICE_URL=your_microservice_url
+    NEXT_PUBLIC_MICROSERVICE_URL=eduquest_microservice_url
     NEXT_PUBLIC_LOGIN_REQUEST_SCOPE=your_login_request_scope
     ```
 
-## Usage
+## Running the Application
 
 1. **Run the development server:**
     ```sh
     npm run dev
     ```
 
-2. **Build the project:**
-    ```sh
-    npm run build
-    ```
-
-3. **Start the production server:**
-    ```sh
-    npm start
-    ```
-
-## Deployment
-
-This project uses Docker for containerization and GitHub Actions for CI/CD.
-
-1. **Build and push Docker image:**
-    ```sh
-    docker build -t your_dockerhub_username/eduquest-frontend .
-    docker push your_dockerhub_username/eduquest-frontend
-    ```
-
-2. **Deploy to Azure Web App:**
-   The deployment is automated using GitHub Actions. On every push to the `main` branch, the workflow defined in `.github/workflows/main_eduquest-frontend.yml` will build and deploy the Docker image to Azure Web App.
-
-## Contributing
-
-1. Fork the repository
-2. Create a new branch (`git checkout -b feature-branch`)
-3. Make your changes
-4. Commit your changes (`git commit -m 'Add some feature'`)
-5. Push to the branch (`git push origin feature-branch`)
-6. Open a pull request
-
-## License
-
-This project is licensed under the MIT License.
