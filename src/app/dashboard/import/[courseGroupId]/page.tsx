@@ -8,6 +8,7 @@ import {type AggregatedResult, ImportCardQuestion} from "@/components/dashboard/
 import {ImportCardUserAttempt} from "@/components/dashboard/import/import-card-user-attempt";
 import {type Quest} from "@/types/quest";
 import {type UserAnswerAttempt} from "@/types/user-answer-attempt";
+import {logger} from "@/lib/default-logger";
 
 
 
@@ -21,7 +22,11 @@ export default function Page({ params }: { params: { courseGroupId: string } }):
 
   const handleQuestions = (q: Question[]): void => {
     setQuestions(q);
-    setNewQuestId(q[0].quest_id);
+    if (q.length > 0) {
+      setNewQuestId(q[0].quest_id);
+    } else {
+      logger.error('No questions found');
+    }
   }
 
   const handleResultAndUserAnswerAttempts = (results: AggregatedResult[], attempts: UserAnswerAttempt[]): void => {
