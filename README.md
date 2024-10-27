@@ -9,8 +9,7 @@ The **EduQuest Frontend Application** is the user interface component of EduQues
 Built using the Next.js framework (React-based), the frontend is highly responsive, ensuring a seamless experience across different devices and screen sizes.
 
 ## Table of Contents
-- [Introduction](#introduction)
-- [Table of Contents](#table-of-contents)
+- [Architecture Overview](#architecture-overview)
 - [Demo](#demo)
   - [Login](#login)
   - [Dashboard](#dashboard)
@@ -24,28 +23,32 @@ Built using the Next.js framework (React-based), the frontend is highly responsi
 - [Installation](#installation)
 - [Running the Application](#running-the-application)
 
+## Architecture Overview
+<p align="center">
+  <img src="images/frontend_arch.svg" alt="Frontend Architecture Diagram" width="500">
+</p>
+
 ## Demo
 ### Login
-![img_16.png](img_16.png)
+![img_16.png](images/img_16.png)
 
 ### Dashboard
-![img_17.png](img_17.png)
+![img_17.png](images/img_17.png)
 
 ### Courses
-![img_18.png](img_18.png)
+![img_18.png](images/img_18.png)
 
 ### Quest Attempt
-![img_15.png](img_15.png)
+![img_15.png](images/img_15.png)
 
 ### Badge Catalogue
-![img_19.png](img_19.png)
+![img_19.png](images/img_19.png)
 
 ### Quest Generator
-![img_20.png](img_20.png)
+![img_20.png](images/img_20.png)
 
 ### Course Insights
-![img_21.png](img_21.png)
-
+![img_21.png](images/img_21.png)
 
 ## Key Features:
 
