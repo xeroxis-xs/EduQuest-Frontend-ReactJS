@@ -4,14 +4,15 @@ import type { ApexOptions } from 'apexcharts';
 import { Chart } from '@/components/core/chart';
 import { logger } from "@/lib/default-logger";
 import type { Quest } from "@/types/analytics/analytics-four";
+import {ZeroMaxScoreChart} from "@/components/dashboard/overview/chart/ZeroMaxScoreChart";
 
 export interface StudentsScoreBarChartProps {
   questProgress: Quest;
 }
 
 export function StudentsScoreBarChart({ questProgress }: StudentsScoreBarChartProps): React.JSX.Element {
-  const userNames = questProgress.students_progress.map((progress) => progress.username);
 
+  const userNames = questProgress.students_progress.map((progress) => progress.username);
   // Updated Mapping with Attempt Status
   const studentScores = questProgress.students_progress.map((progress) => {
     const attempted = progress.highest_score !== null;

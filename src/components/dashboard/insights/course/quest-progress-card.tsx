@@ -11,6 +11,7 @@ import type { Quest } from "@/types/analytics/analytics-four";
 import Typography from "@mui/material/Typography";
 import CardContent from "@mui/material/CardContent";
 import {StudentsScoreBarChart} from "@/components/dashboard/overview/chart/students-score-bar-chart";
+import {ZeroMaxScoreChart} from "@/components/dashboard/overview/chart/ZeroMaxScoreChart";
 
 export interface QuestProgressCardProps {
   questProgress: Quest | null;
@@ -37,7 +38,12 @@ export function QuestProgressCard({ questProgress }: QuestProgressCardProps): Re
       <CardContent sx={{ justifyContent: 'center', alignItems: 'center', flexGrow: 1 }}>
         { questProgress && questProgress.students_progress?.length > 0 ? (
           <Stack>
-            <StudentsScoreBarChart questProgress={questProgress}/>
+            { questProgress.quest_max_score === 0 ?
+              <ZeroMaxScoreChart questProgress={questProgress} />
+              :
+              <StudentsScoreBarChart questProgress={questProgress}/>
+            }
+
           </Stack>
         ) :  questProgress ?
             <Typography variant="body2" align="center" pb={3}>This quest does not have any attempt yet</Typography>

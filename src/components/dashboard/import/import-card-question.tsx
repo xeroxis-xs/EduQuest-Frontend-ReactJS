@@ -27,6 +27,7 @@ interface ImportCardQuestionProps {
 }
 
 interface AnswerAggregate {
+  answerText: string;
   count: number;
   total: number;
   isCorrect: boolean;
@@ -53,8 +54,9 @@ function aggregateUserAnswerAttempts(userAnswerAttempts: UserAnswerAttempt[]): A
   const aggregateData = userAnswerAttempts.reduce<Record<string, QuestionAggregate>>((acc, attempt) => {
     const questionText = attempt.question.text;
     const questionNumber = attempt.question.number;
+    const answerId = attempt.answer.id;
     const answerText = attempt.answer.text;
-    const isCorrect = attempt.answer.is_correct;
+    const isCorrect = attempt.answer.is_correct ?? false; // Default to false if undefined
 
     // Initialize question entry if it doesn't exist
     if (!acc[questionText]) {
@@ -65,8 +67,9 @@ function aggregateUserAnswerAttempts(userAnswerAttempts: UserAnswerAttempt[]): A
     }
 
     // Initialize answer entry if it doesn't exist
-    if (!acc[questionText].answers[answerText]) {
-      acc[questionText].answers[answerText] = {
+    if (!acc[questionText].answers[answerId]) {
+      acc[questionText].answers[answerId] = {
+        answerText,
         count: 0,
         total: 0,
         isCorrect
@@ -74,11 +77,11 @@ function aggregateUserAnswerAttempts(userAnswerAttempts: UserAnswerAttempt[]): A
     }
 
     // Increment total count for the answer
-    acc[questionText].answers[answerText].total += 1;
+    acc[questionText].answers[answerId].total += 1;
 
     // Increment selected count if the answer was selected
     if (attempt.is_selected) {
-      acc[questionText].answers[answerText].count += 1;
+      acc[questionText].answers[answerId].count += 1;
     }
 
     return acc;
@@ -88,7 +91,7 @@ function aggregateUserAnswerAttempts(userAnswerAttempts: UserAnswerAttempt[]): A
     .map(([questionText, { questionNumber, answers }]) => ({
       questionText,
       questionNumber,
-      answers: Object.entries(answers).map(([answerText, { count, total, isCorrect }]) => ({
+      answers: Object.values(answers).map(({ answerText, count, total, isCorrect }) => ({
         answerText,
         isCorrect,
         count,
@@ -98,6 +101,7 @@ function aggregateUserAnswerAttempts(userAnswerAttempts: UserAnswerAttempt[]): A
     }))
     .sort((a, b) => a.questionNumber - b.questionNumber);
 }
+
 
 export function ImportCardQuestion({ questions, onAggregationComplete, newQuestId }: ImportCardQuestionProps): React.JSX.Element {
 
