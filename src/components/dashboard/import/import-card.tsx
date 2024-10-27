@@ -244,6 +244,7 @@ export function ImportCard({ onImportSuccess, courseGroupId }: ImportCardProps):
               <FormLabel htmlFor="quest name">Quest Name</FormLabel>
               <TextField
                 inputRef={questNameRef}
+                defaultValue="Tutorial 1"
                 placeholder="The name of the quest. E.g. 'Week 1 Quiz' or 'Lecture 1 MCQ'"
                 variant='outlined'
                 size='small'
@@ -314,6 +315,7 @@ export function ImportCard({ onImportSuccess, courseGroupId }: ImportCardProps):
               <FormLabel htmlFor="quest description">Quest Description</FormLabel>
               <TextField
                 inputRef={questDescriptionRef}
+                defaultValue="This quest is imported from Wooclap conducted in Week 2"
                 placeholder="The description of the quest. E.g. 'This quest is for tutorial 1 conducted on week 3.'"
                 variant='outlined'
                 multiline

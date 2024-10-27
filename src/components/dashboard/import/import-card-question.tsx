@@ -27,6 +27,7 @@ interface ImportCardQuestionProps {
 }
 
 interface AnswerAggregate {
+  answerId: number;
   answerText: string;
   count: number;
   total: number;
@@ -34,7 +35,10 @@ interface AnswerAggregate {
 }
 
 interface QuestionAggregate {
+  questionId: number;
   questionNumber: number;
+  questionText: string;
+  totalUsers: number;
   answers: Record<string, AnswerAggregate>;
 }
 
@@ -51,56 +55,73 @@ export interface AggregatedResult {
 }
 
 function aggregateUserAnswerAttempts(userAnswerAttempts: UserAnswerAttempt[]): AggregatedResult[] {
-  const aggregateData = userAnswerAttempts.reduce<Record<string, QuestionAggregate>>((acc, attempt) => {
+  // First, determine the number of unique users who attempted each question
+  const usersPerQuestion = userAnswerAttempts.reduce<Record<number, Set<number>>>((acc, attempt) => {
+    const questionId = attempt.question.id;
+    const userQuestAttemptId = attempt.user_quest_attempt_id;
+
+    if (!acc[questionId]) {
+      acc[questionId] = new Set();
+    }
+    acc[questionId].add(userQuestAttemptId);
+
+    return acc;
+  }, {});
+
+  // Now, aggregate the data
+  const aggregateData = userAnswerAttempts.reduce<Record<number, QuestionAggregate>>((acc, attempt) => {
+    const questionId = attempt.question.id;
     const questionText = attempt.question.text;
     const questionNumber = attempt.question.number;
     const answerId = attempt.answer.id;
     const answerText = attempt.answer.text;
-    const isCorrect = attempt.answer.is_correct ?? false; // Default to false if undefined
+    const isCorrect = attempt.answer.is_correct;
 
     // Initialize question entry if it doesn't exist
-    if (!acc[questionText]) {
-      acc[questionText] = {
+    if (!acc[questionId]) {
+      acc[questionId] = {
+        questionId,
+        questionText,
         questionNumber,
+        totalUsers: usersPerQuestion[questionId].size, // Total number of users who attempted this question
         answers: {}
       };
     }
 
     // Initialize answer entry if it doesn't exist
-    if (!acc[questionText].answers[answerId]) {
-      acc[questionText].answers[answerId] = {
+    if (!acc[questionId].answers[answerId]) {
+      acc[questionId].answers[answerId] = {
+        total: usersPerQuestion[questionId].size, // Set total to the number of users who attempted the question
+        answerId,
         answerText,
         count: 0,
-        total: 0,
         isCorrect
       };
     }
 
-    // Increment total count for the answer
-    acc[questionText].answers[answerId].total += 1;
-
     // Increment selected count if the answer was selected
     if (attempt.is_selected) {
-      acc[questionText].answers[answerId].count += 1;
+      acc[questionId].answers[answerId].count += 1;
     }
 
     return acc;
   }, {});
 
-  return Object.entries(aggregateData)
-    .map(([questionText, { questionNumber, answers }]) => ({
+  return Object.values(aggregateData)
+    .map(({ questionText, questionNumber, totalUsers, answers }) => ({
       questionText,
       questionNumber,
-      answers: Object.values(answers).map(({ answerText, count, total, isCorrect }) => ({
+      answers: Object.values(answers).map(({ answerText, count, isCorrect }) => ({
         answerText,
         isCorrect,
         count,
-        total,
-        percentage: ((count / total) * 100).toFixed(2)
+        total: totalUsers, // Set total to the number of users who attempted the question
+        percentage: ((count / totalUsers) * 100).toFixed(2)
       }))
     }))
     .sort((a, b) => a.questionNumber - b.questionNumber);
 }
+
 
 
 export function ImportCardQuestion({ questions, onAggregationComplete, newQuestId }: ImportCardQuestionProps): React.JSX.Element {
@@ -171,8 +192,8 @@ export function ImportCardQuestion({ questions, onAggregationComplete, newQuestI
           a.id === answerId ? { ...a, is_correct: isCorrect } : a
         );
       }
-        // Add the new changed answer
-        return [...prev, { id: answerId, text, is_correct: isCorrect, reason }];
+      // Add the new changed answer
+      return [...prev, { id: answerId, text, is_correct: isCorrect, reason }];
 
     });
   };
@@ -211,6 +232,7 @@ export function ImportCardQuestion({ questions, onAggregationComplete, newQuestI
       const response = await getUserAnswerAttemptByQuest(questId.toString());
       const aggregatedResults = aggregateUserAnswerAttempts(response);
       onAggregationComplete(aggregatedResults, response);
+      logger.debug('aggregatedResults', aggregatedResults);
       // logger.debug('All answer attempts for this quest', response);
     } catch {
       logger.error('Error getting all answer attempts for this quest');
@@ -254,13 +276,13 @@ export function ImportCardQuestion({ questions, onAggregationComplete, newQuestI
                         <Checkbox
                           checked={answer.is_correct}
                           onChange={(e) =>
-                            { handleAnswerChange(
-                              question.id,
-                              answer.id,
-                              answer.text,
-                              answer.reason,
-                              e.target.checked
-                            ); }
+                          { handleAnswerChange(
+                            question.id,
+                            answer.id,
+                            answer.text,
+                            answer.reason,
+                            e.target.checked
+                          ); }
                           }
                         />
                       }
