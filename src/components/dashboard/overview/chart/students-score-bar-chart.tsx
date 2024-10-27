@@ -4,7 +4,6 @@ import type { ApexOptions } from 'apexcharts';
 import { Chart } from '@/components/core/chart';
 import { logger } from "@/lib/default-logger";
 import type { Quest } from "@/types/analytics/analytics-four";
-import {ZeroMaxScoreChart} from "@/components/dashboard/overview/chart/ZeroMaxScoreChart";
 
 export interface StudentsScoreBarChartProps {
   questProgress: Quest;
